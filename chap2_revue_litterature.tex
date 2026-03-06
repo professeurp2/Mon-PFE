@@ -1,0 +1,105 @@
+% !TEX root = ../main.tex
+\chapter{État de l'art et Revue de la Littérature}
+\label{chap:etat_art}
+
+\section{Généralités sur la Commande Numérique par Calculateur (CNC)}
+La Commande Numérique par Calculateur (CNC) se définit comme le pilotage automatisé des mouvements et des fonctions auxiliaires d'une machine-outil par microprocesseur, via l'interprétation d'un programme d'instructions textuelles (G-Code). Depuis les travaux pionniers de John T. Parsons (qui a utilisé des cartes perforées pour usiner des pales d'hélicoptère dans les années 1940), la CNC a évolué de systèmes câblés immenses et rigides vers des architectures logicielles distribuées, flexibles et miniaturisées.
+
+\subsection{Principe d'asservissement d'un système CNC}
+Un système CNC moderne s'articule autour d'une chaîne de commande comportant trois unités principales agissant en synergie :
+\begin{enumerate}
+    \item \textbf{L'Unité de Traitement des Données (Data Processing Unit - DPU) :} Elle correspond au logiciel IHM. Elle lit le fichier de commande numérique, l'analyse, simule la trajectoire et l'envoie de manière séquencée.
+    \item \textbf{L'Unité de Contrôle (Control Loop Unit - CLU) :} C'est le « cerveau interne » (le microcontrôleur sur la machine). Il reçoit les données du DPU, calcule la cinématique, gère les accélérations (planner) et génère les signaux électriques logiques (Step/Direction ou signaux PWM).
+    \item \textbf{L'Unité de Puissance et d'Actionnement :} Composée de drivers (variateurs) qui amplifient les signaux logiques de la CLU, et de moteurs électriques transmettant les couples et mouvements aux axes physiques.
+\end{enumerate}
+
+\section{Classification Architecturale des Machines CNC 5 Axes}
+Le passage d'une machine 3 axes à une machine 5 axes introduit une complexité majeure dans la chaîne cinématique. Pour qu'une fraise puisse atteindre n'importe quel point d'une pièce sous n'importe quel angle, deux axes de rotation (généralement nommés A, B ou C) doivent s'ajouter aux trois translations (X, Y, Z). Il existe trois grandes familles d'architectures pour les machines 5 axes, classées selon l'emplacement de ces deux axes rotatifs. Chaque configuration présente des avantages mécaniques spécifiques.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        node distance=2.5cm and 1.8cm,
+        box/.style={rectangle, draw, rounded corners=4pt, align=center, fill=blue!5, minimum width=3.8cm, minimum height=1.8cm, thick},
+        title/.style={font=\bfseries\small},
+        desc/.style={font=\footnotesize, text width=3.8cm, align=center},
+        arrow/.style={-{Stealth[scale=1.2]}, thick, color=gray!80}
+    ]
+        % Table-Table
+        \node[box] (table_table) {
+            \textbf{Table-Table}\\(Trunnion)
+        };
+        \node[below=0.2cm of table_table, desc, align=center] {Rotations A et C sur la table.\\Meilleure rigidité.};
+        
+        % Head-Head
+        \node[box, right=1cm of table_table] (head_head) {
+            \textbf{Head-Head}\\(Tête Pivotante)
+        };
+        \node[below=0.2cm of head_head, desc, align=center] {Rotations A et C sur la broche.\\Pièces volumineuses.};
+        
+        % Head-Table
+        \node[box, right=1.5cm of head_head] (head_table) {
+            \textbf{Head-Table}\\(Hybride)
+        };
+        \node[below=0.2cm of head_table, desc] {Répartition des rotations\\(mixte Tête / Table).};
+        
+        % Flèches
+        \draw[arrow] (table_table.east) -- (head_head.west) node[midway, above, font=\scriptsize, color=black] {Cinématique};
+        \draw[arrow] (head_head.east) -- (head_table.west) node[midway, above, font=\scriptsize, color=black] {Compromis};
+
+    \end{tikzpicture}
+    \caption{Comparaison schématique des topologies CNC 5 axes}
+    \label{fig:topo_5axes}
+\end{figure}
+\subsection{Configuration "Table-Table" (Trunnion Table ou Table Basculante)}
+Dans cette architecture, les deux axes rotatifs (souvent l'axe A pour le basculement et l'axe B ou C pour la rotation continue) sont emboîtés l'un dans l'autre et supportent la table de travail sur laquelle la pièce est fixée.
+\begin{itemize}
+    \item \textbf{Cinématique :} L'outil se déplace linéairement en X, Y et Z. C'est la pièce à usiner qui tourne (Pan) et bascule (Tilt) face à l'outil.
+    \item \textbf{Avantages :} Cette configuration offre la meilleure rigidité globale (la tête de broche ne bouge pas, évitant les porte-à-faux) et garantit une excellente précision sur les petites pièces compactes.
+    \item \textbf{Limites :} Le volume de la pièce et son poids sont strictement limités par le diamètre du plateau rotatif et le couple des moteurs de basculement.
+\end{itemize}
+C'est l'architecture que nous avons retenue pour notre projet didactique.
+
+\subsection{Configuration "Head-Head" (Tête Pivotante ou Bi-Rotative)}
+Ici, la table supportant la pièce est fixe (ou ne se déplace qu'en translation). Les deux axes rotatifs sont intégrés intégralement dans la tête qui supporte la broche.
+\begin{itemize}
+    \item \textbf{Cinématique :} L'outil se déplace en translation et s'incline dans toutes les directions.
+    \item \textbf{Avantages :} Parfaitement adaptée à l'usinage de pièces de très grandes dimensions et très lourdes (moules géants, longerons d'avion) car le poids de la pièce n'influe pas sur la dynamique spatiale.
+    \item \textbf{Limites :} En raison de l'empilement complexe dans la tête (moteurs, broche lourde), la rigidité angulaire diminue. Le bras de levier important amplifie considérablement la moindre erreur angulaire, exigeant des éléments mécaniques hors de prix.
+\end{itemize}
+
+\subsection{Configuration "Head-Table" (Hybride)}
+Cette architecture répartit les rotations. Généralement, l'axe de basculement est fixé sur la tête de la broche, et l'axe de rotation continue est placé sur une table tournante. Cette solution hybride permet un compromis intéressant pour les machines de taille moyenne, mais complexifie sérieusement les algorithmes de compensation et de Homing.
+
+\section{Les Technologies Mécaniques de Transmission}
+Dans une CNC 5 axes, la moindre imprécision locale fausse l'entièreté de l'assemblage (accumulation d'erreurs). Le passage du mouvement de rotation des actionneurs au mouvement linéaire doit être le plus parfait possible.
+\begin{enumerate}
+    \item \textbf{Les Courroies Crantées (ex: GT2) :} Très répandues dans le prototypage 3D, elles sont rapides et économiques. Toutefois, leur manque de rigidité (élongation sous charge, effet élastique) les rend inadaptées aux résonances vibratoires inhérentes au fraisage, et encore moins au poids contraint d'une architecture Trunnion.
+    \item \textbf{Les Vis à Billes (Ball Screws) :} L'écrou circule sur la vis garnie de billes en acier recyclant perpétuellement dans un circuit fermé. Cette technologie offre un rendement supérieur à $90\%$, une friction presque nulle, une rigidité très élevée face aux charges axiales (efforts de coupe) et une usure insignifiante. Leur utilisation est impérative pour garantir la précision requise par l'usinage 5 axes.
+\end{enumerate}
+
+\section{L'Écosystème Logiciel et le Langage G-Code 5 Axes}
+
+\subsection{La Chaîne Numérique 5 Axes}
+Le flux de données d'une pièce usinée numériquement passe par trois phases :
+\begin{itemize}
+    \item \textbf{CAO (Conception Assistée par Ordinateur) :} Le concepteur crée le modèle 3D de la pièce.
+    \item \textbf{FAO (Fabrication Assistée par Ordinateur) :} Le programmeur génère les parcours d'outil. En 5 axes, on distingue deux méthodes d'usinage : le \textit{3+2 axes} (Usinage Positionnel) où l'outil s'incline puis usine, et le \textit{5 axes continus} (simultané).
+    \item \textbf{Le Post-Processeur :} Il traduit la géométrie (vecteurs de l'outil I, J, K) en positions angulaires réelles (A, B) des moteurs de la machine spécifique.
+\end{itemize}
+
+\subsection{Le Langage G-Code (Norme ISO 6983)}
+C'est le langage universel de la commande numérique. Un programme est une suite alphabétique de blocs d'instructions. En multi-axes, un bloc ressemble à ceci : 
+\texttt{G01 X15.5 Y0.0 Z-5.0 A45.0 B90.0 F800}
+Le logiciel interpréteur (Parser) que nous développerons devra décoder méticuleusement chacune de ces lignes asynchrones.
+
+\section{État de l'art de l'Unité de Traitement Logiciel (Le Choix du Cerveau)}
+L'intelligence de la machine réside dans son unité de traitement. Pour opérer une machine 5 axes "open-source", trois grandes écoles s'affrontent :
+\begin{itemize}
+    \item \textbf{L'école Arduino 8 bits (GRBL Classique) :} Extrêmement populaire pour les graveurs lasers 3 axes, l'Arduino Uno n'a qu'un cœur, 32 ko de mémoire, et ne possède pas assez de Timers matériels indépendants pour générer simultanément des signaux propres pour 5 moteurs. Totalement inadapté à notre projet.
+    \item \textbf{L'école PC + FPGA (LinuxCNC) :} Solution industrielle robuste mais très complexe à configurer et onéreuse.
+    \item \textbf{L'école Architecture 32-bits RTOS (L'ESP32) :} C'est le compromis parfait et le choix validé pour ce PFE. Le microcontrôleur ESP32 possède deux cœurs opérant à 240 MHz. L'utilisation d'un RTOS permet de dédier le Cœur 0 aux communications réseau et à l'IHM, tandis que le Cœur 1 ne s'occupe QUE du calcul de la cinématique et de la génération des impulsions (Stepper Pulses).
+\end{itemize}
+
+\section{Conclusion du chapitre}
+Le passage de 3 à 5 axes exige une refonte totale de la géométrie de la machine (table Trunnion), des solutions de transmissions strictes (Vis à billes), et surtout, d'une rupture architecturale en matière de puissance de calcul embarquée (ESP32). Le chapitre suivant s'attachera à formaliser précisément ce besoin et à déterminer les calculs de sollicitations mécaniques de la future CNC.

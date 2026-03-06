@@ -1,0 +1,258 @@
+% !TEX root = ../main.tex
+\chapter{Étude Technique et Dimensionnement Mécanique (RDM)}
+\label{chap:conception_mec}
+
+Ce chapitre constitue le cœur de la justification physique du projet. Le passage d'une modélisation 3 axes à une architecture 5 axes "Table-Table" (Trunnion) modifie profondément la distribution des contraintes. La surélévation du centre de gravité engendre des moments de basculement importants qui nécessitent un dimensionnement rigoureux de la structure, des guidages et des organes de transmission.
+
+% ========================================================
+\section{Analyse Fonctionnelle du Besoin (AFB)}
+
+\subsection{Saisie du besoin et Graphe des interactions}
+La mini-fraiseuse CNC 5 axes s'insère dans un environnement comprenant l'utilisateur, la ressource informatique, l'outil de coupe et l'environnement d'atelier.
+La \textbf{Fonction Principale (FP)} est la suivante : Permettre l'usinage automatique 3D (sous tous les angles) et précis d'une pièce brute face à un outil rotatif tridimensionnel, en synchronisant 5 axes simultanément depuis un ordinateur.
+
+Les \textbf{Fonctions Contraintes Phares (FC)} s'articulent autour de :
+\begin{itemize}
+    \item \textbf{FC1 :} Assurer une rigidité structurelle pour absorber les vibrations de coupe sans déformation plastique (Critère de Von Mises).
+    \item \textbf{FC2 :} Traiter les calculs cinématiques en temps réel sans dépassement de contrainte inertielle sur les axes de rotation.
+    \item \textbf{FC3 :} Garantir la reproductibilité des mouvements en annihilant le \textit{Backlash} (Jeu d'inversion) mécanique.
+\end{itemize}
+
+\subsection{Cahier des Charges Qualitatif et Quantitatif}
+
+Le tableau suivant condense les paramètres du prototypage :
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|c|p{5cm}|}
+\hline
+\textbf{Sous-système} & \textbf{Niveau visé} & \textbf{Tolérance / Remarque} \\ \hline
+\textbf{Zone de travail} & $X=200$ mm, $Y=200$ mm, $Z=150$ mm & Volume opératoire \\ \hline
+\textbf{Cinématique Plateau} & Axe A (Tilt) : $\pm 90^\circ$ / Axe B (Pan) : $360^\circ$ & Interverrouillage logiciel \\ \hline
+\textbf{Précision Tolérée} & Linéaire $\pm 0.05$ mm / Angulaire $< 0.1^\circ$ & Cumul des jeux \\ \hline
+\textbf{Matériau à usiner} & Résine, Bois Dur, Aluminium (AW-2017) & Dureté max $110$ HB \\ \hline
+\textbf{Transmissions linéaires}& Vis à billes SFU1605 (Pas 5mm) & Rendement $\eta>90\%$ \\ \hline
+\textbf{Guidages linéaires} & Rails profilés à recirculation de billes (HGR15) & Tolérance géométrique \\ \hline
+\end{tabular}
+\caption{Cahier des charges mécanique de la CNC 5 axes Trunnion.}
+\label{tab:cdcf_meca}
+\end{table}
+
+% ========================================================
+\section{Architecture retenue : La table basculante (Trunnion)}
+Le choix s'est porté sur l'architecture où la table porte les axes A et B. L'axe Z porte la broche et se déplace sur le portique en X. La table globale se déplace en translation sur l'axe Y.
+
+Le \textbf{berceau (Axe A)} est fixé sur le chariot Y. Il bascule de l'avant vers l'arrière. Au centre de ce berceau, un \textbf{plateau rotatif (Axe B)} maintient la pièce. 
+L'avantage majeur réside dans la rigidité de la tête (le portique X-Z est massif). Le principal inconvénient, traité dans les preuves de dimensionnement qui suivent, est la contrainte de basculement subie par le chariot Y en plein usinage transversal.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        % Remplacer "placeholder_cad_gantry.png" par l'image Solidworks
+        \includegraphics[width=\linewidth, draft]{placeholder_cad_gantry.png}
+        \caption{Vue CAO du portique (Axes X, Y, Z)}
+        \label{fig:cad_gantry}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        % Remplacer "placeholder_cad_trunnion.png" par l'image Solidworks
+        \includegraphics[width=\linewidth, draft]{placeholder_cad_trunnion.png}
+        \caption{Vue CAO de la table Trunnion (Axes A, B)}
+        \label{fig:cad_trunnion}
+    \end{minipage}
+\end{figure}
+
+% ========================================================
+\section{Étude des efforts de coupe (Modélisation de la force de coupe)}
+
+Pour dimensionner l'ensemble des axes, il faut évaluer la charge imposée par l'arrachement de matière. L'étude prend, pour cas le plus défavorable, le fraisage d'une pièce en alliage d'Aluminium avec une vitesse de coupe conventionnelle.
+
+Soient les paramètres de coupe suivants :
+\begin{itemize}
+    \item Diamètre de fraise ($D_c$) : $6 \text{ mm}$ (à 2 dents, $Z_c = 2$)
+    \item Profondeur de passe radiale ($a_e$) : $6 \text{ mm}$ (Plein bord)
+    \item Profondeur de passe axiale ($a_p$) : $1 \text{ mm}$
+    \item Avance par dent ($f_z$) : $0.05 \text{ mm/dent}$
+    \item Vitesse de coupe ($V_c$) : $150 \text{ m/min}$ (Pour l'aluminium)
+    \item Pression spécifique de coupe ($k_c$) de l'aluminium : $\approx 700 \text{ N/mm}^2$
+\end{itemize}
+
+\subsection{Calcul de la Section de Copeau et de la Force Tangentielle}
+La section du copeau non déformé est donnée par :
+\begin{equation}
+    A_D = a_p \times f_z = 1 \times 0.05 = 0.05 \text{ mm}^2
+\end{equation}
+
+La Force de coupe tangentielle principale ($F_c$) est calculée par le modèle de Kienzle-Victor formel :
+\begin{equation}
+    F_c = k_{c1.1} \cdot b \cdot h^{1-z_{mc}}
+\end{equation}
+En première approche pour une évaluation maximale de PFE, nous utilisons la formule de pression massique directe :
+\begin{equation}
+    F_c = k_c \times A_D \times Z_{en\_prise} = 700 \times 0.05 \times 1 = 35 \text{ N}
+\end{equation}
+Cependant, pour intégrer l'usure de l'outil et les vibrations d'entrée en matière (Coefficient de sécurité $K_s = 2.5$), nous dimensionnons l'ensemble mécanique pour résister à une force de coupe appliquée ponctuellement de :
+\begin{equation}
+    \mathbf{F_{max\_coupe}} = 100 \text{ N}
+\end{equation}
+
+% ========================================================
+\section{Dimensionnement des Arbres de Transmission (Vis à billes)}
+
+Pour répondre aux contraintes de Homing et de précision continue en contournage 5 axes, le système d'entraînement par courroie crantée (type GT2) est écarté au profit de \textbf{Vis à Billes type SFU1605} (Diamètre Nominale $D_N = 16 \text{ mm}$, Pas $P_h = 5 \text{ mm}$). 
+Nous validons mathématiquement ce choix.
+
+\subsection{Détermination de la force axiale sur la Vis}
+Pour l'axe $X$ (Portant la broche), la force axiale ($F_{ax}$) à vaincre pour déplacer la masse $M \approx 10 \text{ kg}$ de la tête est la somme de la force d'inertie de l'accélération ($F_a$), du frottement des chariots guidés ($F_f$) et de la résistance de coupe tangentielle compensée :
+
+\begin{equation}
+    F_{ax} = F_c + F_f + F_{accel}
+\end{equation}
+
+\begin{itemize}
+    \item Frottement : $F_f = \mu \times M \times g = 0.005 \times 10 \times 9.81 = 0.49 \text{ N}$ (Négligeable grâce au guidage linéaire à billes).
+    \item Accélération : Pour $A = 0.5 \text{ m/s}^2$ $\rightarrow F_{accel} = 10 \times 0.5 = 5 \text{ N}$.
+\end{itemize}
+La force axiale prépondérante reste donc l'effort antagoniste de l'usinage (100 N). Soit $\mathbf{F_{ax} = 105.5 \text{ N}}$.
+
+\subsection{Vérification au Flambage (Critère d'Euler)}
+La vis à billes est modélisée comme une poutre cylindrique soumise à une compression axiale importante. Sa longueur libre maximale (axe X) est de $L_f = 400 \text{ mm}$.
+Nous appliquons la formule d'Euler pour une vis bloquée/libérée (montage avec roulement d'extrémité flottant) :
+\begin{equation}
+    F_k = \frac{\pi^2 \cdot E \cdot I}{(k_L \cdot L_f)^2}
+\end{equation}
+Avec :
+\begin{itemize}
+    \item $E$ : Module de Young de l'acier ($210 \times 10^3 \text{ N/mm}^2$)
+    \item $d_{min}$ : Diamètre à fond de filet de la vis SFU1605 ($\approx 12.9 \text{ mm}$)
+    \item $I$ : Moment quadratique de la section $\left(I = \frac{\pi \cdot d_{min}^4}{64} \approx 1358.5 \text{ mm}^4\right)$
+    \item $k_L$ : Facteur d'appui (fixe / appui simple $\approx 0.707$)
+\end{itemize}
+
+Calcul de la charge d'Euler :
+\begin{equation}
+    F_k = \frac{3.1415^2 \times 210000 \times 1358.5}{(0.707 \times 400)^2} = \frac{2.81 \cdot 10^{9}}{79975} = \mathbf{35~218 \text{ N}} \approx 3.5 \text{ Tonnes}
+\end{equation}
+Puisque $F_{ax\_reelle} (105\text{ N}) \ll F_{k} (35218\text{ N})$, la sécurité spatiale au flambage est infinie. La vis $d=16\text{mm}$ est même largement sur-dimensionnée pour notre application, mais nécessaire pour garantir l'absence totale d'élasticité en flexion et contrer l'erreur de "Backlash".
+
+\subsection{L'Effet Bras de Levier (Table Trunnion) et Couple de Renversement}
+Le phénomène majeur spécifique au mode 5 axes est la décentration du point d'application de $F_c$.
+
+La présence du berceau rotatif (Table Trunnion) élève le centre de gravité de la pièce par rapport aux rails Y. La force se trouvant à une hauteur $H \approx 200 \text{ mm}$, elle crée un moment de renversement asymétrique dit "Torque twist" sur le plateau de l'axe Y :
+\begin{equation}
+    M_{renversement} = F_c \times H = 100 \text{ N} \times 0.2 \text{ m} = \mathbf{20 \text{ Nm.}}
+\end{equation}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        force/.style={-{Stealth[scale=1.2]}, thick, red},
+        arm/.style={thick, fill=blue!5, draw=black},
+        axis/.style={dash dot, gray}
+    ]
+        % Base
+        \draw[arm] (-3,-0.5) rectangle (3,0);
+        \node[below] at (0,-0.5) {Chariot Y (Guidages linéaires)};
+        
+        % Bras Trunnion
+        \draw[arm] (-0.5,0) rectangle (0.5,3);
+        \node[right, align=left, font=\footnotesize] at (0.6, 1.5) {Berceau \\(Hauteur $H$)};
+        
+        % Pièce/Plateau
+        \draw[arm, fill=gray!20] (-2,3) rectangle (2,3.5);
+        \node at (0,3.25) {Pièce à usiner};
+        
+        % Force de coupe
+        \draw[force] (-3,3.5) -- (-1.5,3.5) node[midway, above] {$F_c$};
+        
+        % Moment
+        \draw[-{Stealth[scale=1.2]}, thick, blue] (-1, 0.5) arc[start angle=150, end angle=30, radius=1.2] node[midway, above] {$M_{renversement}$};
+        
+        % Cotes
+        \draw[|<->|] (0.8,0) -- (0.8,3) node[midway, right] {$H \approx 200$ mm};
+
+    \end{tikzpicture}
+    \caption{Schéma du torseur des efforts et du moment de renversement sur le chariot Y}
+    \label{fig:torseur_trunnion}
+\end{figure}
+
+Un simple profilé avec des roues Polycarbonate (V-Wheel) fléchirait, perdant la perpendicularité requise pour le $5^{eme}$ axe.
+Cela justifie techniquement l'achat de vrais \textbf{Rails Linéaires à Recirculation de Billes type HGR15} capables d'encaisser un couple résistant de $90$ Nm avec des patins précontraints statiquement pour bloquer cette flexion.
+
+% ========================================================
+\section{Dimensionnement des moteurs d'entraînement (NEMA)}
+
+Le choix du moteur d'axe découle directement de la conservation de l'énergie.
+L'équation fondamentale d'accouplement moteur-vis à billes relie l'effort axial $F_{ax}$ au couple moteur résistant $C_r$ par le pas de la vis $P_h$ et son rendement $\eta \approx 0.9$ :
+
+\begin{equation}
+    C_{r\_continu} = \frac{F_{ax} \cdot P_h}{2\pi \cdot \eta}
+\end{equation}
+\begin{equation}
+    C_{r\_continu} = \frac{105 \times 0.005}{2\pi \times 0.9} = \mathbf{0.093 \text{ Nm}}
+\end{equation}
+
+Toutefois, ce calcul néglige le couple d'inertie ($C_J$) indispensable pour accélérer de zéro la masse de l'écrou et du plateau.
+\begin{equation}
+    C_J = \left( J_{moteur} + J_{vis} + M \cdot \left(\frac{P_h}{2\pi}\right)^2 \right) \cdot \frac{d\omega}{dt}
+\end{equation}
+L'ensemble de ces couples d'inertie demande environ $0.15 \text{ Nm}$ en point d'accélération maximale.
+Le couple de maintien (\textit{Holding Torque}) d'un moteur doit être supérieur de $50\%$ au couple dynamique pour éviter toute de glissement de pôle (perte de pas).
+\begin{equation}
+    C_{maintien\_Requis} = (C_{r\_continu} + C_J) \times 1.5 = (0.093 + 0.15) \times 1.5 \approx \mathbf{0.36 \text{ Nm}}.
+\end{equation}
+
+\textbf{Conclusion pour les axes linéaires :} Le choix se porte sur les \textbf{moteurs pas-à-pas NEMA 17} standards (NEMA17 17HS4401) qui délivrent un Holding Torque de $0.45 \text{ Nm}$ ou $0.59 \text{ Nm}$. Ce couple satisfait intégralement le critère mécanique pour l'entraînement des axes linéaires.
+
+% ========================================================
+\section{Dimensionnement des Transmissions Rotatives (Axes A et B)}
+
+C'est ici que l'erreur goniométrique d'une machine 5 axes (le levier angulaire) détruit silencieusement la pièce.
+
+\subsection{Problématique d'entraînement rotatif et "Backlash angulaire"}
+Une erreur angulaire infinitésimale $\Delta \theta$ du moteur sur l'axe A (Basculement) se traduit par une erreur linéaire tangentielle $\Delta L$ importante à l'extrémité du plateau.
+Soit l'équation :
+\begin{equation}
+    \Delta L = R \cdot \tan(\Delta \theta)
+\end{equation}
+Avec un rayon d'encombrement de plateau Trunnion $R = 100 \text{ mm}$.
+Si le moteur subit un "Backlash" de seulement $1^\circ$ (soit $0.0174 \text{ rad}$) dans son réducteur, l'arrachement à l'autre bout de la pièce est :
+\begin{equation}
+    \Delta L = 100 \times \tan(1^\circ) = \mathbf{1.74 \text{ mm d'erreur de positionnement}}.
+\end{equation}
+
+\subsection{Solutions de réduction}
+Par conséquent, une transmission par courroie standard (trop souple) ou "Direct Drive" (couple $0.5\text{Nm}$ trop faible pour tenir au freinage une pièce excentrée de 1kg) est rejetée.
+Nous dimensionnons \textbf{un étage de Réducteurs à Roue et vis sans fin et/ou courroies à denture fermée}.
+Afin de minimiser le jeu, un rapport global de de réduction de $1:50$ est assigné à l'Axe B.
+Ainsi, la résolution micrométrique obtenue avec le \textit{Micro-stepping} ($1/16_{ème}$) sur l'ESP32 donne :
+\begin{equation}
+    \text{Pas Angulaire} = \frac{1.8^\circ \text{ (Pas NEMA)}}{16 \text{ (Microstep)} \times 50 \text{ (Réduction)}} = \mathbf{0.00225^\circ \text{ par impulsion électronique}}.
+\end{equation}
+À cette résolution, l'erreur de tangence de $100\text{mm}$ (Levier) n'est plus que de $0.003\text{mm}$, ce qui entre parfaitement dans les tolérances exigées.
+
+% ========================================================
+\section{Étude de Résistance Des Matériaux (RDM) de l'Infrastructure}
+
+L'ossature se compose de profilés constructeurs modulaires en aluminium type V-Slot $2040$ et $2080$.
+
+\subsection{Déflexion maximale du Portique (Axe X)}
+Le portique en X (longueur $L=400 \text{ mm}$) agit comme une poutre sur deux appuis simples supportant une charge centrale (Tête d'usinage Z + Moteur de broche de $1\text{ kg}$). L'effort normal inclut le poids $P \approx 40 \text{ N}$ et une réaction dynamique d'usinage de $100 \text{ N}$, soit $F_{max} = 140 \text{ N}$.
+La flèche maximale (déflexion $\delta$) est régie par la formule :
+\begin{equation}
+    f_{max} = \frac{F_{max} \cdot L^3}{48 \cdot E_{alu} \cdot I_{yy}}
+\end{equation}
+Où $I_{yy}$ est le moment d'inertie quadratique du profilé V-Slot $20 \times 80 \text{ mm}$ soumis à torsion transversale.
+Estimons $I_{yy}$ pour un plein rectangle plein (modèle grossier pour l'aluminium $6063-T5$) : $I_{yy} \approx \frac{b h^3}{12}$.
+En utilisant les données constructeurs effectives d'extrusion de l'alliage V-Slot, nous avons $I_{yy} \approx 6.5 \cdot 10^4 \text{ mm}^4$. Pour l'Aluminium, $E = 69~000 \text{ MPa}$.
+
+\begin{equation}
+    f_{max} = \frac{140 \times (400)^3}{48 \times 69000 \times 65000} = \frac{140 \times 64~000~000}{2.15 \cdot 10^{11}} = \mathbf{0.041 \text{ mm}}
+\end{equation}
+Cette flexion est inférieure au dixième de millimètre ($40 \mu m$). Le choix des profilés $2080$ pour le portique valide le critère de très haute rigidité.
+
+% ========================================================
+\section{Conclusion sur l'Étude Mécanique}
+Les calculs formels de dimensionnement confirment sans ambiguïté les réquisitions initiales du cahier des charges. L'utilisation d'une conception modulaire basée sur des profilés massifs, associés à l'inéluctable nécessité d'utiliser des Vis à Billes de grand diamètre et des trains réducteurs, limite l'erreur cumulée à l'échelle du centième de millimètre. 
+Cependant, l'inertie générée par ces lourds mécanismes mécaniques implique l'utilisation d'un système de contrôle commande robuste, que nous analysons et programmons dans les chapitres d'architecture mécatronique et de développement informatique à venir.

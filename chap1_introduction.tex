@@ -1,0 +1,92 @@
+% !TEX root = ../main.tex
+\chapter*{Introduction Générale}
+\addcontentsline{toc}{chapter}{Introduction Générale}
+\label{chap:intro}
+
+\section*{Contexte et Justification du Projet}
+L'industrie manufacturière mondiale traverse une phase de mutation sans précédent, portée par des exigences de précision millimétrique, de flexibilité accrue et de réduction des temps de cycle. Au centre de cette dynamique, la Machine-Outil à Commande Numérique (MOCN) s'est imposée comme l'équipement indispensable à la production moderne. Si les architectures à trois axes ont longtemps dominé le marché pour la majorité des opérations d'usinage, l'émergence de besoins de plus en plus complexes - notamment dans les secteurs de l'aéronautique, du médical, et de la mécanique de précision - a propulsé la technologie d'usinage 5 axes au premier plan.
+
+Cependant, aborder la conception d'une CNC 5 axes constitue un défi d'intégration mécatronique majeur. Il ne s'agit plus seulement de contrôler des translations linéaires, mais d'assurer la synchronisation parfaite de cinq degrés de liberté (trois translations et deux rotations) via un logiciel de commande capable de traiter des calculs de cinématique inverse en temps réel.
+
+\section*{Évolution du Concept d'Industrie et Enjeux Locaux}
+Le terme « industrie » a connu plusieurs ruptures technologiques. Comprendre ces évolutions permet de situer la pertinence de ce Projet de Fin d'Études (PFE) :
+\begin{itemize}
+    \item \textbf{L'Industrie 1.0 et 2.0 :} Fondées sur l'énergie thermique puis électrique, elles ont permis la naissance de la machine-outil, mais celle-ci restait asservie à la main de l'homme.
+    \item \textbf{L'Industrie 3.0 :} Elle a introduit l'informatique de gestion et l'automatisation. C'est l'époque des CNC "boîtes noires" où l'utilisateur est totalement dépendant des constructeurs de contrôleurs propriétaires.
+    \item \textbf{L'Industrie 4.0 :} Elle marque l'avènement des systèmes cyber-physiques. La machine devient un nœud communicant. C'est dans ce paradigme que s'inscrit notre projet : créer une machine intelligente, dont le code source est ouvert, adaptable et pilotable via des interfaces modernes (Wi-Fi, IHM sur tablette).
+\end{itemize}
+
+L'usinage multiaxes est le bras armé de cette nouvelle industrie. En permettant l'orientation spatiale de l'outil, la CNC 5 axes supprime de multiples montages/démontages de la pièce, garantissant une meilleure précision géométrique (tolérances de forme restrictives).
+
+\begin{figure}[htbp]
+    \centering
+    % Placeholder pour une image de CNC 5 axes
+    % Remplacer "placeholder_cnc5axes.png" par l'image réelle
+    \includegraphics[width=0.7\textwidth, draft]{placeholder_cnc5axes.png} 
+    \caption{Concept d'usinage sur un centre CNC 5 axes (Table Trunnion)}
+    \label{fig:concept_5axes}
+\end{figure}
+
+\section*{Problématique}
+L'acquisition de centres d'usinage 5 axes reste un luxe technologique, souvent inaccessible pour beaucoup de structures de formation, de FabLabs ou de petites unités de production, particulièrement dans les pays en développement comme le Mali. Cette barrière d'entrée n'est pas seulement financière (coût d'achat et d'entretien des machines industrielles), mais aussi logicielle. 
+Les systèmes propriétaires (Fanuc, Heidenhain, Siemens) interdisent toute modification algorithmique de bas niveau, limitant l'apprentissage profond de la mécatronique de commande pour les étudiants et ingénieurs.
+
+La problématique qui sous-tend ce mémoire est donc la suivante : \textbf{Comment concevoir et réaliser localement, à moindre coût, une mini-fraiseuse CNC 5 axes et développer l'intégralité de son environnement logiciel (de la cinématique inverse sur microcontrôleur 32 bits jusqu'à l'Interface Homme-Machine multiplateforme) pour obtenir un système d'usinage didactique, performant et ouvert ?}
+
+\section*{Objectifs du Projet}
+L'objectif principal est la réalisation de A à Z d'un prototype fonctionnel de CNC 5 axes piloté par un logiciel propriétaire (développé "from scratch"). Les objectifs spécifiques se déclinent comme suit :
+\begin{enumerate}
+    \item \textbf{Conception Mécanique :} Dimensionnement d'une structure rigide de type "Table basculante et rotative" (Trunnion Table) permettant d'abriter les axes A et B sans perte de précision.
+    \item \textbf{Architecture Électronique :} Intégration d'un microcontrôleur hautement performant (ESP32 à double cœur) capable de soutenir les calculs matriciels en temps réel, couplé à des composants fiables (Vis à billes, Moteurs pas-à-pas NEMA de précision).
+    \item \textbf{Développement Logiciel Embarqué (Firmware) :} Implémentation algorithmique en C/C++ de la cinématique inverse et de la génération d'impulsions à très haute fréquence via RTOS.
+    \item \textbf{Développement Logiciel IHM :} Création d'une Interface de commande (Sender) en langage Dart/Flutter, permettant une communication fluide, asynchrone (JSON) et multiplateforme (Windows/Android) avec la machine.
+\end{enumerate}
+
+\section*{Planification du Projet}
+Afin de mener à bien ce projet ambitieux, une planification rigoureuse a été établie. Le diagramme de Gantt ci-dessous illustre les différentes phases clés de la réalisation : de l'étude bibliographique à la validation finale des performances d'usinage.
+
+\begin{figure}[htbp]
+    \centering
+    \resizebox{\textwidth}{!}{
+    \begin{ganttchart}[
+        y unit title=0.6cm,
+        y unit chart=0.7cm,
+        x unit=0.8cm,
+        vgrid,
+        time slot format=isodate-yearmonth,
+        time slot unit=month,
+        title/.append style={fill=blue!10},
+        title label font=\bfseries\footnotesize,
+        bar/.append style={fill=blue!50, rounded corners=2pt},
+        bar label font=\footnotesize,
+        group/.append style={fill=black},
+        group label font=\bfseries\footnotesize
+    ]{2023-09}{2024-06}
+        \gantttitlecalendar{year, month=shortname} \\
+        \ganttgroup{Phase 1: Étude \& État de l'art}{2023-09}{2023-11} \\
+        \ganttbar{Recherches bibliographiques}{2023-09}{2023-10} \\
+        \ganttbar{Choix de l'architecture}{2023-10}{2023-11} \\
+        \ganttgroup{Phase 2: Conception (CAO \& Ajustements)}{2023-11}{2024-02} \\
+        \ganttbar{Modélisation Trunnion \& Gantry}{2023-11}{2024-01} \\
+        \ganttbar{Dimensionnement mécanique}{2024-01}{2024-02} \\
+        \ganttgroup{Phase 3: Développement Logiciel}{2023-12}{2024-04} \\
+        \ganttbar{Firmware ESP32 (Cinématique)}{2023-12}{2024-03} \\
+        \ganttbar{Interface IHM (Flutter)}{2024-02}{2024-04} \\
+        \ganttgroup{Phase 4: Réalisation \& Tests}{2024-03}{2024-06} \\
+        \ganttbar{Câblage électrique}{2024-03}{2024-04} \\
+        \ganttbar{Assemblage mécanique}{2024-04}{2024-05} \\
+        \ganttbar{Tests d'usinage \& Calibrations}{2024-05}{2024-06}
+    \end{ganttchart}
+    }
+    \caption{Diagramme de Gantt prévisionnel des grandes phases du projet PFE}
+    \label{fig:gantt_projet}
+\end{figure}
+
+\section*{Structure du Mémoire}
+Pour exposer rigoureusement notre démarche, ce mémoire est structuré en plusieurs chapitres consécutifs :
+\begin{itemize}
+    \item \textbf{Le Chapitre 1} présente la revue de la littérature sur la technologie d'usinage 5 axes et l'état de l'art des systèmes de commande cyber-physiques.
+    \item \textbf{Le Chapitre 2} détaille la conception et les lourds calculs de dimensionnement mécanique (structure, transmission, RDM).
+    \item \textbf{Le Chapitre 3} se focalise sur l'architecture électronique et le développement logiciel complet sous Flutter et la cinématique inverse sous ESP32.
+    \item \textbf{Le Chapitre 4}, enfin, présente la réalisation pratique, le paramétrage, les tests d'usinage et la validation des performances de notre mini-fraiseuse.
+\end{itemize}

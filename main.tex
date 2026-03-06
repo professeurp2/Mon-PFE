@@ -1,0 +1,71 @@
+\documentclass[12pt,a4paper,oneside]{report}
+
+% --- Packages de base ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\geometry{hmargin=2.5cm,vmargin=2.5cm}
+\usepackage{setspace}
+\onehalfspacing % Interligne 1.5 obligatoire pour les PFE
+
+% --- Packages pour les graphiques et schémas ---
+\usepackage{tikz}
+\usepackage{pgfgantt}
+\usepackage{circuitikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, calc, fit, backgrounds}
+
+% --- Packages de mise en forme professionnelle ---
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{tcolorbox}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{tocloft}
+
+% Définition de la couleur bleue pro (similaire aux exemples)
+\definecolor{macouleur}{RGB}{31, 78, 121}
+
+% Personnalisation des titres (Bleu pour s'aligner sur le standard professionnel)
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\color{macouleur}}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{macouleur}}{\thesection}{1em}{}
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{macouleur}}{\thesubsection}{1em}{}
+
+% Rangement des listes de figures et tableaux pour qu'ils soient bleus aussi
+\renewcommand{\cfttoctitlefont}{\hfill\Huge\bfseries\color{macouleur}}
+\renewcommand{\cftloftitlefont}{\hfill\Huge\bfseries\color{macouleur}}
+\renewcommand{\cftlottitlefont}{\hfill\Huge\bfseries\color{macouleur}}
+
+% --- Début du document ---
+\begin{document}
+
+\include{00_dedicaces_remerciements}
+\include{00_frontmatter}
+
+\newpage
+\tableofcontents % Sommaire automatique
+
+\newpage
+\renewcommand{\listfigurename}{Liste des figures}
+\listoffigures
+\addcontentsline{toc}{chapter}{Liste des figures}
+
+\newpage
+\renewcommand{\listtablename}{Liste des tableaux}
+\listoftables
+\addcontentsline{toc}{chapter}{Liste des tableaux}
+
+\newpage
+\include{chap1_introduction} % Appel du fichier chapitre
+\include{chap2_revue_litterature} % Appel du fichier chapitre
+\include{chap3_conception_mec} % Appel du fichier chapitre
+\include{chap4_realisation_mecatro} % Appel du fichier chapitre
+\include{chap5_developpement_logiciel} % Appel du fichier logiciel et cinématique
+\include{chap6_tests_conclusion} % Appel des tests et conclusion
+
+\end{document}

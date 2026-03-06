@@ -1,0 +1,141 @@
+% !TEX root = ../main.tex
+\chapter{Réalisation, Assemblage, Tests et Qualification}
+\label{chap:tests_conclusion}
+
+La transition entre un jumeau numérique CAO ou une théorie de commande mathématique (aérienne) et une machine industrielle concrète ("au sol") est jonchée d'écueils physiques imperceptibles sur ordinateur. La flexion, les jeux thermiques et résiduels, ainsi que le bruit électromagnétique, exigent un processus d'étalonnage et de tests itératifs intensifs. Ce dernier chapitre solde la conception en confrontant la fraiseuse CNC 5 axes à l'épreuve de la métrologie et de l'usinage réel.
+
+% ========================================================
+\section{Processus d'Assemblage Métrologique}
+
+Contrairement à une imprimante 3D (FDM) tolérant des désalignements structurels compensables dynamiquement par un capteur Z (type BLTouch), l'usinage par soustraction de matière 5 axes est incompensable si le bâti (la machine) n'est pas \textit{orthonormé} à l'origine.
+
+\subsection{L'Équerrage du Portique (Squaring process)}
+L'assemblage des V-Slots de la base Y et du portique X/Z s'est fait sur un plan de travail certifié (Marbre). 
+\begin{enumerate}
+    \item \textbf{Étalonnage X/Y :} Un jeu d'équerres mécaniques de précision classe 00 (DIN 875) a été positionné entre les traverses. Un serrage au couple via clé dynamométrique a été effectué pour garantir une perpendicularité spatiale $\perp_{XY} < 0.02 \text{ mm/m}$.
+    \item \textbf{Calibration de la broche :} Un support à comparateur horizontal à cadran (Micromètre) fixé sur le plateau a permis d'usiner virtuellement "dans le vide". Le balayage manuel de la tête en Z confirme que l'outil est strictement tangentiel à l'axe Z (aucun faux-rond de fixation "Tramming" n'excédant $0.015 \text{ mm}$).
+\end{enumerate}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        tool/.style={rectangle, draw, fill=gray!20, thick},
+        comp/.style={circle, draw=black, fill=white, inner sep=0pt, minimum size=0.8cm, thick},
+        line/.style={thick}
+    ]
+        % Base/Marbre
+        \draw[thick, fill=blue!5] (-3,0) rectangle (3,-0.5);
+        \node at (0,-0.25) {Marbre de métrologie (Base de référence)};
+        
+        % Equerre
+        \draw[tool, fill=orange!20] (0.5,0) -- (0.5,2.5) -- (1,2.5) -- (1,0.5) -- (2.5,0.5) -- (2.5,0) -- cycle;
+        \node[font=\footnotesize, align=center] at (1.8, 0.25) {Équerre\\DIN 875};
+        
+        % Broche Z
+        \draw[tool, fill=gray!40] (-1.5,1) rectangle (-0.5,3);
+        \node[font=\footnotesize, rotate=90] at (-1, 2) {Axe Z (Broche)};
+        
+        % Comparateur
+        \draw[line] (-0.5,1.5) -- (0,1.5); % bras
+        \node[comp] at (0.2, 1.5) {}; 
+        \draw[-{Stealth[scale=1]}, thick, red] (0.4, 1.5) -- (0.5, 1.5); % palpeur
+        \node[above, font=\scriptsize] at (0.2, 1.9) {Comparateur};
+        
+        % Mouvement
+        \draw[<->, thick, blue, dashed] (-1.5,1.5) -- (-1.5,2.5) node[midway, left] {Balayage $\Delta Z$};
+        
+    \end{tikzpicture}
+    \caption{Principe de mesure de la perpendicularité de la broche par balayage (Tramming)}
+    \label{fig:squaring}
+\end{figure}
+
+\subsection{Câblage en Étoile (\textit{Star Grounding}) et Anti-Interférences}
+Toute la "nappe nerveuse" (câbles codeurs, signaux \textit{Step/Dir}) a été acheminée dans des gaines (Drag Chains) de manière physiquement distante (séparation de 10 cm minimum) des câbles de puissance (36V AC du Spindle). L'innovation électrotechnique repose sur la \textit{mise à la terre en étoile} : la protection faradienne (\textit{Shield}) des câbles de la broche (Moteur VFD) n'est reliée à la terre ($GND$) que \textbf{d'un seul côté} (au niveau du coffret d'entrée), l'autre extrémité (côté tête d'usinage) étant laissée flottante. Cela rompt la boucle de courant harmonique (Ground Loop) qui parasitait l'ESP32.
+
+% ========================================================
+\section{Étalonnage Logiciel (Homing et Offsets Cinématiques)}
+
+\subsection{La conversion logico-mécanique ($Steps/mm$)}
+Le microcontrôleur ESP32 ne comprend que des impulsions (Ticks). Les valeurs saisies dans sa mémoire EEPROM établissent le rapport de transformation entre la rotation paramétrique du moteur et le millimètre ISO usiné.
+
+Pour l'axe X (Vis à billes de pas $5\text{mm}$, Moteur $1.8^\circ=200\text{ Pas/tr}$, Microstepping du DM556 paramétré à $1/16$) :
+\begin{equation}
+    Steps/mm = \frac{N_{pas/tour} \times \mu{Step}}{P_h} = \frac{200 \times 16}{5} = \textbf{640 \text{ Impulsions/mm}}.
+\end{equation}
+
+Pour le plateau Trunnion rotatif Axe B (Réduction harmonique ratio $1:50$) :
+\begin{equation}
+    Steps/\text{Degré} = \frac{200 \times 16 \times 50}{360^\circ} = \textbf{444.444 \text{ Impulsions/Degré}}.
+\end{equation}
+L'exactitude "flottante" de ce paramétrage confirme à l'ESP32 l'extrême finesse de déclenchement d'une interpolation 5 axes continue.
+
+\subsection{Palpage du \textit{Tool Center Point} (Offsets Trunnion)}
+Le logiciel Riverpod (sous Flutter) nécessite l'intégration des variables globales de Denavit-Hartenberg $\mathbf{L_y}$ et $\mathbf{L_z}$ modélisées au Chapitre 5. 
+Pour ce faire, une pige de centrage (Edge Finder mécanique à ressort) montée à 1000 Tr/min sur la broche a été abaissée lentement sur le bloc Trunnion. La désaxation du plateau lors d'une rotation B manuelle a permis de localiser "l'oeil du cyclone" (X, Y) et "l'apex" (Z) de l'axe de basculement A.
+\begin{itemize}
+    \item \textbf{Mesure retenue $L_{y}$ :} $34.50 \text{ mm}$ (décalage entre broche Z et centre de pivot A).
+    \item \textbf{Mesure retenue $L_{z}$ :} $112.80 \text{ mm}$ (hauteur du plateau vis-à-vis du pivot).
+\end{itemize}
+
+% ========================================================
+\section{Validation Métrologique par l'Usinage (Tests Pratiques)}
+
+\subsection{Essai 1 : Contourage 2.5D (Rigidité et Répétabilité)}
+\textbf{Protocole :} Usinage d'une poche rectangulaire (pocketing) et d'un alésage dans un bloc d'aluminium AW-2017A avec une fraise de $6\text{ mm}$ (Avance : $400 \text{ mm/min}$, Passe de $0.5 \text{ mm}$).
+\textbf{Analyse des Résultats :} Le pied à coulisse au $1/50^{ème}$ constate une tolérance d'erreur de positionnement $\Delta_{moyen} = \pm 0.04 \text{ mm}$. La pièce n'affiche pas de trace d'arrachement par vibration (Broutage). Les vis sphériques à billes absorbent victorieusement les pics d'accélération inertielle du système sans flexion notable du portique (validant la RDM).
+
+\subsection{Essai 2 : Usinage Positionnel "3+2 axes"}
+\textbf{Protocole :} Opération multi-faces sur une pièce fixée une seule fois. Le plan G-Code pivote le plateau de $90^\circ$ (Axe B) pour le fraisage d'une gorge latérale, puis bascule de $45^\circ$ (Axe A) pour chanfreiner une arrête supérieure.
+\textbf{Analyse des Résultats :} Tous les contours usinés se croisent ou s'alignent parfaitement. La transmission réseau UDP du G-Code depuis l'application tablette Flutter s'est maintenue stable durant les 27 minutes du cycle, confirmant la pertinence d'utiliser FreeRTOS (Dual Core).
+
+\subsection{Essai 3 : Interpolation Simultanée 5 Axes "Continue"}
+\textbf{Protocole :} Usinage surfacique complexe d'un dôme asymétrique et d'une pale d'hélice dans un bloc de résine dense (Cibatool). 
+Les 5 moteurs tournent simultanément à des vitesses variées. L'outil "glisse" spatialement en pivotant avec la pièce pour rester toujours perpendiculaire (normale $I,J,K$) à la surface conique usinée.
+\textbf{Analyse des Résultats :} Le Ring Buffer (Look-Ahead) du C++ a parfaitement lissé les micro-décélérations. Les drivers s'échauffent au sein de leur plage thermale tolérée ($< 55^\circ$C avec brassage de l'air de l'armoire). La fluidité spectaculaire des mouvements de la table Trunnion prouve définitivement la capacité de la matrice mathématique inversée à rattraper les dérives de basculement en temps réel.
+
+
+\begin{figure}[htbp]
+    \centering
+    \begin{minipage}{0.31\textwidth}
+        \centering
+        \includegraphics[width=\linewidth, draft]{placeholder_test1_2D.png}
+        \caption{Contourage 2.5D}
+        \label{fig:test1}
+    \end{minipage}\hfill
+    \begin{minipage}{0.31\textwidth}
+        \centering
+        \includegraphics[width=\linewidth, draft]{placeholder_test2_3plus2.png}
+        \caption{Chanfreins en 3+2}
+        \label{fig:test2}
+    \end{minipage}\hfill
+    \begin{minipage}{0.31\textwidth}
+        \centering
+        \includegraphics[width=\linewidth, draft]{placeholder_test3_5axes.png}
+        \caption{Dôme continu 5 axes}
+        \label{fig:test3}
+    \end{minipage}
+\end{figure}
+
+% ========================================================
+\section*{Conclusion Générale et Perspectives}
+\addcontentsline{toc}{section}{Conclusion Générale et Perspectives}
+
+L'aboutissement de ce Projet de Fin d'Études cristallise la transition aboutie d'une conception théorique exigeante vers un équipement mécatronique de précision d'industrie 4.0 fonctionnel. L'objectif initial – l'abstraction de la difficulté logicielle et du coût effarant d'une machine CNC 5 axes propriétaire pour les structures éducatives maliennes – s'est imposé comme le fil conducteur des choix d'ingénierie.
+
+\textbf{Bilan Opérationnel et Technique :}
+La démarche a validé successivement des ruptures technologiques vis-à-vis du prototypage conventionnel :
+\begin{itemize}
+    \item \textbf{Sur la mécanique (Chapitres 2 et 3) :} L'emploi systématique de composants industriels durcis (Guidages linéaires précontraints et Vis à billes roulées) a permis d'éradiquer la flexion mortelle induite par le lourd couple de renversement ($20 \text{ Nm}$) du centre de gravité mobile de la table Trunnion basculante.
+    \item \textbf{Sur la mécatronique de supervision (Chapitres 4 et 5) :} Nous avons brisé le monopole des vieux microcontrôleurs 8-bits en démontrant l'efficacité retentissante du \textbf{processeur temps réel ESP32} couplé au système de \textit{Tasking} FreeRTOS. Le cerveau exécute avec véhémence des transformations de matrices homogènes ($x, y, z$ corrigés dynamiquement par $\cos/\sin$ selon A et B) afin de maintenir l'outil sur le point de contact TCP (Tool Center Point) nominal.
+    \item \textbf{Sur l'interaction logicielle (Flutter / Riverpod) :} La conception \textit{From Scratch} d'un interpréteur asynchrone G-code et interface Homme-Machine (IHM) multi-plateformes, affranchie des saturations graphiques grâce au framework Riverpod de Google, offre au client final (l'opérateur) un portail de communication TCP/IP stable et esthétique, remplaçant la boite noire par un code auditable (Open-Source).
+\end{itemize}
+
+\textbf{Perspectives d'Innovation :}
+Si ce PFE atteint ses objectifs cinématiques, ce laboratoire modulaire appelle naturellement une myriade d'évolutions incrémentales, tant sur le plan mécanique que dans le paradigme de l'Internet des Objets (IoT) :
+\begin{enumerate}
+    \item \textbf{Évolution de l'Atelier Logiciel (I.A. et Maintenance Prédictive) :} En branchant des résistances de type de Shunt sur l'alimentation 36V, l'ESP32 pourrait capter en temps réel les pics de courant consommés lors du fraisage de matière difficile, les numériser pour les remonter sur le réseau jusqu'à une \textit{Intelligence Artificielle} sur l'APP Flutter, laquelle prédirait l'usure prématurée d'une lame ou d'une avarie broche (Condition Monitoring).
+    \item \textbf{Évolution de Servocommande :} Actuellement paramétrée en "Boucle Ouverte", la machine pourrait accueillir des servomoteurs "Closed-Loop" dotés d'encodeurs rotatifs absolus. Couplés au Firmware C++, ils compenseraient en temps-masqué une éventuelle perte de pas lors d'une collision imprévue, sauvant une pièce de plusieurs heures d'usinages.
+    \item \textbf{Ergonomie "Industry 5.0" et Automatisation :} L'ajout d'une station logicielle générant la commutation pneumatique pour une broche dotée d'un "Automatic Tool Changer" (ATC) et d'un palpeur autonome de numérisation 3D sans contact.
+\end{enumerate}
+
+Le passage à l'usinage $5$ axes n'est plus, par ce projet, un tabou d'ingénierie exclusif. Cette mini-fraiseuse en constitue le socle tangible : une machine capable de former la prochaine génération de cadres concepteurs-usiniers à la matrice des contraintes cinématiques de l'industrie de pointe africaine.

@@ -1,0 +1,52 @@
+% !TEX root = ../main.tex
+\chapter{Réalisation, Assemblage, Tests et Conclusion}
+\label{chap:tests_conclusion}
+
+\section{Réalisation Mécanique et Électrique}
+
+\subsection{Assemblage du Portique et du Plateau Trunnion}
+L'assemblage a suivi un protocole métrologique strict pour garantir l'\textit{équerrage} (Squaring) parfait de la machine.
+Le Plateau Trunnion (Axes A et B) constitue la phase critique. L'axe de rotation du plateau B doit croiser parfaitement (coplanarité) l'axe de basculement A. Tout décalage (offset $L_x$ induit) ruinerait la cinématique inverse. Le réducteur a été pré-contraint pour annuler le jeu d'inversion mécanique.
+
+\subsection{Câblage et Intégration du Coffret Électrique}
+Toute la "nappe nerveuse" (câbles moteurs et logiques) a été acheminée en dissociant la puissance (36V) et la logique (5V/3.3V). Chaque tresse de blindage a été mise à la terre en un point unique (Star Grounding) dans le boitier pour combattre les boucles de masse.
+
+\section{Étalonnage Logiciel (Homing et Calibration)}
+
+\subsection{Calibration des Steps par Millimètre}
+La conversion Théorie/Réalité nécessite le calibrage des impulsions logiques.
+Pour la vis à billes (pas de 5mm, $1/16$ microstepping) :
+\begin{equation}
+    Steps/mm = \frac{N_{pas/tour} \times Microstepping}{Pitch_{vis\_a\_billes}} = \frac{200 \times 16}{5} = 640 \text{ Steps/mm}
+\end{equation}
+
+\subsection{L'Étalonnage du Pivot Point (Offsets Cinématiques)}
+C'est le sommet de la calibration 5 axes. La formule de Denavit-Hartenberg implémentée dépend de constantes d'excentricité ($L_y, L_z$). Celles-ci doivent être mesurées physiquement avec un Palpeur pour localiser mathématiquement le Centre Absolu de Rotation du Plateau B. Ces coordonnées ($TCP$) sont transmises au parser G-Code de l'application Flutter via Riverpod avant de lancer l'usinage.
+
+\section{Tests d'usinage et Validation des Performances}
+
+\subsection{Test 1 : Validation du contournage 3 Axes}
+Gravure de circuits électroniques (PCB FR4) avec un foret "V-Bit" à $0.1 \text{ mm}$ de profondeur. Le résultat est net, sans "chatter", prouvant la forte rigidité verticale (Axe Z).
+
+\subsection{Test 2 : Validation du 3+2 Axes}
+Usiner les cinq faces visibles d'un cube sans démonter la pièce de l'étau. Le plateau B tourne de $90^\circ$, la broche usine la face 1. L'axe A bascule de $45^\circ$, la broche usine un chanfrein. Les trous sont parfaitement alignés. L'IHM Flutter n'a connu aucune désynchronisation depuis le stream Riverpod UART.
+
+\subsection{Test 3 : Usinage simultané 5 Axes "Continu" (La Turbine)}
+Fichier G-Code de plusieurs Mo contenant uniquement des micro-linéaires (`G1 X.. Y.. Z.. A.. B..`). L'algorithme Dual-Core a maintenu le Ring Buffer plein. La tête ne s'est pas arrêtée dans les virages. L'interface Flutter a restitué la visualisation transparente sur Android, confirmant la stabilité absolue de l'architecture distribuée.
+
+\section*{Conclusion Générale et Perspectives}
+\addcontentsline{toc}{section}{Conclusion Générale et Perspectives}
+
+L'aboutissement de ce Projet de Fin d'Études marque la transition maîtrisée d'une conception théorique exigeante vers une matérialisation mécatronique fonctionnelle. L'objectif initial était ambitieux : démocratiser l'accès à une technologie d'industrie 4.0 lourde — l'usinage à 5 axes — par la conception locale d'une architecture globale "Desktop".
+
+Le pari logiciel a été un grand succès : s'affranchissant des logiciels de commande obscurs ou limitatifs (Arduino 8-bits), la symbiose entre un Sender développé en \textbf{Flutter} (gérant son état via \textbf{Riverpod} de façon asynchrone) et un Firmware C++ sur l'\textbf{ESP32} (gérant le Buffer temporel et les complexes Matrices Trunnion de Denavit-Hartenberg) s'est avérée extrêmement fluide. Les tests valident cette architecture par la réalisation de parcours 5 axes sans saccades.
+
+\textbf{Perspectives Evolutives :}
+L'excellence industrielle appelle des améliorations continues. 
+\begin{itemize}
+    \item \textit{Mécanique :} Le remplacement des moteurs Open Loop par des Servomoteurs à codeurs (boucle fermée).
+    \item \textit{Mécatronique :} L'ajout d'un Changeur d'Outil Automatique (ATC - Automatic Tool Changer).
+    \item \textit{IHM / I.A. :} L'application Flutter pourrait monitorer la chute de courant d'un moteur pour extrapoler l'usure de l'outil de coupe, réalisant la promesse de la maintenance prédictive inhérente à l'Industrie 4.0.
+\end{itemize}
+
+Cette mini-fraiseuse CNC 5 axes n'est pas uniquement un équipement technique matériel, c'est un véritable laboratoire modulaire de R\&D local.
