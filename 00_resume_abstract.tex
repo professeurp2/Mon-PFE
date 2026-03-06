@@ -1,0 +1,27 @@
+% !TEX root = main.tex
+
+% --- Page de Résumé / Abstract ---
+\chapter*{Résumé}
+\addcontentsline{toc}{chapter}{Résumé}
+
+Le présent Projet de Fin d'Études décrit de manière holistique la conception, le dimensionnement, et la programmation d'une micro-fraiseuse à commande numérique (CNC) 5 axes dotée d'une table trunnion basculante rotative. L'enjeu de cette étude est de démocratiser l'accès à l'usinage tridimensionnel complexe, traditionnellement réservé aux industries lourdes, en développant une solution "Desktop" abordable et open-source.
+
+Sur le plan mécanique, une analyse conceptuelle (SysML, RDM) a permis de sélectionner des composants rigides capables d'absorber le couple de renversement. Sur le plan mécatronique et logiciel, le défi de la cinématique inverse a été relevé grâce à une architecture logicielle distribuée innovante. Un microcontrôleur ESP32 gère en temps réel le calcul matriciel complexe et le cadençage "Look-Ahead" des moteurs via FreeRTOS, tandis qu'une application multiplateforme développée en Flutter (Dart) assure la supervision et la traduction du G-Code, le tout de manière fluide grâce au système d'état réactif Riverpod. Les tests pratiques (fraisage simultané 5 axes) confirment la capacité de la machine à produire des géométries d'avant-garde.
+
+\vspace{0.5cm}
+\noindent\textbf{Mots-clés :} CNC 5 axes, Fraisage, Trunnion, ESP32, Flutter, Cinématique Inverse, Mécatronique, G-Code, AMDEC.
+
+\vspace{1.5cm}
+
+% --- Abstract ---
+\begin{center}
+    \textbf{\Large Abstract}
+\end{center}
+\addcontentsline{toc}{chapter}{Abstract}
+
+This final year project holistically chronicles the design, sizing, and programming of a 5-axis computer numerical control (CNC) micro-milling machine equipped with a rotary trunnion table. The challenge of this thesis is to democratize access to complex three-dimensional machining—traditionally reserved for heavy industry—by developing an affordable and open-source "Desktop" solution.
+
+On the mechanical side, a conceptual analysis (SysML, strength of materials) led to the selection of rigid components capable of absorbing overturning torque. On the mechatronic and software side, the challenge of inverse kinematics was met with an innovative distributed software architecture. An ESP32 microcontroller manages complex matrix calculations and motor "Look-Ahead" sequencing in real-time via FreeRTOS, while a cross-platform application developed in Flutter (Dart) handles supervision and G-Code translation smoothly using the Riverpod reactive state system. Practical tests (simultaneous 5-axis milling) validate the machine's ability to produce avant-garde geometries.
+
+\vspace{0.5cm}
+\noindent\textbf{Keywords :} 5-axis CNC, Milling, Trunnion, ESP32, Flutter, Inverse Kinematics, Mechatronics, G-Code, FMEA.

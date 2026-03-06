@@ -1,52 +1,260 @@
 % !TEX root = ../main.tex
-\chapter{Réalisation, Assemblage, Tests et Conclusion}
-\label{chap:tests_conclusion}
+\chapter{Développement Logiciel et Modélisation UML}
+\label{chap:logiciel}
 
-\section{Réalisation Mécanique et Électrique}
+L'intelligence du système réside dans son architecture logicielle distribuée. Ce chapitre détaille la conception informatique par la modélisation UML (\textit{Unified Modeling Language}) et l'implémentation de la dualité entre l'interface haut niveau (Flutter) et le micrologiciel temps réel (ESP32).
 
-\subsection{Assemblage du Portique et du Plateau Trunnion}
-L'assemblage a suivi un protocole métrologique strict pour garantir l'\textit{équerrage} (Squaring) parfait de la machine.
-Le Plateau Trunnion (Axes A et B) constitue la phase critique. L'axe de rotation du plateau B doit croiser parfaitement (coplanarité) l'axe de basculement A. Tout décalage (offset $L_x$ induit) ruinerait la cinématique inverse. Le réducteur a été pré-contraint pour annuler le jeu d'inversion mécanique.
+% ========================================================
+\section{Modélisation UML du Système Global}
 
-\subsection{Câblage et Intégration du Coffret Électrique}
-Toute la "nappe nerveuse" (câbles moteurs et logiques) a été acheminée en dissociant la puissance (36V) et la logique (5V/3.3V). Chaque tresse de blindage a été mise à la terre en un point unique (Star Grounding) dans le boitier pour combattre les boucles de masse.
+\subsection{Diagramme de Séquence : Cycle de vie d'un Usinage}
+Le fraisage d'une pièce nécessite une orchestration parfaite entre l'opérateur, l'App de contrôle, le serveur Wi-Fi et les actionneurs physiques.
 
-\section{Étalonnage Logiciel (Homing et Calibration)}
+\begin{figure}[htbp]
+    \centering
+    \resizebox{\textwidth}{!}{
+    \begin{tikzpicture}[
+        node distance=3.5cm,
+        lifeline/.style={draw, thick, dashed},
+        actor/.style={rectangle, draw=macouleur, fill=blue!10, text width=2cm, align=center, minimum height=1cm, thick},
+        msg/.style={-{Stealth[scale=1.2]}, thick},
+        reply/.style={dashed, -{Stealth[scale=1.2]}, thick}
+    ]
+        % Acteurs
+        \node[actor] (user) {Opérateur};
+        \node[actor, right=of user] (app) {App Flutter\\(IHM)};
+        \node[actor, right=of app] (esp_core0) {ESP32 (Core 0)\\Serveur TCP};
+        \node[actor, right=of esp_core0] (esp_core1) {ESP32 (Core 1)\\Planner / IRS};
+        \node[actor, right=of esp_core1] (moteur) {Moteurs NEMA};
 
-\subsection{Calibration des Steps par Millimètre}
-La conversion Théorie/Réalité nécessite le calibrage des impulsions logiques.
-Pour la vis à billes (pas de 5mm, $1/16$ microstepping) :
-\begin{equation}
-    Steps/mm = \frac{N_{pas/tour} \times Microstepping}{Pitch_{vis\_a\_billes}} = \frac{200 \times 16}{5} = 640 \text{ Steps/mm}
-\end{equation}
+        % Lignes de vie
+        \draw[lifeline] (user.south) -- ++(0, -9.5);
+        \draw[lifeline] (app.south) -- ++(0, -9.5);
+        \draw[lifeline] (esp_core0.south) -- ++(0, -9.5);
+        \draw[lifeline] (esp_core1.south) -- ++(0, -9.5);
+        \draw[lifeline] (moteur.south) -- ++(0, -9.5);
 
-\subsection{L'Étalonnage du Pivot Point (Offsets Cinématiques)}
-C'est le sommet de la calibration 5 axes. La formule de Denavit-Hartenberg implémentée dépend de constantes d'excentricité ($L_y, L_z$). Celles-ci doivent être mesurées physiquement avec un Palpeur pour localiser mathématiquement le Centre Absolu de Rotation du Plateau B. Ces coordonnées ($TCP$) sont transmises au parser G-Code de l'application Flutter via Riverpod avant de lancer l'usinage.
+        % Messages
+        \draw[msg] ([yshift=-1cm]user.south) -- ([yshift=-1cm]app.south) node[midway, above, font=\footnotesize] {Charge G-Code};
+        \draw[msg] ([yshift=-2cm]app.south) -- ([yshift=-2cm]esp_core0.south) node[midway, above, font=\footnotesize] {Send : `{"cmd":"G1", "X":15}`};
+        
+        \draw[msg] ([yshift=-3cm]esp_core0.south) -- ([yshift=-3cm]esp_core1.south) node[midway, above, font=\footnotesize] {Push Ring Buffer};
+        \draw[reply] ([yshift=-4cm]esp_core1.south) -- ([yshift=-4cm]esp_core0.south) node[midway, above, font=\footnotesize] {Buffer OK};
+        
+        \draw[reply] ([yshift=-5cm]esp_core0.south) -- ([yshift=-5cm]app.south) node[midway, above, font=\footnotesize] {ACK (JSON)};
+        
+        \draw[msg] ([yshift=-6cm]esp_core1.south) -- ([yshift=-6cm]moteur.south) node[midway, above, font=\footnotesize] {Pulsations (Step/Dir)};
+        \draw[reply] ([yshift=-7cm]esp_core1.south) -- ([yshift=-7cm]app.south) node[midway, above, near end, font=\footnotesize, fill=white] {Stream Position Actuelle};
+        
+        \draw[msg] ([yshift=-8.5cm]user.south) -- ([yshift=-8.5cm]app.south) node[midway, above, font=\footnotesize] {E-Stop (Logiciel)};
+        \draw[msg] ([yshift=-9cm]app.south) -- ([yshift=-9cm]esp_core1.south) node[midway, above, near end, font=\footnotesize, fill=white, text=red] {Interrupt Mouvement !};
 
-\section{Tests d'usinage et Validation des Performances}
+    \end{tikzpicture}
+    }
+    \caption{Diagramme de Séquence UML des interactions Client-Serveur-Moteurs}
+    \label{fig:uml_sequence}
+\end{figure}
 
-\subsection{Test 1 : Validation du contournage 3 Axes}
-Gravure de circuits électroniques (PCB FR4) avec un foret "V-Bit" à $0.1 \text{ mm}$ de profondeur. Le résultat est net, sans "chatter", prouvant la forte rigidité verticale (Axe Z).
+\subsection{Diagramme de Classes (Firmware ESP32)}
+Le code source ESP32 s'affranchit du code "spaghetti" séquentiel grâce à une structuration en Programmation Orientée Objet (C++).
 
-\subsection{Test 2 : Validation du 3+2 Axes}
-Usiner les cinq faces visibles d'un cube sans démonter la pièce de l'étau. Le plateau B tourne de $90^\circ$, la broche usine la face 1. L'axe A bascule de $45^\circ$, la broche usine un chanfrein. Les trous sont parfaitement alignés. L'IHM Flutter n'a connu aucune désynchronisation depuis le stream Riverpod UART.
+\begin{figure}[htbp]
+    \centering
+    \resizebox{0.8\textwidth}{!}{
+    \begin{tikzpicture}[
+        class/.style={rectangle, draw=black, thick, fill=white, text width=4cm, rounded corners, align=left},
+        title/.style={font=\bfseries, align=center, fill=gray!20, draw, thick, rounded corners=0pt, minimum width=4cm, minimum height=0.7cm},
+        line/.style={-{Diamond[scale=1.5, open]}, thick}
+    ]
+        % CNC Controller
+        \node[class] (cnc) at (0,0) {
+            \vspace{0.7cm}\\ 
+            - state: MachineState\\
+            - queue: RingBuffer*\\
+            + init()\\
+            + emergencyStop()
+        };
+        \node[title] at (0, 0.6) {CncController};
 
-\subsection{Test 3 : Usinage simultané 5 Axes "Continu" (La Turbine)}
-Fichier G-Code de plusieurs Mo contenant uniquement des micro-linéaires (`G1 X.. Y.. Z.. A.. B..`). L'algorithme Dual-Core a maintenu le Ring Buffer plein. La tête ne s'est pas arrêtée dans les virages. L'interface Flutter a restitué la visualisation transparente sur Android, confirmant la stabilité absolue de l'architecture distribuée.
+        % GCodeParser
+        \node[class] (parser) at (-5, -4) {
+            \vspace{0.7cm}\\ 
+            - jsonDoc: StaticJsonDocument\\
+            + parseLine(String text)\\
+            + validateSyntax(): bool
+        };
+        \node[title] at (-5, -3.4) {GcodeParser};
 
-\section*{Conclusion Générale et Perspectives}
-\addcontentsline{toc}{section}{Conclusion Générale et Perspectives}
+        % Kinematics
+        \node[class] (ik) at (0, -4) {
+            \vspace{0.7cm}\\ 
+            - Ly: float\\
+            - Lz: float\\
+            + calculateTrunnion(float X, ...)\\
+            + getMotorSteps(): long[]
+        };
+        \node[title] at (0, -3.4) {KinematicsSolver};
 
-L'aboutissement de ce Projet de Fin d'Études marque la transition maîtrisée d'une conception théorique exigeante vers une matérialisation mécatronique fonctionnelle. L'objectif initial était ambitieux : démocratiser l'accès à une technologie d'industrie 4.0 lourde — l'usinage à 5 axes — par la conception locale d'une architecture globale "Desktop".
+        % Motor
+        \node[class] (motor) at (5, -4) {
+            \vspace{0.7cm}\\ 
+            - stepPin: int\\
+            - dirPin: int\\
+            + generatePulse()\\
+            + setDirection(bool dir)
+        };
+        \node[title] at (5, -3.4) {StepperMotor};
 
-Le pari logiciel a été un grand succès : s'affranchissant des logiciels de commande obscurs ou limitatifs (Arduino 8-bits), la symbiose entre un Sender développé en \textbf{Flutter} (gérant son état via \textbf{Riverpod} de façon asynchrone) et un Firmware C++ sur l'\textbf{ESP32} (gérant le Buffer temporel et les complexes Matrices Trunnion de Denavit-Hartenberg) s'est avérée extrêmement fluide. Les tests valident cette architecture par la réalisation de parcours 5 axes sans saccades.
+        % Relations
+        \draw[line] (parser.north) -- (-5, -0.6) -- (cnc.west);
+        \draw[line] (ik.north) -- (cnc.south);
+        \draw[line] (motor.north) -- (5, -0.6) -- (cnc.east);
 
-\textbf{Perspectives Evolutives :}
-L'excellence industrielle appelle des améliorations continues. 
+    \end{tikzpicture}
+    }
+    \caption{Diagramme de Classes UML de l'architecture logicielle embarquée}
+    \label{fig:uml_classes}
+\end{figure}
+
+% ========================================================
+\subsection{Diagramme d'États (Machine à États Finis de l'ESP32)}
+
+Afin de garantir une sécurité opérationnelle absolue, le C++ embarqué refuse catégoriquement d'exécuter un mouvement si la machine n'entre pas dans le bon état (\textit{State Machine}).
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        state/.style={rectangle, draw=black, rounded corners=12pt, fill=blue!5, text width=2.5cm, align=center, thick, minimum height=1.2cm},
+        trans/.style={-{Stealth[scale=1.2]}, thick, draw=macouleur},
+        textNode/.style={fill=white, font=\scriptsize, align=center}
+    ]
+        \node[state, fill=red!10] (alarm) at (0, 3) {ALARM\\(Stop / Défaut)};
+        \node[state, fill=yellow!10] (idle) at (0, 0) {IDLE\\(Prêt / Attente)};
+        \node[state, fill=green!10] (run) at (5, 0) {RUN\\(Usinage)};
+        \node[state, fill=orange!10] (homing) at (-5, 0) {HOMING\\(Origines)};
+        
+        \draw[trans, bend left] (idle) to node[textNode, above] {Reçoit G-Code} (run);
+        \draw[trans, bend left] (run) to node[textNode, below] {Buffer vide} (idle);
+        \draw[trans] (run) -- (alarm) node[textNode, midway] {Collision\\Fin de course};
+        \draw[trans] (idle) -- (alarm) node[textNode, midway] {Bouton\\E-Stop};
+        \draw[trans, bend left] (alarm) to node[textNode, above] {Unlock\\(\texttt{\$X})} (idle);
+        
+        \draw[trans, bend right] (idle) to node[textNode, below] {Cmd \texttt{\$H}} (homing);
+        \draw[trans, bend right] (homing) to node[textNode, above] {Fins de\\courses OK} (idle);
+    \end{tikzpicture}
+    \caption{Diagramme d'États UML du contrôleur interne de la CNC}
+    \label{fig:state_machine}
+\end{figure}
+
+Le passage à l'état \texttt{RUN} active la lecture du Ring Buffer, confiant la génération impulsionnelle au Core 1.
+
+\section{Implémentation du Code : Micrologiciel (ESP32)}
+
+\subsection{L'Architecture Dual-Core (FreeRTOS)}
+Le SoC (System on Chip) ESP32 dispose de deux cœurs Tensilica $240 \text{ MHz}$. Pour ne rater aucune \textit{Microseconde} de pulsation vers les drivers de moteurs lors d'un calcul complexe ou d'un transfert réseau, les tâches ont été assignées statiquement sous l'OS temps réel \textbf{FreeRTOS}.
+
 \begin{itemize}
-    \item \textit{Mécanique :} Le remplacement des moteurs Open Loop par des Servomoteurs à codeurs (boucle fermée).
-    \item \textit{Mécatronique :} L'ajout d'un Changeur d'Outil Automatique (ATC - Automatic Tool Changer).
-    \item \textit{IHM / I.A. :} L'application Flutter pourrait monitorer la chute de courant d'un moteur pour extrapoler l'usure de l'outil de coupe, réalisant la promesse de la maintenance prédictive inhérente à l'Industrie 4.0.
+    \item \textbf{Core 0 (Protocole et Logique) :} Gère la pile TCP/IP (Wi-Fi), reçoit les packets JSON, exécute la classe \texttt{GcodeParser} et empile les commandes validées dans le \textit{Ring Buffer}.
+    \item \textbf{Core 1 (Temps Réel et ISR) :} Dédié au \texttt{KinematicsSolver}. Il lit le Buffer, génère la trajectoire "Look-Ahead" et pilote les interruptions matérielles (Hardware Timers) \textit{exactement} aux cadences requises pour les pins STEP.
 \end{itemize}
 
-Cette mini-fraiseuse CNC 5 axes n'est pas uniquement un équipement technique matériel, c'est un véritable laboratoire modulaire de R\&D local.
+\subsection{Cinématique Inverse et Paramétrage Denavit-Hartenberg}
+
+Le cœur de la transformation Table-Table réside dans la résolution de la cinématique inverse. Pour localiser précisément n'importe quel point de la pièce soumise aux rotations A et B, le firmware embarque les matrices des paramètres de Denavit-Hartenberg (D-H) modifiés.
+
+Le tableau D-H liant l'outil au système de coordonnées du plateau rotatif s'établit avec les excentricités d'assemblage mesurées physiquement (Offsets $L_{x}, L_{y}, L_{z}$) :
+
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|l|}
+    \hline
+    \textbf{Axe $i$} & \textbf{Articul.} & \textbf{$\alpha_{i-1}$ (\circ)} & \textbf{$a_{i-1}$ (mm)} & \textbf{$\theta_i$ (\circ)} & \textbf{$d_i$ (mm)} \\ \hline
+    0 $\rightarrow$ X  & Linéaire  & 0 & 0 & 0 & $X_{moteur}$ \\ \hline
+    X $\rightarrow$ Y  & Linéaire  & -90 & 0 & -90 & $Y_{moteur}$ + Offset $L_{y}$ \\ \hline
+    Y $\rightarrow$ Z  & Linéaire  & -90 & 0 & 0 & $Z_{moteur}$ + Offset $L_{z}$ \\ \hline
+    Z $\rightarrow$ A  & Rotatif (Tilt) & 90 & 0 & $\theta_A$ & 0 \\ \hline
+    A $\rightarrow$ B  & Rotatif (Pan)  & -90 & 0 & $\theta_B$ & Hauteur Pièce \\ \hline
+    \end{tabular}
+    \caption{Paramètres de Denavit-Hartenberg Modifiés de la Table Trunnion 5 Axes}
+    \label{tab:dh_parameters}
+\end{table}
+
+Le produit des matrices de transformations intermédiaires $^0T_n = \prod_{i=1}^n {^{i-1}T_i}$ est implémenté en C++ à l'aide de \textit{Look-Up Tables (LUT)} trigonométriques. Au lieu d'utiliser la fonction mathématique lourde \texttt{sin(theta)}, l'ESP32 pointe vers un tableau RAM pré-calculé :
+\begin{verbatim}
+// Extrait de l'algorithme d'interpolation de la Cinématique Inverse
+void calculateInverseKinematics(float x, float y, float z, float a, float b) {
+    float sin_b = lut_sin[int(b * 100)];
+    float cos_b = lut_cos[int(b * 100)];
+    float sin_a = lut_sin[int(a * 100)];
+    float cos_a = lut_cos[int(a * 100)];
+    
+    // Compensation vectorielle Trunnion selon matrice D-H
+    motor_X = x*cos_b - y*sin_b;
+    motor_Y = (x*sin_b + y*cos_b)*cos_a - (z+Lz)*sin_a + Ly;
+    motor_Z = (x*sin_b + y*cos_b)*sin_a + (z+Lz)*cos_a - Lz;
+}
+\end{verbatim}
+
+% ========================================================
+\section{L'Interface Homme-Machine (Flutter)}
+
+L'application Dart/Flutter \textit{Single Codebase} (Windows, Linux, Android) fournit un \textit{dashboard} (tableau de bord) esthétique et réactif.
+
+\subsection{Le Parseur G-Code (Logigramme UML)}
+Contrairement aux architectures classiques, l'intelligence d'interprétation du G-Code lourd (fichiers `.nc` de plusieurs Mégaoctets) est déportée sur le poste maître (Téléphone ou PC Flutter) afin de soulager la RAM de l'ESP32. 
+L'application Flutter utilise les \textit{Expressions Régulières (Regex)} pour isoler chaque commande, calcule la faisabilité, et sérialise la trame en JSON allégé.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        process/.style={rectangle, draw=black, rounded corners=5pt, fill=blue!10, text width=3cm, align=center, thick, minimum height=1cm},
+        decision/.style={diamond, aspect=2, draw=black, fill=yellow!10, text width=2.5cm, align=center, thick, inner sep=0pt},
+        data/.style={trapezium, trapezium left angle=70, trapezium right angle=110, draw=black, fill=green!10, text width=2.5cm, align=center, thick},
+        arrow/.style={-{Stealth[scale=1.2]}, thick}
+    ]
+        \node[data] (file) at (0, 4) {Fichier G-Code (.nc)};
+        \node[process] (read) at (0, 2.5) {Lecture ligne par ligne Async};
+        \node[process] (regex) at (0, 1) {Regex: \texttt{G[0-1] X([0-9.]+)...}};
+        \node[decision] (valid) at (0, -1) {Syntaxe valide ?};
+        
+        \node[process, fill=orange!10] (error) at (-4, -1) {Ignorer / Log};
+        \node[process] (json) at (0, -3.5) {Sérialisation JSON\\ \texttt{\{"c":"G1","X":5\}}};
+        \node[decision] (buffer) at (0, -6) {ESP Buffer > 80\% ?};
+        \node[process, fill=red!10] (wait) at (-4, -6) {Attente (Delay)};
+        \node[data, fill=macouleur!20] (tx) at (0, -8.5) {Transmission UDP vers ESP32};
+        
+        \draw[arrow] (file) -- (read);
+        \draw[arrow] (read) -- (regex);
+        \draw[arrow] (regex) -- (valid);
+        
+        \draw[arrow] (valid) -- node[above, font=\scriptsize] {Non} (error);
+        \draw[arrow] (valid) -- node[right, font=\scriptsize] {Oui} (json);
+        
+        \draw[arrow] (json) -- (buffer);
+        \draw[arrow] (buffer) -- node[above, font=\scriptsize] {Oui} (wait);
+        \draw[arrow] (wait) |- (buffer.west); % boucle d'attente
+        \draw[arrow] (buffer) -- node[right, font=\scriptsize] {Non} (tx);
+    \end{tikzpicture}
+    \caption{Logigramme de parsing, sérialisation et transmission du G-Code sous Flutter}
+    \label{fig:gcode_parser}
+\end{figure}
+
+\subsection{State Management : La pureté de Riverpod}
+Le Widget de coordonnées, interrogeant l'ESP32 $50 \text{ fois par seconde}$, noierait le Thread de rendu graphique d'un téléphone si nous utilisions la commande racine \texttt{setState()}.
+L'intégration du package \textbf{Riverpod} (Modèle \texttt{StateNotifier}) est la solution d'ingénierie adoptée. Le Stream UDP de l'ESP32 est écouté par un \texttt{StreamProvider}.
+Seuls les widgets d'affichage enveloppés dans un \texttt{ConsumerWidget} et abonnés spécifiquement ("$watch$") à la portion de la classe d'état \texttt{MachinePosition} se redessinent, réduisant la consommation CPU du téléphone Android à $< 2\%$.
+
+\begin{verbatim}
+// Utilisation de Riverpod pour isoler le rafraîchissement
+class AxesDisplayWidget extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Ne se reconstruit QUE si la coordonnée X ou Y change
+    final machineState = ref.watch(machineStateProvider);
+    return Text("X: ${machineState.x.toStringAsFixed(3)} mm");
+  }
+}
+\end{verbatim}
+
+\section{Conclusion de la conception logicielle}
+L'architecture de programmation illustrée par l'UML confirme que la conception 5 axes n'est pas limitée à la mécanique, mais dépend d'un système informationnel à haute disponibilité. Le pont entre le C++ Temps réel embarqué et la modernité réactive de Flutter garantit une expérience utilisateur digne des commandes numériques industrielles modernes.

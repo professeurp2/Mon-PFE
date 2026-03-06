@@ -146,6 +146,33 @@ Ce contacteur s'ouvre magnétiquement brisant instantanément :
 \end{enumerate}
 Le réenclenchement mécanique manuel du champignon rouge est obligatoirement requis, couplé à un appui sur le bouton "Reset/Resume" de l'armoire, interdisant de ce fait tout redémarrage inopiné intempestif préjudiciable physiquement.
 
+\section{Dimensionnement Électrique et Bilan de Puissance}
+
+Une commande numérique 5 axes présente un cumul critique de consommateurs de courant (les cinq moteurs PàP fonctionnent quasi-simultanément). Le calcul rigoureux du bilan énergétique est impératif pour dimensionner l'Alimentation à Découpage (SMPS) principale et éviter une chute de tension (Brown-out) risquant de faire décrocher un moteur en plein usinage.
+
+\subsection{Consommation théorique (Bilan d'intensité)}
+Les composants actifs nécessitant une évaluation de puissance sont :
+\begin{itemize}
+    \item \textbf{Moteurs NEMA 17 (x5) :} Le courant nominal maximal par phase d'un `17HS4401` est $I_m = 1.7 \text{ A}$. Nous utilisons une configuration Bipolaire avec un réglage de V-Ref sur le driver limitant le courant efficace RMS à environ $1.4 \text{ A}$ pour limiter l'échauffement Joule. La consommation totale des moteurs bloqués (Holding Torque) est de : $P_{moteurs} = 5 \times 1.4 \text{ A} = 7.0 \text{ A}$.
+    \item \textbf{Électronique de Supervision (ESP32 + Wi-Fi) :} L'activation de la radio RF de l'ESP32 requiert un courant en crête $I_{pic} = 500 \text{ mA}$ sur la ligne $3.3 \text{ V}$, soit une dissipation indirecte (via le convertisseur DC-DC Step-Down $36V \rightarrow 5V$) négligeable de $0.2 \text{ A}$ (coté 36V).
+    \item \textbf{Pertes et ventilateurs :} Les composants passifs, les LEDs et les ventilateurs annexes tirent environ $0.5 \text{ A}$.
+\end{itemize}
+
+\subsection{Sélection de l'Alimentation Primaire (SMPS)}
+
+L'intensité totale projetée au régime critique est :
+\begin{equation}
+    I_{total\_RMS} = \sum I = 7.0 + 0.2 + 0.5 = 7.7 \text{ Ampères}.
+\end{equation}
+
+Pour l'alimentation des moteurs pas à pas, on opte pour une tension de $36 \text{ VDC}$ au lieu de $12 \text{ VDC}$ ou $24 \text{ VDC}$. L'augmentation de la tension diminue drastiquement le temps d'établissement du courant dans l'inductance (di/dt) des bobines, permettant au moteur de garder son couple résistant même à très haute vitesse angulaire.
+Le besoin en puissance électrique brute au primaire est donc :
+\begin{equation}
+    P_{calcul} \approx 36 \text{V} \times 7.7 \text{A} = 277 \text{ Watts}.
+\end{equation}
+
+Afin d'appliquer un coefficient de sécurité industriel ($\times 1.25$) qui empêchera l'alimentation de chauffer en fonctionnant à la limite de ses condensateurs, la \textbf{SMPS choisie est un modèle LRS-350-36 (36 V / 9.7 A / 350 W)}.
+
 % ========================================================
-\section{Conclusion sur l'Étude Électronique}
+\section{Conclusion sur l'infrastructure Mécatronique}
 L'infrastructure mécatronique mise en œuvre surcarte n'est pas qu'un amalgame de câbles : elle conditionne la vie ou la mort du signal algorithmique.  C’est seulement par l'optimisation des fronts temporels avec des Level Shifters, l'étanchéité absolue de l’isolement galvanique, et la provision d'un courant ininterrompu via condensateur, que nous autorisons le système d'exploitation de l'ESP32 à se consacrer intégralement à son immense tache conceptuelle : le calcul de la Cinématique Inverse pure. Le Chapitre 5 qui suit se plonge précisément au cœur de l'algèbre algorithmique de ce microcontrôleur dual-core et de son pendant Interface (l'IHM Flutter).

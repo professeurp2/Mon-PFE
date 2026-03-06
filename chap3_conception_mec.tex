@@ -11,12 +11,126 @@ Ce chapitre constitue le cœur de la justification physique du projet. Le passag
 La mini-fraiseuse CNC 5 axes s'insère dans un environnement comprenant l'utilisateur, la ressource informatique, l'outil de coupe et l'environnement d'atelier.
 La \textbf{Fonction Principale (FP)} est la suivante : Permettre l'usinage automatique 3D (sous tous les angles) et précis d'une pièce brute face à un outil rotatif tridimensionnel, en synchronisant 5 axes simultanément depuis un ordinateur.
 
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        node distance=1cm and 2cm,
+        box/.style={rectangle, draw=macouleur, rounded corners, minimum height=1cm, text width=3.5cm, align=center, thick, fill=blue!5},
+        bubble/.style={ellipse, draw=orange, thick, fill=orange!10, text width=3cm, align=center, minimum height=1.5cm},
+        line/.style={draw, thick}
+    ]
+        \node[bubble] (user) {Utilisateur /\\Concepteur CAO};
+        \node[bubble, right=3cm of user] (matiere) {Matière brute /\\Stock};
+        \node[box, below=1.5cm of user, xshift=3.25cm] (systeme) {\textbf{Mini-Fraiseuse CNC 5 Axes}};
+        
+        \draw[line] (user) -- (systeme) node[midway, left=0.2cm] {À qui ?};
+        \draw[line] (matiere) -- (systeme) node[midway, right=0.2cm] {Sur quoi ?};
+        \draw[line, -{Stealth[scale=1.2]}, red, thick] (systeme.south) -- ++(0,-1) node[below, text width=5cm, align=center, fill=white] {Dans quel but ?\\ \textit{Usiner des géométries complexes sans démontage grâce au fraisage multiaxes.}};
+        
+    \end{tikzpicture}
+    \caption{Diagramme "Bête à cornes" : Expression du besoin fondamental}
+    \label{fig:bete_a_cornes}
+\end{figure}
+
 Les \textbf{Fonctions Contraintes Phares (FC)} s'articulent autour de :
 \begin{itemize}
     \item \textbf{FC1 :} Assurer une rigidité structurelle pour absorber les vibrations de coupe sans déformation plastique (Critère de Von Mises).
     \item \textbf{FC2 :} Traiter les calculs cinématiques en temps réel sans dépassement de contrainte inertielle sur les axes de rotation.
     \item \textbf{FC3 :} Garantir la reproductibilité des mouvements en annihilant le \textit{Backlash} (Jeu d'inversion) mécanique.
+    \item \textbf{FC4 :} S'interfacer facilement via Wi-Fi avec le poste de conception (ordinateur/tablette).
 \end{itemize}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        bubble/.style={ellipse, draw, thick, text width=2.5cm, align=center, minimum height=1.2cm},
+        main/.style={rectangle, draw=macouleur, rounded corners, fill=blue!10, text width=3cm, align=center, thick, minimum height=1.5cm},
+        line/.style={draw, thick, -{Stealth[scale=1.2]}}
+    ]
+        % Milieu extérieur
+        \node[bubble, fill=green!10] (piece) at (-4, 2) {Pièce brute};
+        \node[bubble, fill=orange!10] (user) at (4, 2) {Opérateur\\(IHM/Wi-Fi)};
+        \node[bubble, fill=gray!10] (energie) at (4, -2) {Énergie\\Électrique};
+        \node[bubble, fill=red!10] (vibration) at (-4, -2) {Forces de\\Coupe / Copeaux};
+        \node[bubble, fill=yellow!10] (outil) at (0, 3) {Outil de\\coupe (Fraise)};
+        \node[bubble, fill=teal!10] (budget) at (0, -3) {Contraintes\\Coût \& Fab};
+        
+        % Centre
+        \node[main] (cnc) at (0, 0) {\textbf{CNC 5 Axes}\\(Système)};
+        
+        % Liens FP
+        \draw[line, bend left=15, draw=blue, thick] (piece) to node[above] {FP1} (outil);
+        \draw[line, bend right=15, draw=blue, thick] (outil) to (cnc);
+        \draw[line, bend right=15, draw=blue, thick] (piece) to (cnc);
+        
+        % Liens FC
+        \draw[line, dashed] (user) -- (cnc) node[midway, above] {FC4};
+        \draw[line, dashed] (energie) -- (cnc) node[midway, below] {FCe};
+        \draw[line, dashed] (vibration) -- (cnc) node[midway, below] {FC1};
+        \draw[line, dashed] (budget) -- (cnc) node[midway, left] {FCc};
+
+    \end{tikzpicture}
+    \caption{Diagramme Pieuvre : Graphe des interactions de la machine}
+    \label{fig:diagramme_pieuvre}
+\end{figure}
+
+\subsection{Arborescence technique (Diagramme FAST)}
+Afin de transformer le besoin d'usinage tridimensionnel (FP1) en choix constructifs réels, nous avons établi un diagramme FAST (\textit{Function Analysis System Technique}) résumant les grandes liaisons mécatroniques validées.
+
+\begin{figure}[htbp]
+    \centering
+    \resizebox{0.95\textwidth}{!}{
+    \begin{tikzpicture}[
+        node distance=0.5cm and 1.5cm,
+        box/.style={rectangle, draw, rounded corners, minimum height=1cm, text width=3.5cm, align=center, fill=white, thick},
+        tech/.style={rectangle, draw, rounded corners, minimum height=1cm, text width=3.5cm, align=center, fill=gray!10, thick},
+        line/.style={draw, -{Stealth[scale=1.2]}, thick}
+    ]
+        \node[box, fill=macouleur!20] (fp) {\textbf{FP1 : Usiner 5 faces}\\(Déplacer relatif pièce/outil)};
+        
+        \node[box, right=of fp, yshift=2.5cm] (ft1) {FT1 : Animer l'outil en rotation (Broche)};
+        \node[box, right=of fp] (ft2) {FT2 : Déplacer cartésiennement X, Y, Z};
+        \node[box, right=of fp, yshift=-3cm] (ft3) {FT3 : Basculer et pivoter la pièce};
+        
+        % FT1
+        \node[tech, right=of ft1] (st1) {Moteur Brushless DC};
+        
+        % FT2
+        \node[box, right=of ft2, yshift=1cm] (ft21) {FT2.1 : Guider en translation stricte};
+        \node[box, right=of ft2, yshift=-1cm] (ft22) {FT2.2 : Entraîner la liaison linaire};
+        
+        \node[tech, right=of ft21] (st21) {Rails/Patin HGR15 (\textit{High-Rigidity})};
+        \node[tech, right=of ft22] (st22) {Vis à billes SFU1605 \& NEMA 17};
+        
+        % FT3
+        \node[box, right=of ft3, yshift=0.5cm] (ft31) {FT3.1 : Guider rotatifs A et B};
+        \node[box, right=of ft3, yshift=-1cm] (ft32) {FT3.2 : Démultiplier le couple (Anti-Backlash)};
+        
+        \node[tech, right=of ft31] (st31) {Roulements croisés de plateau Trunnion};
+        \node[tech, right=of ft32] (st32) {Transmission 1:50 Poulie/Courroie crantée};
+        
+        % Lines
+        \draw[line] (fp.east) -- (ft1.west);
+        \draw[line] (fp.east) -- (ft2.west);
+        \draw[line] (fp.east) -- (ft3.west);
+        
+        \draw[line] (ft1.east) -- (st1.west);
+        
+        \draw[line] (ft2.east) -- (ft21.west);
+        \draw[line] (ft2.east) -- (ft22.west);
+        \draw[line] (ft21.east) -- (st21.west);
+        \draw[line] (ft22.east) -- (st22.west);
+        
+        \draw[line] (ft3.east) -- (ft31.west);
+        \draw[line] (ft3.east) -- (ft32.west);
+        \draw[line] (ft31.east) -- (st31.west);
+        \draw[line] (ft32.east) -- (st32.west);
+
+    \end{tikzpicture}
+    }
+    \caption{Diagramme FAST condensé de l'architecture micromécanique}
+    \label{fig:fast}
+\end{figure}
 
 \subsection{Cahier des Charges Qualitatif et Quantitatif}
 

@@ -1,0 +1,84 @@
+% !TEX root = main.tex
+
+% ========================================================
+% BIBLIOGRAPHIE
+% ========================================================
+\newpage
+\addcontentsline{toc}{chapter}{Bibliographie et Nétographie}
+\begin{thebibliography}{99}
+
+\bibitem{machining} 
+\textbf{Smid, Peter.} \textit{CNC Programming Handbook, Third Edition}. Industrial Press Inc., 2007. \newline
+(Référence canonique sur la structure et le parsing du G-Code ISO 6983).
+
+\bibitem{robotics} 
+\textbf{Craig, John J.} \textit{Introduction to Robotics: Mechanics and Control}. Pearson Prentice Hall, 2005. \newline
+(Méthode de Denavit-Hartenberg et calculs matriciels de cinématique inverse).
+
+\bibitem{rdm} 
+\textbf{Timoshenko, Stephen P.} \textit{Résistance des matériaux}. Dunod. \newline
+(Calcul des flèches sur les guides de translation HGR15).
+
+\bibitem{esp32} 
+\textbf{Espressif Systems.} \textit{ESP32 Technical Reference Manual}, 2023. \newline
+\texttt{https://www.espressif.com/en/support/documents/technical-documents} \newline
+(Architecture Dual-Core et FreeRTOS).
+
+\bibitem{flutter} 
+\textbf{Dev Google.} \textit{Flutter Architectural Overview}. \newline
+\texttt{https://docs.flutter.dev/resources/architectural-overview} \newline
+(Documentation sur le Render Tree, StateNotifier et le pattern Riverpod).
+
+\bibitem{openbuilds}
+\textbf{OpenBuilds Community.} \textit{Open Source Machine Design Archives}. \newline
+\texttt{https://openbuilds.com/} \newline
+(Inspiration pour les sous-assemblages de la géométrie V-Slot des profils aluminium).
+
+\end{thebibliography}
+
+% ========================================================
+% ANNEXES
+% ========================================================
+\newpage
+\appendix
+\chapter{Annexes techniques}
+
+\section{Extrait de l'algorithme "Look-Ahead" du Planner (C++)}
+Cet annexe présente une portion simplifiée de l'accélération trapézoïdale programmée sur le Core 1 de l'ESP32 pour lisser les micro-segments du G-Code 5 axes.
+
+\begin{tcolorbox}[colback=white, colframe=macouleur, title=Planner.cpp (Extrait)]
+\begin{verbatim}
+void plan_buffer_line(float x, float y, float z, float a, float b, float feed_rate) {
+    // Calcul du vecteur déplacement 5D (Espace Machine)
+    float dx = x - position[X_AXIS];
+    float dy = y - position[Y_AXIS];
+    float dz = z - position[Z_AXIS];
+    float da = a - position[A_AXIS];
+    float db = b - position[B_AXIS];
+
+    float distance = sqrt(dx*dx + dy*dy + dz*dz + da*da + db*db);
+
+    // Blocage si déplacement inférieur à la tolérance mécanique (0.01mm)
+    if (distance < MINIMUM_PLANNER_SPEED) return;
+
+    // Calcul de la vitesse de croisière cible (Target Speed)
+    float nominal_speed = feed_rate;
+    
+    // Détection d'angle aigu (Jonction) entre l'ancien bloc et le nouveau
+    float junction_cos_theta = calculate_junction_deviation(previous_vector,
+                                                            current_vector);
+                                                            
+    // Ralentissement dynamique aux angles (Cornering Speed)
+    float max_junction_speed = min(nominal_speed, 
+                                   sqrt(JUNCTION_DEVIATION * acceleration 
+                                   / (1.0 - junction_cos_theta)));
+
+    // Insertion dans le Ring Buffer
+    block_buffer[head].nominal_speed = nominal_speed;
+    block_buffer[head].entry_speed = max_junction_speed;
+    
+    // Avance de l'index du Buffer Circulaire
+    head = (head + 1) % BLOCK_BUFFER_SIZE;
+}
+\end{verbatim}
+\end{tcolorbox}
