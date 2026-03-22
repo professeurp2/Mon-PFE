@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.3.6)  22 MAR 2026 21:15
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.3.6)  22 MAR 2026 21:40
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -745,7 +745,7 @@ File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 ) (main.aux (00_resume_abstract.aux)
 Package babel Info: 'french' activates 'french' shorthands.
 (babel)             Reported on input line 12.
- (00_dedicaces_remerciements.aux) (00_frontmatter.aux) (chap1_introduction.aux) (chap2_revue_litterature.aux) (chap3_conception_mec.aux) (chap4_realisation_mecatro.aux) (chap5_developpement_logiciel.aux) (chap6_tests_conclusion.aux) (99_annexe_documentation.aux) (99_backmatter.aux))
+ (00_dedicaces_remerciements.aux) (00_frontmatter.aux) (chap1_introduction.aux) (chap2_revue_litterature.aux) (chap3_conception_mec.aux) (chap4_realisation_mecatro.aux) (chap5_developpement_logiciel.aux) (chap6_tests_conclusion.aux) (99_backmatter.aux))
 \openout1 = `main.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 53.
@@ -929,12 +929,12 @@ LaTeX Font Info:    Font shape `T1/phv/m/it' in size <12> not available
 (Font)              Font shape `T1/phv/m/sl' tried instead on input line 86.
 LaTeX Font Info:    Font shape `T1/phv/m/sl' will be
 (Font)              scaled to size 11.39996pt on input line 86.
- [10])
+)
 \tf@toc=\write5
 \openout5 = `main.toc'.
 
- [11] (main.lof
-Overfull \hbox (8.8718pt too wide) in paragraph at lines 27--27
+ [10] (main.lof
+Overfull \hbox (8.5526pt too wide) in paragraph at lines 27--27
  [][] [][][]\T1/phv/m/n/12 (-20) Diagramme de Classes UML de l'ap-pli-ca-tion Flut-ter (Pat-tern Pro-vi-der/Riverpod)[][] []  
  []
 
@@ -942,29 +942,29 @@ Overfull \hbox (8.8718pt too wide) in paragraph at lines 27--27
 \tf@lof=\write6
 \openout6 = `main.lof'.
 
- [12] (main.lot)
+ [11] (main.lot)
 \tf@lot=\write7
 \openout7 = `main.lot'.
 
- [13]
+ [12]
 \openout2 = `chap1_introduction.aux'.
 
- (chap1_introduction.tex [14
+ (chap1_introduction.tex [13
 
 
-] [15]
+] [14]
 LaTeX Font Info:    Font shape `T1/phv/b/n' will be
 (Font)              scaled to size 9.49997pt on input line 91.
 LaTeX Font Info:    Font shape `T1/phv/m/n' will be
 (Font)              scaled to size 9.49997pt on input line 91.
- [16]) [17]
+ [15]) [16]
 \openout2 = `chap2_revue_litterature.aux'.
 
  (chap2_revue_litterature.tex
 Chapitre 1.
 LaTeX Font Info:    Font shape `T1/phv/b/n' will be
 (Font)              scaled to size 13.67995pt on input line 8.
-[18
+[17
 
 
 
@@ -972,12 +972,12 @@ LaTeX Font Info:    Font shape `T1/phv/b/n' will be
 ]
 LaTeX Font Info:    Font shape `T1/phv/m/n' will be
 (Font)              scaled to size 7.59998pt on input line 47.
- [19] [20]
+ [18] [19]
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `cmtt' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
- [21]) [22]
+ [20]) [21]
 \openout2 = `chap3_conception_mec.aux'.
 
  (chap3_conception_mec.tex
@@ -992,13 +992,13 @@ Overfull \hbox (10.50964pt too wide) in paragraph at lines 40--41
 []\T1/phv/b/n/12 (-20) FC4 : \T1/phv/m/n/12 (-20) S'in-ter-fa-cer fa-ci-le-ment via Wi-Fi avec le poste de concep-tion (or-di-na-teur/tablette). 
  []
 
-[23
+[22
 
 
 
 
-] [24]
-<images/img_tech_broche.jpg, id=725, 803.0pt x 803.0pt>
+] [23]
+<images/img_tech_broche.jpg, id=667, 803.0pt x 803.0pt>
 File: images/img_tech_broche.jpg Graphic file (type jpg)
 <use images/img_tech_broche.jpg>
 Package pdftex.def Info: images/img_tech_broche.jpg  used on input line 142.
@@ -1008,22 +1008,22 @@ Underfull \hbox (badness 10000) in paragraph at lines 143--143
 []\T1/phv/m/sc/12 (+20) Figure 2.4 \T1/phv/m/n/12 (+20) ^^U []Moteur
  []
 
-<images/img_tech_hgr15.jpg, id=726, 1505.625pt x 1505.625pt>
+<images/img_tech_hgr15.jpg, id=668, 1505.625pt x 1505.625pt>
 File: images/img_tech_hgr15.jpg Graphic file (type jpg)
 <use images/img_tech_hgr15.jpg>
 Package pdftex.def Info: images/img_tech_hgr15.jpg  used on input line 148.
 (pdftex.def)             Requested size: 127.01515pt x 127.00003pt.
-<images/img_tech_vis_billes.jpg, id=727, 1204.5pt x 1204.5pt>
+<images/img_tech_vis_billes.jpg, id=669, 1204.5pt x 1204.5pt>
 File: images/img_tech_vis_billes.jpg Graphic file (type jpg)
 <use images/img_tech_vis_billes.jpg>
 Package pdftex.def Info: images/img_tech_vis_billes.jpg  used on input line 154.
 (pdftex.def)             Requested size: 127.01515pt x 127.00003pt.
-<images/img_tech_trunnion.jpg, id=728, 512.91624pt x 406.51875pt>
+<images/img_tech_trunnion.jpg, id=670, 512.91624pt x 406.51875pt>
 File: images/img_tech_trunnion.jpg Graphic file (type jpg)
 <use images/img_tech_trunnion.jpg>
 Package pdftex.def Info: images/img_tech_trunnion.jpg  used on input line 162.
 (pdftex.def)             Requested size: 127.01326pt x 100.66176pt.
-<images/img_tech_courroie.jpg, id=729, 1505.625pt x 833.1125pt>
+<images/img_tech_courroie.jpg, id=671, 1505.625pt x 833.1125pt>
 File: images/img_tech_courroie.jpg Graphic file (type jpg)
 <use images/img_tech_courroie.jpg>
 Package pdftex.def Info: images/img_tech_courroie.jpg  used on input line 168.
@@ -1038,54 +1038,52 @@ Overfull \hbox (29.17628pt too wide) in paragraph at lines 176--177
 []\T1/phv/b/n/12 (-20) Moteur Bru-sh-less DC (Broche) : \T1/phv/m/n/12 (-20) Sé-lec-tionné pour son rap-port puis-sance/encombrement
  []
 
-[25] [26 <./images/img_tech_broche.jpg> <./images/img_tech_hgr15.jpg> <./images/img_tech_vis_billes.jpg> <./images/img_tech_trunnion.jpg> <./images/img_tech_courroie.jpg>] [27]
+[24] [25 <./images/img_tech_broche.jpg> <./images/img_tech_hgr15.jpg> <./images/img_tech_vis_billes.jpg> <./images/img_tech_trunnion.jpg> <./images/img_tech_courroie.jpg>] [26]
 Overfull \hbox (41.58519pt too wide) in paragraph at lines 256--256
 |[]\T1/phv/b/n/17.28 (-20) Résistance des Ma-té-riaux (RDM) et Ana-lyse de Contraintes| 
  []
 
-[28]
+[27]
 Overfull \hbox (15.91112pt too wide) in paragraph at lines 351--351
 |[]\T1/phv/b/n/17.28 (-20) Dimensionnement des mo-teurs d'en-traî-ne-ment (NEMA)| 
  []
 
-[29]
+[28]
 Overfull \hbox (7.58511pt too wide) in paragraph at lines 376--376
 |[]\T1/phv/b/n/17.28 (-20) Dimensionnement des Trans-mis-sions Ro-ta-tives (Axes
  []
 
-[30] [31]) [32]
+[29] [30]) [31]
 \openout2 = `chap4_realisation_mecatro.aux'.
 
  (chap4_realisation_mecatro.tex
 Chapitre 3.
-[33
+[32
 
 
 
 
-] [34] [35]
+] [33] [34]
 Overfull \hbox (25.19731pt too wide) in paragraph at lines 132--133
  [][] 
  []
 
-[36] [37] [38]) [39]
+[35] [36] [37]) [38]
 \openout2 = `chap5_developpement_logiciel.aux'.
 
  (chap5_developpement_logiciel.tex
 Chapitre 4.
-LaTeX Font Info:    Font shape `T1/phv/b/n' will be
-(Font)              scaled to size 10.40245pt on input line 114.
-[40
+[39
 
 
 
 
-] [41] [42]
+] [40] [41]
 Overfull \hbox (40.51466pt too wide) in paragraph at lines 198--198
 []\T1/cmtt/m/n/12 void calculateInverseKinematics(float x, float y, float z, float a, float b) {[] 
  []
 
-[43]
+[42]
 Overfull \hbox (8.47884pt too wide) in paragraph at lines 234--234
  []\T1/cmtt/m/n/12 {"c":"G1","X":5} 
  []
@@ -1098,7 +1096,7 @@ Overfull \hbox (2.77089pt too wide) in paragraph at lines 255--255
 |[]\T1/phv/b/n/14.4 (-20) Architecture Lo-gi-cielle de l'App Flut-ter (Dia-gramme de Classes)| 
  []
 
-[44]) [45] [46]
+[43]) [44] [45]
 \openout2 = `chap6_tests_conclusion.aux'.
 
  (chap6_tests_conclusion.tex
@@ -1107,7 +1105,7 @@ LaTeX Font Info:    Font shape `T1/phv/b/it' in size <14.4> not available
 (Font)              Font shape `T1/phv/b/sl' tried instead on input line 52.
 LaTeX Font Info:    Font shape `T1/phv/b/sl' will be
 (Font)              scaled to size 13.67995pt on input line 52.
-[47
+[46
 
 
 
@@ -1125,7 +1123,7 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `math shift' on input line 58.
 
-[48] [49]
+[47] [48]
 Underfull \hbox (badness 10000) in paragraph at lines 114--114
 []\T1/phv/m/sc/12 (+20) Figure 5.4 \T1/phv/m/n/12 (+20) ^^U []Dôme
  []
@@ -1155,7 +1153,7 @@ Underfull \hbox (badness 5189) in paragraph at lines 154--154
 []|\T1/phv/m/n/12 (+20) Visserie, Câbles, E-
  []
 
-[50]
+[49]
 Underfull \hbox (badness 10000) in paragraph at lines 180--180
 []|\T1/phv/b/n/12 (+20) Mode de dé-
  []
@@ -1250,18 +1248,10 @@ Underfull \hbox (badness 2343) in paragraph at lines 180--180
 []|\T1/phv/m/n/12 (+20) Abaissement ma-nuel
  []
 
-[51]) [52]
-\openout2 = `99_annexe_documentation.aux'.
-
- (99_annexe_documentation.tex [53
-
-
-
-
-]) [54]
+[50]) [51]
 \openout2 = `99_backmatter.aux'.
 
- (99_backmatter.tex [55
+ (99_backmatter.tex [52
 
 
 
@@ -1298,28 +1288,28 @@ Overfull \hbox (40.94514pt too wide) in paragraph at lines 73--73
 []                                   \T1/cmtt/m/n/12 sqrt(JUNCTION_DEVIATION * acceleration[] 
  []
 
-) [56
+) [53
 
-] [57] (main.aux (00_resume_abstract.aux) (00_dedicaces_remerciements.aux) (00_frontmatter.aux) (chap1_introduction.aux) (chap2_revue_litterature.aux) (chap3_conception_mec.aux) (chap4_realisation_mecatro.aux) (chap5_developpement_logiciel.aux) (chap6_tests_conclusion.aux) (99_annexe_documentation.aux) (99_backmatter.aux))
+] [54] (main.aux (00_resume_abstract.aux) (00_dedicaces_remerciements.aux) (00_frontmatter.aux) (chap1_introduction.aux) (chap2_revue_litterature.aux) (chap3_conception_mec.aux) (chap4_realisation_mecatro.aux) (chap5_developpement_logiciel.aux) (chap6_tests_conclusion.aux) (99_backmatter.aux))
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 3612C0C0ED441490141C6577BAFA25E1;31003.
+(rerunfilecheck)             Checksum: 7ABE5AE62CBCDBCAE35F8EC724338CE7;28325.
  ) 
 Here is how much of TeX's memory you used:
- 51108 strings out of 467871
- 1198876 string characters out of 5415957
- 1890239 words of memory out of 5000000
- 78575 multiletter control sequences out of 15000+600000
- 708862 words of font info for 430 fonts, out of 8000000 for 9000
+ 51039 strings out of 467871
+ 1197253 string characters out of 5415957
+ 1889708 words of memory out of 5000000
+ 78544 multiletter control sequences out of 15000+600000
+ 705889 words of font info for 423 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  84i,13n,104p,1398b,1036s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\PROFESSEUR\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ectt0800.pk> <C:\Users\PROFESSEUR\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ectt1200.pk><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx8.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msam7.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvb8a.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvbo8a.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvr8a.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvro8a.pfb>
-Output written on main.pdf (57 pages, 945033 bytes).
+Output written on main.pdf (54 pages, 930179 bytes).
 PDF statistics:
- 1147 PDF objects out of 1200 (max. 8388607)
- 248 named destinations out of 1000 (max. 500000)
- 98190 words of extra memory for PDF output out of 106986 (max. 10000000)
+ 1069 PDF objects out of 1200 (max. 8388607)
+ 228 named destinations out of 1000 (max. 500000)
+ 94006 words of extra memory for PDF output out of 106986 (max. 10000000)
 

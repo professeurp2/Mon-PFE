@@ -343,9 +343,6 @@ INPUT chap5_developpement_logiciel.aux
 INPUT .\chap6_tests_conclusion.aux
 INPUT .\chap6_tests_conclusion.aux
 INPUT chap6_tests_conclusion.aux
-INPUT .\99_annexe_documentation.aux
-INPUT .\99_annexe_documentation.aux
-INPUT 99_annexe_documentation.aux
 INPUT .\99_backmatter.aux
 INPUT .\99_backmatter.aux
 INPUT 99_backmatter.aux
@@ -451,9 +448,9 @@ INPUT .\main.toc
 INPUT .\main.toc
 INPUT main.toc
 INPUT C:\Users\PROFESSEUR\AppData\Local\Programs\MiKTeX\fonts\tfm\adobe\helvetic\phvro8t.tfm
+OUTPUT main.toc
 INPUT C:\Users\PROFESSEUR\AppData\Local\Programs\MiKTeX\fonts\vf\adobe\helvetic\phvro8t.vf
 INPUT C:\Users\PROFESSEUR\AppData\Local\Programs\MiKTeX\fonts\tfm\adobe\helvetic\phvro8r.tfm
-OUTPUT main.toc
 INPUT .\main.lof
 INPUT .\main.lof
 INPUT main.lof
@@ -553,10 +550,7 @@ OUTPUT chap5_developpement_logiciel.aux
 INPUT .\chap5_developpement_logiciel.tex
 INPUT .\chap5_developpement_logiciel.tex
 INPUT chap5_developpement_logiciel.tex
-INPUT C:\Users\PROFESSEUR\AppData\Local\Programs\MiKTeX\fonts\tfm\adobe\helvetic\phvb8t.tfm
 INPUT C:\Users\PROFESSEUR\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ectt0800.tfm
-INPUT C:\Users\PROFESSEUR\AppData\Local\Programs\MiKTeX\fonts\vf\adobe\helvetic\phvb8t.vf
-INPUT C:\Users\PROFESSEUR\AppData\Local\Programs\MiKTeX\fonts\tfm\adobe\helvetic\phvb8r.tfm
 INPUT .\chap6_tests_conclusion.tex
 INPUT .\chap6_tests_conclusion.tex
 OUTPUT chap6_tests_conclusion.aux
@@ -573,12 +567,6 @@ INPUT C:\Users\PROFESSEUR\AppData\Local\Programs\MiKTeX\fonts\tfm\public\amsfont
 INPUT C:\Users\PROFESSEUR\AppData\Local\Programs\MiKTeX\fonts\tfm\public\amsfonts\symbols\msbm10.tfm
 INPUT C:\Users\PROFESSEUR\AppData\Local\Programs\MiKTeX\fonts\vf\adobe\helvetic\phvbo8t.vf
 INPUT C:\Users\PROFESSEUR\AppData\Local\Programs\MiKTeX\fonts\tfm\adobe\helvetic\phvbo8r.tfm
-INPUT .\99_annexe_documentation.tex
-INPUT .\99_annexe_documentation.tex
-OUTPUT 99_annexe_documentation.aux
-INPUT .\99_annexe_documentation.tex
-INPUT .\99_annexe_documentation.tex
-INPUT 99_annexe_documentation.tex
 INPUT .\99_backmatter.tex
 INPUT .\99_backmatter.tex
 OUTPUT 99_backmatter.aux
@@ -613,9 +601,6 @@ INPUT chap5_developpement_logiciel.aux
 INPUT .\chap6_tests_conclusion.aux
 INPUT .\chap6_tests_conclusion.aux
 INPUT chap6_tests_conclusion.aux
-INPUT .\99_annexe_documentation.aux
-INPUT .\99_annexe_documentation.aux
-INPUT 99_annexe_documentation.aux
 INPUT .\99_backmatter.aux
 INPUT .\99_backmatter.aux
 INPUT 99_backmatter.aux
