@@ -71,7 +71,17 @@ Ici, la table supportant la pièce est fixe (ou ne se déplace qu'en translation
 \subsection{Configuration "Head-Table" (Hybride)}
 Cette architecture répartit les rotations. Généralement, l'axe de basculement est fixé sur la tête de la broche, et l'axe de rotation continue est placé sur une table tournante. Cette solution hybride permet un compromis intéressant pour les machines de taille moyenne, mais complexifie sérieusement les algorithmes de compensation et de Homing.
 
-\section{Les Technologies Mécaniques de Transmission}
+\section{Problématiques Avancées : Singularités et TCP}
+
+L'usinage 5 axes introduit des défis théoriques absents des machines cartésiennes classiques : la gestion des singularités et le contrôle du point de contact outil.
+
+\subsection{Les Singularités Cinématiques (Gimbal Lock)}
+Une singularité cinématique survient lorsque deux axes de rotation s'alignent, entraînant la perte d'un degré de liberté. Pour une table Trunnion (Axe A et B), cela se produit généralement lorsque l'Axe B est vertical et que l'angle de l'Axe A atteint une valeur critique (souvent $0^\circ$).
+À ce point précis, une infinité de combinaisons d'angles peut donner la même position spatiale, ce qui peut provoquer des accélérations infinies théoriques des moteurs et des marques de vibration sur la pièce. Le logiciel de contrôle doit intégrer des algorithmes d'évitement ou de lissage de trajectoire aux abords de ces zones critiques.
+
+\subsection{Le Concept de TCP (Tool Center Point Control)}
+Dans un système 3 axes, la position de l'outil est directement liée aux coordonnées X, Y, Z. En 5 axes, toute rotation de la table (Axe A ou B) déplace physiquement la pièce par rapport à la pointe de l'outil.
+Le \textbf{TCP Control} est la capacité du contrôleur à compenser automatiquement ces décalages géométriques. Au lieu de programmer les positions des moteurs, le programmeur définit la trajectoire de la \textbf{pointe de l'outil} par rapport à la pièce. C'est l'intelligence embarquée (le microcontrôleur) qui recalcule en temps réel les compensations linéaires $\Delta X, \Delta Y, \Delta Z$ nécessaires pour "suivre" le mouvement de rotation sans quitter le contact avec la matière.
 Dans une CNC 5 axes, la moindre imprécision locale fausse l'entièreté de l'assemblage (accumulation d'erreurs). Le passage du mouvement de rotation des actionneurs au mouvement linéaire doit être le plus parfait possible.
 \begin{enumerate}
     \item \textbf{Les Courroies Crantées (ex: GT2) :} Très répandues dans le prototypage 3D, elles sont rapides et économiques. Toutefois, leur manque de rigidité (élongation sous charge, effet élastique) les rend inadaptées aux résonances vibratoires inhérentes au fraisage, et encore moins au poids contraint d'une architecture Trunnion.

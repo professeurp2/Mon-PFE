@@ -8,9 +8,16 @@
 \usepackage{geometry}
 \usepackage{amsmath}
 \usepackage{amsfonts}
-\geometry{hmargin=2.5cm,vmargin=2.5cm}
+\usepackage{amssymb}
+\geometry{hmargin=2.5cm,vmargin=2.5cm, bindingoffset=0.5cm}
 \usepackage{setspace}
 \onehalfspacing % Interligne 1.5 obligatoire pour les PFE
+
+% --- Optimisation de la Typographie (Style Arial/Helvetica) ---
+\usepackage[scaled]{helvet}    % Charge Helvetica (quasi identique à Arial)
+\renewcommand{\familydefault}{\sfdefault} % Définit le Sans-Serif par défaut pour tout le document
+\usepackage{microtype}         % Améliore l'espacement et l'alignement des blocs
+\usepackage{parskip}           % Ajoute un léger espace entre les paragraphes (plus moderne)
 
 % --- Packages pour les graphiques et schémas ---
 \usepackage{tikz}
@@ -24,6 +31,7 @@
 \usepackage{enumitem}
 \usepackage{titlesec}
 \usepackage{tocloft}
+\usepackage[colorlinks=true, allcolors=macouleur]{hyperref} % Liens cliquables professionnels
 
 % Définition de la couleur bleue pro (similaire aux exemples)
 \definecolor{macouleur}{RGB}{31, 78, 121}

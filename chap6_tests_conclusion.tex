@@ -60,12 +60,12 @@ Le microcontrôleur ESP32 ne comprend que des impulsions (Ticks). Les valeurs sa
 
 Pour l'axe X (Vis à billes de pas $5\text{mm}$, Moteur $1.8^\circ=200\text{ Pas/tr}$, Microstepping du DM556 paramétré à $1/16$) :
 \begin{equation}
-    Steps/mm = \frac{N_{pas/tour} \times \mu{Step}}{P_h} = \frac{200 \times 16}{5} = \textbf{640 \text{ Impulsions/mm}}.
+    \textbf{AN : } Steps/mm = \frac{N_{pas/tour} \times \mu{Step}}{P_h} = \frac{200 \times 16}{5} = \boxed{640 \text{ Impulsions/mm}}
 \end{equation}
 
 Pour le plateau Trunnion rotatif Axe B (Réduction harmonique ratio $1:50$) :
 \begin{equation}
-    Steps/\text{Degré} = \frac{200 \times 16 \times 50}{360^\circ} = \textbf{444.444 \text{ Impulsions/Degré}}.
+    \textbf{AN : } Steps/\text{Degré} = \frac{200 \times 16 \times 50}{360^\circ} = \boxed{444,444 \text{ Impulsions/Degré}}
 \end{equation}
 L'exactitude "flottante" de ce paramétrage confirme à l'ESP32 l'extrême finesse de déclenchement d'une interpolation 5 axes continue.
 
@@ -82,7 +82,7 @@ Pour ce faire, une pige de centrage (Edge Finder mécanique à ressort) montée 
 
 \subsection{Essai 1 : Contourage 2.5D (Rigidité et Répétabilité)}
 \textbf{Protocole :} Usinage d'une poche rectangulaire (pocketing) et d'un alésage dans un bloc d'aluminium AW-2017A avec une fraise de $6\text{ mm}$ (Avance : $400 \text{ mm/min}$, Passe de $0.5 \text{ mm}$).
-\textbf{Analyse des Résultats :} Le pied à coulisse au $1/50^{ème}$ constate une tolérance d'erreur de positionnement $\Delta_{moyen} = \pm 0.04 \text{ mm}$. La pièce n'affiche pas de trace d'arrachement par vibration (Broutage). Les vis sphériques à billes absorbent victorieusement les pics d'accélération inertielle du système sans flexion notable du portique (validant la RDM).
+\textbf{Analyse des Résultats :} Le pied à coulisse au $1/50^{\text{ème}}$ constate une tolérance d'erreur de positionnement $\Delta_{moyen} = \pm 0.04 \text{ mm}$. La pièce n'affiche pas de trace d'arrachement par vibration (Broutage). Les vis sphériques à billes absorbent victorieusement les pics d'accélération inertielle du système sans flexion notable du portique (validant la RDM).
 
 \subsection{Essai 2 : Usinage Positionnel "3+2 axes"}
 \textbf{Protocole :} Opération multi-faces sur une pièce fixée une seule fois. Le plan G-Code pivote le plateau de $90^\circ$ (Axe B) pour le fraisage d'une gorge latérale, puis bascule de $45^\circ$ (Axe A) pour chanfreiner une arrête supérieure.
@@ -98,19 +98,19 @@ Les 5 moteurs tournent simultanément à des vitesses variées. L'outil "glisse"
     \centering
     \begin{minipage}{0.31\textwidth}
         \centering
-        \includegraphics[width=\linewidth, draft]{placeholder_test1_2D.png}
+%        \includegraphics[width=\linewidth, draft]{placeholder_test1_2D.png}
         \caption{Contourage 2.5D}
         \label{fig:test1}
     \end{minipage}\hfill
     \begin{minipage}{0.31\textwidth}
         \centering
-        \includegraphics[width=\linewidth, draft]{placeholder_test2_3plus2.png}
+%        \includegraphics[width=\linewidth, draft]{placeholder_test2_3plus2.png}
         \caption{Chanfreins en 3+2}
         \label{fig:test2}
     \end{minipage}\hfill
     \begin{minipage}{0.31\textwidth}
         \centering
-        \includegraphics[width=\linewidth, draft]{placeholder_test3_5axes.png}
+%        \includegraphics[width=\linewidth, draft]{placeholder_test3_5axes.png}
         \caption{Dôme continu 5 axes}
         \label{fig:test3}
     \end{minipage}
@@ -124,6 +124,7 @@ La viabilité de ce projet repose sur la démonstration qu'une technologie compl
 \begin{table}[htbp]
     \centering
     \renewcommand{\arraystretch}{1.2}
+\resizebox{\textwidth}{!}{
     \begin{tabular}{|l|p{4cm}|c|c|r|}
     \hline
     \textbf{Catégorie} & \textbf{Désignation Composant} & \textbf{Qté} & \textbf{PU (FCFA)} & \textbf{P. Total (FCFA)} \\ \hline
@@ -150,6 +151,7 @@ La viabilité de ce projet repose sur la démonstration qu'une technologie compl
     \hline
     \multicolumn{4}{|r|}{\textbf{COÛT GLOBAL ESTIMÉ DE REVIENT DU PROTOTYPE}} & \textbf{526 000 FCFA} \\ \hline
     \end{tabular}
+}
     \caption{Nomenclature Financière (Bill of Materials) détaillée en Francs CFA}
     \label{tab:bom}
 \end{table}

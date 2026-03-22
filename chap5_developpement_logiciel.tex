@@ -62,8 +62,8 @@ Le code source ESP32 s'affranchit du code "spaghetti" séquentiel grâce à une 
     \centering
     \resizebox{0.8\textwidth}{!}{
     \begin{tikzpicture}[
-        class/.style={rectangle, draw=black, thick, fill=white, text width=4cm, rounded corners, align=left},
-        title/.style={font=\bfseries, align=center, fill=gray!20, draw, thick, rounded corners=0pt, minimum width=4cm, minimum height=0.7cm},
+        class/.style={rectangle, draw=black, thick, fill=white, text width=5cm, rounded corners, align=left},
+        title/.style={font=\bfseries, align=center, fill=gray!20, draw, thick, rounded corners=0pt, minimum width=5cm, minimum height=0.7cm},
         line/.style={-{Diamond[scale=1.5, open]}, thick}
     ]
         % CNC Controller
@@ -74,7 +74,7 @@ Le code source ESP32 s'affranchit du code "spaghetti" séquentiel grâce à une 
             + init()\\
             + emergencyStop()
         };
-        \node[title] at (0, 0.6) {CncController};
+        \node[title, anchor=north] at (cnc.north) {CncController};
 
         % GCodeParser
         \node[class] (parser) at (-5, -4) {
@@ -83,7 +83,7 @@ Le code source ESP32 s'affranchit du code "spaghetti" séquentiel grâce à une 
             + parseLine(String text)\\
             + validateSyntax(): bool
         };
-        \node[title] at (-5, -3.4) {GcodeParser};
+        \node[title, anchor=north] at (parser.north) {GcodeParser};
 
         % Kinematics
         \node[class] (ik) at (0, -4) {
@@ -93,7 +93,7 @@ Le code source ESP32 s'affranchit du code "spaghetti" séquentiel grâce à une 
             + calculateTrunnion(float X, ...)\\
             + getMotorSteps(): long[]
         };
-        \node[title] at (0, -3.4) {KinematicsSolver};
+        \node[title, anchor=north] at (ik.north) {KinematicsSolver};
 
         % Motor
         \node[class] (motor) at (5, -4) {
@@ -103,7 +103,7 @@ Le code source ESP32 s'affranchit du code "spaghetti" séquentiel grâce à une 
             + generatePulse()\\
             + setDirection(bool dir)
         };
-        \node[title] at (5, -3.4) {StepperMotor};
+        \node[title, anchor=north] at (motor.north) {StepperMotor};
 
         % Relations
         \draw[line] (parser.north) -- (-5, -0.6) -- (cnc.west);
@@ -148,6 +148,19 @@ Afin de garantir une sécurité opérationnelle absolue, le C++ embarqué refuse
 
 Le passage à l'état \texttt{RUN} active la lecture du Ring Buffer, confiant la génération impulsionnelle au Core 1.
 
+\section{Algorithmique de Génération de Mouvements}
+
+\subsection{DDA (Digital Differential Analyzer) vs Timers Hardware}
+La génération de pas pour 5 axes simultanés impose un synchronisme parfait. Deux approches algorithmiques ont été évaluées :
+\begin{itemize}
+    \item \textbf{L'algorithme de Bresenham / DDA :} Il s'agit d'une méthode logicielle où une boucle principale incrémente une erreur de position. Bien que simple, elle consomme des cycles CPU et peut être perturbée par d'autres interruptions logicielles, créant de la gigue (jitter).
+    \item \textbf{La Génération par Timers (Choix retenu) :} Nous utilisons les Timers 64 bits de l'ESP32. À chaque interruption matérielle (ISR), le calcul de la vitesse actuelle (S-Curve) détermine le délai exact avant la prochaine impulsion. Cette méthode est totalement déterministe et permet d'atteindre des fréquences de découpage de $100 \text{ kHz}$ sans dérive temporelle.
+\end{itemize}
+
+\subsection{Gestion du Flux : Logique Look-Ahead}
+Le fraisage 5 axes continu génère des milliers de micro-segments G-Code. Si le contrôleur s'arrêtait à chaque fin de ligne, le mouvement serait saccadé.
+Nous avons implémenté un buffer de \textbf{Look-Ahead} (Anticipation). L'algorithme analyse les 20 segments à venir pour calculer l'angle de jonction entre les vecteurs. Si l'angle est faible, le Planner maintient une vitesse élevée ("Cornering speed"). Si le changement de direction est brutal (ex. angle vif), il calcule une rampe de décélération préventive pour respecter les limites de couple des moteurs et éviter les pertes de pas par inertie.
+
 \section{Implémentation du Code : Micrologiciel (ESP32)}
 
 \subsection{L'Architecture Dual-Core (FreeRTOS)}
@@ -168,7 +181,7 @@ Le tableau D-H liant l'outil au système de coordonnées du plateau rotatif s'é
     \centering
     \begin{tabular}{|c|c|c|c|c|l|}
     \hline
-    \textbf{Axe $i$} & \textbf{Articul.} & \textbf{$\alpha_{i-1}$ (\circ)} & \textbf{$a_{i-1}$ (mm)} & \textbf{$\theta_i$ (\circ)} & \textbf{$d_i$ (mm)} \\ \hline
+    \textbf{Axe $i$} & \textbf{Articul.} & \textbf{$\alpha_{i-1}$ ($^\circ$)} & \textbf{$a_{i-1}$ (mm)} & \textbf{$\theta_i$ ($^\circ$)} & \textbf{$d_i$ (mm)} \\ \hline
     0 $\rightarrow$ X  & Linéaire  & 0 & 0 & 0 & $X_{moteur}$ \\ \hline
     X $\rightarrow$ Y  & Linéaire  & -90 & 0 & -90 & $Y_{moteur}$ + Offset $L_{y}$ \\ \hline
     Y $\rightarrow$ Z  & Linéaire  & -90 & 0 & 0 & $Z_{moteur}$ + Offset $L_{z}$ \\ \hline
@@ -237,6 +250,65 @@ L'application Flutter utilise les \textit{Expressions Régulières (Regex)} pour
     \end{tikzpicture}
     \caption{Logigramme de parsing, sérialisation et transmission du G-Code sous Flutter}
     \label{fig:gcode_parser}
+\end{figure}
+
+\subsection{Architecture Logicielle de l'App Flutter (Diagramme de Classes)}
+L'application mobile et desktop suit un patron d'architecture réactive orientée données, articulée autour du State Management.
+
+\begin{figure}[htbp]
+    \centering
+    \resizebox{0.9\textwidth}{!}{
+    \begin{tikzpicture}[
+        class/.style={rectangle, draw=black, thick, fill=white, text width=6.5cm, rounded corners, align=left},
+        title/.style={font=\bfseries, align=center, fill=blue!10, draw, thick, rounded corners=0pt, minimum width=6.5cm, minimum height=0.7cm},
+        line/.style={-{Stealth[scale=1.2]}, thick},
+        assoc/.style={-{Diamond[scale=1.5, open]}, thick}
+    ]
+        % UI Layer
+        \node[class] (ui) at (0,0) {
+            \vspace{0.7cm}\\ 
+            + build(context): Widget\\
+            + onPlayPressed()\\
+            + onStopPressed()
+        };
+        \node[title, anchor=north] at (ui.north) {MainDashboardView};
+
+        % State Layer
+        \node[class] (provider) at (0, -4) {
+            \vspace{0.7cm}\\ 
+            - state: MachineState\\
+            + updatePosition(JSON)\\
+            + sendCommand(GCode)
+        };
+        \node[title, anchor=north] at (provider.north) {MachineStateNotifier};
+
+        % Service Layer
+        \node[class] (service) at (6, -4) {
+            \vspace{0.7cm}\\ 
+            - socket: RawDatagramSocket\\
+            + listen(): Stream\\
+            + sendUDP(trame)
+        };
+        \node[title, anchor=north] at (service.north) {UdpCommunicationService};
+
+        % Data Model
+        \node[class] (model) at (-6, -4) {
+            \vspace{0.7cm}\\ 
+            + x, y, z: double\\
+            + a, b: double\\
+            + status: String
+        };
+        \node[title, anchor=north] at (model.north) {MachineModel};
+
+        % Relations
+        \draw[line] (ui.south) -- (provider.north) node[midway, right, font=\scriptsize] {watch/read};
+        \draw[assoc] (model.east) -- (provider.west);
+        \draw[line] (service.west) -- (provider.east);
+
+    \end{tikzpicture}
+    }
+    \caption{Diagramme de Classes UML de l'application Flutter (Pattern Provider/Riverpod)}
+    \label{fig:uml_flutter}
 \end{figure}
 
 \subsection{State Management : La pureté de Riverpod}

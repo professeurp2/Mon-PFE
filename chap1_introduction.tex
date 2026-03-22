@@ -22,7 +22,7 @@ L'usinage multiaxes est le bras armé de cette nouvelle industrie. En permettant
     \centering
     % Placeholder pour une image de CNC 5 axes
     % Remplacer "placeholder_cnc5axes.png" par l'image réelle
-    \includegraphics[width=0.7\textwidth, draft]{placeholder_cnc5axes.png} 
+%    \includegraphics[width=0.7\textwidth, draft]{placeholder_cnc5axes.png} 
     \caption{Concept d'usinage sur un centre CNC 5 axes (Table Trunnion)}
     \label{fig:concept_5axes}
 \end{figure}
@@ -32,6 +32,17 @@ L'acquisition de centres d'usinage 5 axes reste un luxe technologique, souvent i
 Les systèmes propriétaires (Fanuc, Heidenhain, Siemens) interdisent toute modification algorithmique de bas niveau, limitant l'apprentissage profond de la mécatronique de commande pour les étudiants et ingénieurs.
 
 La problématique qui sous-tend ce mémoire est donc la suivante : \textbf{Comment concevoir et réaliser localement, à moindre coût, une mini-fraiseuse CNC 5 axes et développer l'intégralité de son environnement logiciel (de la cinématique inverse sur microcontrôleur 32 bits jusqu'à l'Interface Homme-Machine multiplateforme) pour obtenir un système d'usinage didactique, performant et ouvert ?}
+
+\section*{Souveraineté Technologique et Enjeux au Mali}
+Dans le contexte de la transition industrielle du Mali, l'acquisition de technologies de pointe est le pivot de la croissance économique. Ce projet dépasse le cadre d'un simple exercice académique pour s'inscrire dans une vision de \textbf{Souveraineté Technologique}. L'École Nationale d'Ingénieurs Abderhamane Baba Touré (ENI-ABT) a pour mission de former des cadres capables de s'affranchir de la dépendance externe.
+
+La maîtrise locale du code source et de la conception mécanique d'un système 5 axes permet :
+\begin{itemize}
+    \item \textbf{La Maintenance Autonome :} Les pannes sur les CNC industrielles étrangères paralysent souvent les entreprises maliennes faute de pièces ou de techniciens agréés. Une machine "open-design" est réparable localement.
+    \item \textbf{L'Industrialisation des PME :} Permettre à de petits ateliers de fabriquer des pièces de haute précision (prothèses médicales, pièces aéronautiques de rechange, moules complexes) sans investissements de plusieurs centaines de millions de FCFA.
+    \item \textbf{L'Innovation Continue :} La possibilité de modifier les algorithmes de la machine pour l'adapter à des besoins spécifiques (impression 3D béton, découpe laser multiaxes, etc.).
+\end{itemize}
+C’est une contribution directe à l'édifice d'une industrie nationale résiliente et auto-suffisante.
 
 \section*{Objectifs du Projet}
 L'objectif principal est la réalisation de A à Z d'un prototype fonctionnel de CNC 5 axes piloté par un logiciel propriétaire (développé "from scratch"). Les objectifs spécifiques se déclinent comme suit :
