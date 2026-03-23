@@ -1,0 +1,457 @@
+% !TEX root = ../main.tex
+\chapter{Annexes Techniques et Documentation}
+\label{annexe:documentation}
+
+\section{A.1 — Code Source Commenté du Firmware ESP32}
+
+\subsection{A.1.1 — Fichier Principal : \texttt{main.cpp}}
+
+\begin{tcolorbox}[colback=gray!5, colframe=macouleur, title=\texttt{main.cpp} -- Point d'entrée du firmware ESP32]
+\begin{verbatim}
+/**
+ * @file main.cpp
+ * @brief Firmware CNC 5-axes pour ESP32 (configuration Trunnion Table)
+ * @author Étudiant PFE - ENI-ABT, Génie Mécanique et Énergie
+ * @date 2025
+ * @hardware ESP32-WROOM-32U, DM556 x5, NEMA17 x5, MeanWell 36V/350W
+ *
+ * ARCHITECTURE DUAL-CORE:
+ *   - Core 0: Réseau Wi-Fi (UDP), parsing JSON, cinématique inverse
+ *   - Core 1: Hardware Timer ISR (Step/Dir), Ring Buffer, Planner
+ */
+
+#include <Arduino.h>
+#include <WiFi.h>
+#include <AsyncUDP.h>
+#include "GCodeParser.h"       // Parser G-Code ISO 6983
+#include "Planner5Axes.h"      // Planificateur Look-Ahead
+#include "InvKinematics.h"     // Cinématique Inverse Trunnion
+#include "StepGenerator.h"     // Générateur d'impulsions Step/Dir
+#include "SafetyMonitor.h"     // Gestion E-STOP et fins de course
+
+// ---- Configuration Réseau Wi-Fi ----
+const char* WIFI_SSID = "CNC5AXES_AP";
+const char* WIFI_PASS = "cnc12345";    // Réseau AP propre à la machine
+const uint16_t UDP_PORT = 2222;
+
+// ---- Instances Globales ----
+AsyncUDP udp;
+GCodeParser  parser;
+Planner5Axes planner;
+InvKinematics ik;
+StepGenerator stepGen;
+SafetyMonitor safety;
+
+// Tâche réseau sur Core 0 (basse priorité)
+void taskNetwork(void* pvParameters) {
+    WiFi.softAP(WIFI_SSID, WIFI_PASS);
+    udp.listen(UDP_PORT);
+    
+    udp.onPacket([](AsyncUDPPacket packet) {
+        // Extraire la charge utile JSON
+        String payload((char*)packet.data(), packet.length());
+        
+        // Valider le CRC-16 du paquet
+        if (!validateCRC(payload)) return;
+        
+        // Parser le bloc G-Code
+        GCodeBlock block = parser.parseBlock(payload);
+        
+        // Calcul cinématique inverse (TCP compensé)
+        MotorPositions motors = ik.solve(
+            block.x, block.y, block.z,
+            block.a, block.b);
+        
+        // Insérer dans le Ring Buffer du Planner
+        planner.bufferBlock(motors, block.feedRate);
+        
+        // Envoyer ACK avec position courante
+        String ack = buildACKJson(ik.getCurrentPosition());
+        packet.print(ack);
+    });
+    
+    // Boucle infinie (la pile réseau gère l'événementiel)
+    while(true) vTaskDelay(100 / portTICK_PERIOD_MS);
+}
+
+// Tâche temps-réel sur Core 1 (priorité maximale)
+void taskRealTime(void* pvParameters) {
+    // Configurer les Hardware Timers pour Step Generation
+    stepGen.init();
+    safety.init();
+    
+    while(true) {
+        // Vérifier les fins de course et E-STOP
+        if (safety.isEmergencyStop()) {
+            stepGen.disableAllAxes();
+            planner.clearBuffer();
+            // Attendre l'acquittement de l'opérateur
+            while(safety.isEmergencyStop()) vTaskDelay(1);
+        }
+        
+        // Exécuter le bloc suivant s'il est disponible
+        if (planner.hasBlock()) {
+            MotionBlock block = planner.popBlock();
+            stepGen.executeBlock(&block);  // Bloquant
+        }
+        
+        vTaskDelay(1 / portTICK_PERIOD_MS); // Yield 1ms
+    }
+}
+
+void setup() {
+    Serial.begin(115200);
+    
+    // Démarrer les deux tâches sur leurs cœurs assignés
+    xTaskCreatePinnedToCore(taskNetwork,  "NetTask",  8192, NULL, 1, NULL, 0);
+    xTaskCreatePinnedToCore(taskRealTime, "RTTask",   4096, NULL, 5, NULL, 1);
+    
+    // Déléguer immédiatement à FreeRTOS Scheduler
+}
+
+void loop() { vTaskDelete(NULL); } // Loop non utilisée
+\end{verbatim}
+\end{tcolorbox}
+
+\subsection{A.1.2 — Algorithme de Cinématique Inverse : \texttt{InvKinematics.cpp}}
+
+\begin{tcolorbox}[colback=gray!5, colframe=macouleur, title=\texttt{InvKinematics.cpp} -- Calcul des compensations TCP Trunnion]
+\begin{verbatim}
+/**
+ * @brief Résout la cinématique inverse de la table Trunnion.
+ * Transforme les coordonnées pièce (x_w, y_w, z_w, A°, B°)
+ * en positions machine corrigées (x_m, y_m, z_m).
+ *
+ * ÉQUATIONS MATHÉMATIQUES (Trunnion A+B):
+ *   R_plateau = rayon du plateau = 100 mm
+ *   H_berceau = hauteur du pivot sous la table = 80 mm
+ *
+ *   dZ = R * (1 - cos(A_rad))       // Décalage TCP en Z
+ *   dY = R * sin(A_rad)              // Décalage TCP en Y
+ *
+ *   x_m = x_w   - dY * (-sin(B_rad)) // Projection X par rotation B
+ *   y_m = y_w   - dY * cos(B_rad)    // Projection Y
+ *   z_m = z_w   - dZ                 // Correction Z
+ */
+MotorPositions InvKinematics::solve(float x_w, float y_w, float z_w,
+                                     float A_deg, float B_deg) {
+    const float R = PLATEAU_RADIUS_MM;  // 100.0f mm
+    
+    // Conversion Degrés -> Radians
+    float A_rad = A_deg * DEG_TO_RAD;
+    float B_rad = B_deg * DEG_TO_RAD;
+    
+    // Calcul des offsets TCP (Table Trunnion A+B)
+    float dZ_tcp = R * (1.0f - cosf(A_rad));
+    float dY_tcp = R * sinf(A_rad);
+    
+    // Application de la rotation B sur les offsets (matrice 2x2)
+    float dx_machine = dY_tcp * (-sinf(B_rad));
+    float dy_machine = dY_tcp * cosf(B_rad);
+    
+    // Positions machine finales
+    MotorPositions motors;
+    motors.x = x_w - dx_machine;
+    motors.y = y_w - dy_machine;
+    motors.z = z_w - dZ_tcp;
+    motors.a = A_deg;  // Angles moteurs A et B
+    motors.b = B_deg;  // = angulations demandées
+    
+    return motors;
+}
+\end{verbatim}
+\end{tcolorbox}
+
+\subsection{A.1.3 — Interface Utilisateur Flutter : \texttt{dashboard\_page.dart}}
+
+\begin{tcolorbox}[colback=gray!5, colframe=macouleur, title=\texttt{dashboard\_page.dart} -- Écran principal IHM Flutter]
+\begin{verbatim}
+/// Page principale de l'IHM - Tableau de bord de la CNC 5 Axes
+/// Architecture : Riverpod v2 + Flutter 3.x
+/// Widget Stateless consommant les états depuis les Providers
+class DashboardPage extends ConsumerWidget {
+  const DashboardPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Écoute réactive de l'état complet de la machine
+    final machineState = ref.watch(machineStateProvider);
+    final coordinates = ref.watch(coordinatesProvider);
+    final connectionStatus = ref.watch(connectionStatusProvider);
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF0A0F1E),
+      body: Row(
+        children: [
+          // === PANNEAU GAUCHE : Coordonnées & Status ===
+          SizedBox(
+            width: 280,
+            child: Column(
+              children: [
+                // En-tête Machine
+                MachineHeaderWidget(
+                  machineName: 'CNC-5AXES / ENI-ABT',
+                  status: connectionStatus,
+                ),
+                // Affichage des 5 axes (monospace, grand)
+                for (final axis in ['X', 'Y', 'Z', 'A', 'B'])
+                  AxisCoordinateCard(
+                    axisLabel: axis,
+                    value: coordinates.getAxis(axis),
+                    isRotary: axis == 'A' || axis == 'B',
+                  ),
+              ],
+            ),
+          ),
+          
+          // === PANNEAU CENTRE : Visualisateur 3D G-Code ===
+          Expanded(
+            child: GCodeViewer3D(
+              gcodeBlocks: ref.watch(gcodeQueueProvider),
+              currentLineIndex: machineState.currentLine,
+            ),
+          ),
+          
+          // === PANNEAU DROITE : Contrôles ===
+          SizedBox(
+            width: 300,
+            child: Column(
+              children: [
+                // Boutons Action Principaux
+                CycleControlButtons(
+                  onStart: () => ref.read(
+                    cycleControlProvider.notifier).startCycle(),
+                  onPause: () => ref.read(
+                    cycleControlProvider.notifier).feedHold(),
+                  onEStop: () => ref.read(
+                    safetyProvider.notifier).triggerEStop(),
+                ),
+                // Contrôle Jog Manuel
+                const JogPadWidget(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+\end{verbatim}
+\end{tcolorbox}
+
+% ============================================
+\section{A.2 — Fiches Techniques des Composants Principaux}
+
+\subsection{A.2.1 — Extrait de la Fiche Technique ESP32-WROOM-32U (Espressif Systems)}
+
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|l|l|}
+\hline
+\rowcolor{macouleur!20}
+\textbf{Paramètre} & \textbf{Valeur} \\
+\hline
+Processeur & Xtensa LX6 Dual-Core 32-bit \\
+\hline
+Fréquence CPU & 80 / 160 / 240 MHz (configurable) \\
+\hline
+SRAM interne & 520 KB \\
+\hline
+Flash embarquée & 4 MB (SPI Flash) \\
+\hline
+Wi-Fi & 802.11 b/g/n 2.4 GHz, 150 Mbps \\
+\hline
+Bluetooth & BT Classic 4.2 + BLE \\
+\hline
+GPIO disponibles & 34 broches (28 configurables) \\
+\hline
+Hardware Timers & 4 × 64 bits haute résolution \\
+\hline
+ADC & 18 canaux 12 bits (0--3.6V) \\
+\hline
+DAC & 2 canaux 8 bits \\
+\hline
+Tension d'alimentation & $3{,}0$ -- $3{,}6$ V (Typique $3{,}3$ V) \\
+\hline
+Courant de veille (Deep Sleep) & $10\,\mu A$ \\
+\hline
+Courant opération Wi-Fi (Pic Tx) & $500\,mA$ (Burst), $80\,mA$ nominal \\
+\hline
+Température opération & $-40°C$ -- $+85°C$ (Gamme Industrielle) \\
+\hline
+Dimensions module & $18 \times 25{,}5 \times 3{,}1$ mm \\
+\hline
+Certification & CE, FCC, TELEC, IC \\
+\hline
+\end{tabular}
+\caption{Caractéristiques techniques clés de l'ESP32-WROOM-32U (Source : Espressif DS ESP32 Rev 3.3)}
+\label{tab:esp32_specs}
+\end{table}
+
+\subsection{A.2.2 — Extrait de la Fiche Technique Driver DM556 (Leadshine)}
+
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|l|l|}
+\hline
+\rowcolor{macouleur!20}
+\textbf{Paramètre} & \textbf{Valeur} \\
+\hline
+Courant moteur (pic) & 1{,}0 -- 5{,}6 A (réglable par DIP) \\
+\hline
+Tension d'alimentation & 18 -- 50 V DC \\
+\hline
+Micro-stepping & 400 / 800 / 1~600 / 3~200 / 6~400 / 12~800 / 25~600 pas/tour \\
+\hline
+Fréquence Step max & 200 kHz \\
+\hline
+Temps de réponse Step & $< 1\,\mu s$ (Isolation optique) \\
+\hline
+Niveau logique entrée & $3{,}5$ -- $5{,}5$ V (TTL 5V requis) \\
+\hline
+Courant d'entrée ($I_f$) & $10$ -- $14$ mA \\
+\hline
+Protection thermique & Oui ($75°C$ coupure auto) \\
+\hline
+Protection court-circuit & Oui \\
+\hline
+Protection surtension & Oui (Moteur back-EMF) \\
+\hline
+Rendement & $\approx 95\%$ \\
+\hline
+Dimensions & $118 \times 75.5 \times 34$ mm \\
+\hline
+\end{tabular}
+\caption{Caractéristiques techniques clés du Driver DM556 (Source : Leadshine DS 2018)}
+\label{tab:dm556_specs}
+\end{table}
+
+\subsection{A.2.3 — Caractéristiques du Moteur NEMA 17HS4401}
+
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|l|l|}
+\hline
+\rowcolor{macouleur!20}
+\textbf{Paramètre} & \textbf{Valeur} \\
+\hline
+Pas angulaire (plein pas) & $1{,}8°$ (200 pas/tour) \\
+\hline
+Holding Torque & $0{,}45$ Nm \\
+\hline
+Courant de phase (nominal) & $1{,}7$ A \\
+\hline
+Résistance de phase & $1{,}5\,\Omega$ \\
+\hline
+Inductance de phase & $3{,}6$ mH \\
+\hline
+Inertie rotor & $68\,g.cm^2$ \\
+\hline
+Longueur (hors arbre) & 40 mm \\
+\hline
+Poids & 0{,}34 kg \\
+\hline
+Taille boîtier & $42{,}3 \times 42{,}3$ mm (NEMA 17) \\
+\hline
+Interface arbre & $\varnothing\, 5$ mm (simple méplat) \\
+\hline
+\end{tabular}
+\caption{Caractéristiques techniques du moteur pas-à-pas NEMA 17HS4401}
+\label{tab:nema17_specs}
+\end{table}
+
+% ============================================
+\section{A.3 — Données Brutes des Tests de Métrologie (Axe Y -- 20 Mesures)}
+
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|c|c||c|c|c|}
+\hline
+\rowcolor{macouleur!20}
+\textbf{N° Mesure} & \textbf{Valeur ($\mu m$)} & \textbf{Écart ($\mu m$)} & \textbf{N° Mesure} & \textbf{Valeur ($\mu m$)} & \textbf{Écart ($\mu m$)} \\
+\hline
+1 & $-26$ & $+3$ & 11 & $-28$ & $+1$ \\
+2 & $-31$ & $-2$ & 12 & $-32$ & $-3$ \\
+3 & $-29$ & $0$ & 13 & $-27$ & $+2$ \\
+4 & $-28$ & $+1$ & 14 & $-30$ & $-1$ \\
+5 & $-33$ & $-4$ & 15 & $-29$ & $0$ \\
+6 & $-27$ & $+2$ & 16 & $-27$ & $+2$ \\
+7 & $-29$ & $0$ & 17 & $-32$ & $-3$ \\
+8 & $-30$ & $-1$ & 18 & $-28$ & $+1$ \\
+9 & $-26$ & $+3$ & 19 & $-31$ & $-2$ \\
+10 & $-29$ & $0$ & 20 & $-29$ & $0$ \\
+\hline
+\multicolumn{2}{|c|}{\textbf{Moyenne}} & $\boldsymbol{\bar{x} = -29}$ & \multicolumn{2}{c|}{\textbf{Déviation Std.}} & $\boldsymbol{\sigma = 1{,}9\,\mu m}$ \\
+\hline
+\end{tabular}
+\caption{Données brutes des 20 mesures métrologie de l'axe Y (déplacement consigne = 50 mm)}
+\label{tab:raw_data_y}
+\end{table}
+
+% ============================================
+\section{A.4 — Manuel Opérateur (Guide de Démarrage Rapide)}
+
+\subsection{A.4.1 — Procédure de Démarrage}
+\begin{enumerate}
+    \item \textbf{Vérifications avant mise sous tension :}
+    \begin{itemize}
+        \item S'assurer que la zone de travail est libre d'obstacles.
+        \item Vérifier que le bouton E-STOP (champignon rouge) est \textbf{enfoncé}.
+        \item Contrôler visuellement les connexions des câbles moteurs.
+    \end{itemize}
+    \item \textbf{Mise sous tension :} Activer l'interrupteur général du coffret. L'afficheur OLED affiche «BOOTING...» puis «IDLE — WIFI OK».
+    \item \textbf{Connexion Wi-Fi :} Connecter l'ordinateur/tablette au réseau \textbf{CNC5AXES\_AP} (Mot de passe: \texttt{cnc12345}).
+    \item \textbf{Lancement de l'IHM Flutter :} Ouvrir l'application. L'indicateur de connexion passe au vert.
+    \item \textbf{Déverrouillage E-STOP :} Tourner le champignon rouge d'un quart de tour (sens anti-horaire). Cliquer sur «Déverrouiller (\$X)» dans l'IHM.
+    \item \textbf{Homing (Référencement) :} Cliquer sur «Homing (\$H)» dans l'IHM. La machine va automatiquement referencer les 5 axes sur leurs fins de course. La LED verte «CONNECTÉ» s'allume.
+    \item \textbf{Chargement du fichier G-Code :} Utiliser l'onglet «Éditeur» pour charger le fichier \texttt{.nc}. Vérifier le résultat de la validation.
+    \item \textbf{Lancement de l'usinage :} Appuyer sur «LANCER L'USINAGE» (bouton vert). Surveiller l'avancement dans le visualisateur 3D.
+\end{enumerate}
+
+\subsection{A.4.2 — Procédure d'Arrêt d'Urgence}
+En cas de comportement anormal (vibrations anormales, odeur de brûlé, collision imminente) :
+\begin{enumerate}
+    \item Appuyer immédiatement sur le champignon rouge E-STOP.
+    \item Cela coupe l'alimentation 36V et désactive tous les moteurs.
+    \item Ne pas relancer la machine avant d'avoir identifié et corrigé la cause.
+    \item Un redémarrage complet (séquence depuis l'étape 1) est requis.
+\end{enumerate}
+
+\subsection{A.4.3 — Planning de Maintenance Préventive}
+
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|p{5cm}|l|p{4cm}|}
+\hline
+\rowcolor{macouleur!20}
+\textbf{Fréquence} & \textbf{Opération} & \textbf{Composant} & \textbf{Produit/Outil} \\
+\hline
+Avant chaque utilisation & Inspection visuelle des câbles & Câbles moteurs & Visuel \\
+\hline
+Avant chaque utilisation & Serrage des guides & Vis de serrage HGR15 & Clé Allen 4mm \\
+\hline
+Hebdomadaire & Nettoyage des copeaux & Fraise, rails, plateau & Soufflette + chiffon \\
+\hline
+Mensuel & Graissage des rails HGR15 & Patins à billes & Graisse lithium EP2 \\
+\hline
+Mensuel & Graissage des écrous vis à billes & SFU1605 x3 & Huile machine SAE 10 \\
+\hline
+Trimestriel & Test E-STOP (Fonctionnel) & Contacteur KM1 & Manuel \\
+\hline
+Semestriel & Vérification des courroies (tension) & Entraînements A+B & Tensiomètre \\
+\hline
+Annuel & Recalibration complète (métrologie) & 5 axes & Comparateur $1\,\mu m$ \\
+\hline
+Aux 500 h & Remplacement courroies GT2 & Entraînements A+B & Courroie GT2-6mm neuve \\
+\hline
+Aux 1~000 h & Remplacement joints OLED & Afficheur OLED & SSD1306 neuf \\
+\hline
+\end{tabular}
+\caption{Planning de maintenance préventive de la CNC 5 axes}
+\label{tab:maintenance}
+\end{table}

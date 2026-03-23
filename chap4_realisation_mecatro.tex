@@ -2,35 +2,136 @@
 \chapter{Architecture Électronique et Ingénierie des Signaux}
 \label{chap:mechatronics}
 
-La conception mécanique, validée au chapitre précédent, ne peut fournir le summum de sa précision sans une électronique de commande hyper-réactive et immunisée contre les perturbations électromagnétiques. L'architecture matérielle d'une CNC 5 axes est fondamentalement différente d'un sytème cartésien simple, exigeant le pilotage asynchrone à haute fréquence de multiples onduleurs (Drivers) et la gestion de la sûreté des personnes \textit{via} des circuits câblés de coupure d'énergie.
+La conception mécanique, validée au chapitre précédent, ne peut fournir le summum de sa précision sans une électronique de commande hyper-réactive et immunisée contre les perturbations électromagnétiques. L'architecture matérielle d'une CNC 5 axes est fondamentalement différente d'un système cartésien simple, exigeant le pilotage asynchrone à haute fréquence de multiples onduleurs (Drivers) et la gestion de la sûreté des personnes \textit{via} des circuits câblés de coupure d'énergie.
 
 % ========================================================
-\section{L'Unité de Traitement Embarquée (Le "Cerveau")}
+\section{L'Unité de Traitement Embarquée (Le «Cerveau»)}
 
 \subsection{Analyse Critique des Microcontrôleurs}
 Le choix de l'unité de traitement est dicté par la fréquence de récurrence spatiale des interruptions temporelles (Timers).
 Chacun des 5 moteurs nécessite 2 broches (GPIO) de contrôle direct (\textit{Step} et \textit{Direction}).
-La fréquence de signal \textit{Step} (impulsions par seconde, Hz) requise pour faire tourner un moteur à la vitesse limite de $v_{max} = 3000 \text{ mm/min}$ (soit $50 \text{ mm/s}$) avec la vis à billes détaillée au chapitre précédent est :
+La fréquence de signal \textit{Step} requise pour faire tourner un moteur à $v_{max} = 3000 \text{ mm/min}$ est :
 \begin{equation}
-    \textbf{AN : } f_{step} = \frac{v_{max}}{\text{Résolution}} = \frac{50}{(5 / (200 \times 16))} = \frac{50}{0,0015625} \approx \boxed{32~000 \text{ Hz}}
+    f_{step} = \frac{v_{max}}{\text{Résolution}} = \frac{50\,\text{mm/s}}{5/(200 \times 16)\,\text{mm/pas}} \approx \boxed{32~000 \text{ Hz}}
 \end{equation}
 
-* \textbf{Le problème des 8 bits (Arduino) :} Le microcontrôleur classique ATmega328P de 16 MHz a un cycle machine de $62.5 \text{ ns}$. Avec l'algorithmique cinématique complexe tournant dans la seule boucle `void loop()`, il engendre du \textit{Jitter} (gigue de phase temporelle) inévitable, entraînant le décrochage (calage) physique des moteurs.
+Le tableau~\ref{tab:microcontroleurs} compare les solutions envisagées :
 
-* \textbf{La solution 32 bits, Modèle ESP32 :} L'Espressif ESP32-WROOM-32U a été sélectionné pour sa structure Xtensa Dual-Core à 240 MHz (cycle machine $\approx 4 \text{ ns}$). Outre sa puissance brute ($600 \text{ DMIPS}$), sa validation industrielle repose sur sa capacité à exécuter nativement un Système d'Exploitation Temps Réel : \textbf{FreeRTOS}.
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{|l|c|c|c|c|p{4cm}|}
+\hline
+\rowcolor{macouleur!20}
+\textbf{Processeur} & \textbf{Fréquence} & \textbf{Cœurs} & \textbf{FreeRTOS} & \textbf{GPIO} & \textbf{Verdict} \\
+\hline
+ATmega328P (Arduino Uno) & 16 MHz & 1 & Non & 20 & \textbf{Éliminé} : Jitter inévitable, insuffisant pour 5x Step/Dir \\
+\hline
+ATmega2560 (Mega) & 16 MHz & 1 & Non & 54 & \textbf{Éliminé} : Même architecture 8-bits, trop lent \\
+\hline
+STM32F4 (ARM Cortex-M4) & 168 MHz & 1 & Oui & 112 & Acceptable, mais programmation complexe \\
+\hline
+Raspberry Pi 4 + FPGA & 1,8 GHz & 4 & Linux RT & 40 & Trop complexe, OS non-déterministe \\
+\hline
+\textbf{ESP32-WROOM-32U} & \textbf{240 MHz} & \textbf{2 (Xtensa)} & \textbf{Oui} & \textbf{34} & \textbf{\textcolor{macouleur}{RETENU} : Optimal pour ce PFE} \\
+\hline
+\end{tabular}
+}
+\caption{Comparatif des microcontrôleurs candidats pour le contrôleur CNC 5 axes}
+\label{tab:microcontroleurs}
+\end{table}
+
+\textbf{La solution 32 bits, Modèle ESP32 :} L'Espressif ESP32-WROOM-32U a été sélectionné pour sa structure Xtensa Dual-Core à 240 MHz (cycle machine $\approx 4 \text{ ns}$). Sa capacité à exécuter nativement FreeRTOS et à intégrer le Wi-Fi sur puce en fait la solution idéale.
 
 \subsection{Allocation Mémoire et Tâches (FreeRTOS)}
-L'intérêt majeur de l'ESP32 est la séparation asymétrique des tâches logicielles.
-Grâce à l'API système d'Espressif (`xTaskCreatePinnedToCore`), l'architecture a été scindée physiquement :
+Grâce à l'API système d'Espressif (\texttt{xTaskCreatePinnedToCore}), l'architecture a été scindée physiquement entre les deux cœurs :
+
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|l|p{5cm}|p{5cm}|}
+\hline
+\rowcolor{macouleur!20}
+\textbf{Cœur} & \textbf{Tâches assignées} & \textbf{Priorité / Timing} \\
+\hline
+\textbf{Core 0} & Pile TCP/IP Wi-Fi, serveur UDP, parsing JSON, calcul matriciel D-H, envoi ACK Flutter & Non-critique (priorité basse) \\
+\hline
+\textbf{Core 1} & ISR Hardware Timer (Step/Dir), lecture Ring Buffer, planificateur Look-Ahead, gestion des fins de course & \textbf{Hyper-déterministe} (priorité maximale) \\
+\hline
+\end{tabular}
+\caption{Allocation des tâches FreeRTOS par cœur ESP32}
+\label{tab:freertos_tasks}
+\end{table}
+
+Cette séparation garantit que la génération des impulsions STEP (Core 1) n'est \textbf{jamais interrompue} par les opérations réseau Wi-Fi (Core 0), éliminant le jitter temporel responsable des pertes de pas (\textit{step loss}).
+
+\subsection{Carte Mère Personnalisée (PCB)}
+Le projet nécessite un PCB (Printed Circuit Board) personnalisé intégrant l'ESP32, les connecteurs vers les 5 drivers DM556, les Level Shifters, et les connecteurs d'entrée/sortie de sécurité. Les caractéristiques du PCB sont :
 \begin{itemize}
-    \item \textbf{Sur le Core 0 (Tâches non-critiques temporellement) :} Gestion de la pile réseau (TCP/IP Wi-Fi), du serveur WebSockets, réception des trames JSON depuis l'interface Flutter, et parsing/calcul matriciel Denavit-Hartenberg.
-    \item \textbf{Sur le Core 1 (Tâches hyper-déterministes) :} Gestion de l'\textit{Interrupt Service Routine} (ISR) d'un Timer Hardware dédié unilatéralement au balayage des pins STEP/DIR des cinq axes, lisant le buffer circulaire de trajectoire et pilotant les drivers sans la moindre instruction de débranchement concurrent.
+    \item \textbf{Dimensions :} 120 × 80 mm (format Compact Industrial)
+    \item \textbf{Stackup :} 2 couches (Signal TOP + GND PLANE BOTTOM)
+    \item \textbf{Largeur de piste puissance :} 2 mm minimum (calculé pour 5 A)
+    \item \textbf{Largeur de piste signal :} 0.3 mm (Step/Dir TTL)
+    \item \textbf{Plan de masse :} Couche inférieure dédiée au GND pour réduire les boucles CEM
+    \item \textbf{Logiciel de conception :} KiCad 7 (open-source)
 \end{itemize}
+
+Le pinout de l'ESP32 sur la carte est décrit dans le tableau~\ref{tab:pinout_esp32} :
+
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{|l|l|l|l|}
+\hline
+\rowcolor{macouleur!20}
+\textbf{Broche ESP32} & \textbf{Fonction} & \textbf{Destination} & \textbf{Niveau logique} \\
+\hline
+GPIO 12 & STEP\_X & Level Shifter → DM556 Axe X & $3{,}3$V → $5$V \\
+\hline
+GPIO 14 & DIR\_X & Level Shifter → DM556 Axe X & $3{,}3$V → $5$V \\
+\hline
+GPIO 27 & STEP\_Y & Level Shifter → DM556 Axe Y & $3{,}3$V → $5$V \\
+\hline
+GPIO 26 & DIR\_Y & Level Shifter → DM556 Axe Y & $3{,}3$V → $5$V \\
+\hline
+GPIO 25 & STEP\_Z & Level Shifter → DM556 Axe Z & $3{,}3$V → $5$V \\
+\hline
+GPIO 33 & DIR\_Z & Level Shifter → DM556 Axe Z & $3{,}3$V → $5$V \\
+\hline
+GPIO 32 & STEP\_A & Level Shifter → DM556 Axe A & $3{,}3$V → $5$V \\
+\hline
+GPIO 4 & DIR\_A & Level Shifter → DM556 Axe A & $3{,}3$V → $5$V \\
+\hline
+GPIO 2 & STEP\_B & Level Shifter → DM556 Axe B & $3{,}3$V → $5$V \\
+\hline
+GPIO 15 & DIR\_B & Level Shifter → DM556 Axe B & $3{,}3$V → $5$V \\
+\hline
+GPIO 34 & LIMIT\_X (Fin de course X) & Capteur inductif & Entrée Pull-UP 3{,}3V \\
+\hline
+GPIO 35 & LIMIT\_Y (Fin de course Y) & Capteur inductif & Entrée Pull-UP 3{,}3V \\
+\hline
+GPIO 36 & LIMIT\_Z (Fin de course Z) & Capteur inductif & Entrée Pull-UP 3{,}3V \\
+\hline
+GPIO 39 & E-STOP (Arrêt d'urgence) & Contact NF via relais & Entrée Pull-DOWN \\
+\hline
+GPIO 5 & ENABLE (Enable global drivers) & Level Shifter → 5 DM556 & $3{,}3$V → $5$V \\
+\hline
+GPIO 23 & SDA (Écran OLED I2C) & SSD1306 0{,}96'' & $3{,}3$V I2C \\
+\hline
+GPIO 22 & SCL (Écran OLED I2C) & SSD1306 0{,}96'' & $3{,}3$V I2C \\
+\hline
+\end{tabular}
+}
+\caption{Table de correspondance des broches (Pinout) de l'ESP32 sur le PCB personnalisé}
+\label{tab:pinout_esp32}
+\end{table}
 
 % ========================================================
 \section{Chaîne de Puissance et Drivers Moteurs}
 
-L'ESP32 génère des signaux TTL logiques de $3.3 \text{ V}$ avec un courant maximal extractible d'environ $40 \text{ mA}$ par pin. Les moteurs NEMA 17 demandent des pointes dépassant les $2.5 \text{ A}$ (à $24 \text{ V}$). Cette différence flagrante de puissance d'un rapport de plus de $500$ impose d'intercaler de gros "muscles" électroniques : les Stepper Drivers autonomes complets (type DM556).
+L'ESP32 génère des signaux TTL logiques de $3{,}3 \text{ V}$. Les moteurs NEMA 17 demandent des pointes dépassant $2{,}5 \text{ A}$ (à $36 \text{ V}$). Ce rapport de $500:1$ impose des amplificateurs électroniques dédiés : les Stepper Drivers DM556.
 
 \begin{figure}[htbp]
     \centering
@@ -39,7 +140,6 @@ L'ESP32 génère des signaux TTL logiques de $3.3 \text{ V}$ avec un courant max
         box/.style={draw, rounded corners, minimum height=1.5cm, text width=3.5cm, align=center, thick},
         line/.style={-{Stealth[scale=1.2]}, thick}
     ]
-        % Composants
         \node[box, fill=orange!10] (pc) {PC / Flutter \\ (Via Wi-Fi UDP)};
         \node[box, fill=blue!10, right=2cm of pc] (esp32) {Microcontrôleur \\ ESP32 (3.3V)};
         \node[box, fill=yellow!10, right=2cm of esp32] (ls) {Level Shifter \\ (SN74AHCT125N)};
@@ -47,13 +147,11 @@ L'ESP32 génère des signaux TTL logiques de $3.3 \text{ V}$ avec un courant max
         \node[box, fill=gray!20, below=1.5cm of driver] (motor) {Moteurs NEMA 17 \\ (Axes X,Y,Z,A,B)};
         \node[box, fill=green!10, below=1.5cm of ls] (psu) {Alimentation \\ 36V / 350W};
 
-        % Connexions
         \draw[line, dashed, <->] (pc) -- (esp32) node[midway, above, font=\footnotesize] {G-Code (JSON)};
         \draw[line] (esp32) -- (ls) node[midway, above, font=\footnotesize] {Step/Dir (3.3V)};
         \draw[line] (ls) -- (driver) node[midway, above, font=\footnotesize] {Step/Dir (5V)};
         \draw[line] (driver) -- (motor) node[midway, right, font=\footnotesize] {Puissance hachée};
         \draw[line, draw=red, thick] (psu) -| (driver) node[near end, left, font=\footnotesize] {36V DC};
-
     \end{tikzpicture}
     }
     \caption{Architecture électronique globale et logique d'amplification des signaux}
@@ -61,57 +159,46 @@ L'ESP32 génère des signaux TTL logiques de $3.3 \text{ V}$ avec un courant max
 \end{figure}
 
 \subsection{Dimensionnement de l'Interface de Logique (Level Shifter)}
-Un phénomène mécatronique destructeur de signaux est la chute de tension relative aux optocoupleurs asociaux intégrés dans les \textit{Drivers} industriels DM556.
-L'optocoupleur (ex. puce 6N137) nécessite une tension de l'ordre de $V_f \approx 1.4 \text{ V}$ avec un courant passant $I_F = 10 \text{ mA}$ pour garantir le déclenchement de la DEL infrarouge interne en moins de $50 \text{ ns}$.
-Or, la résistance de limitation d'entrée montée en usine sur le DM556 est de $270 \Omega$. 
-
-Si l'ESP32 fournit une onde carrée à $3.3 \text{ V}$ (qui chute souvent à $3.0 \text{ V}$ en charge statique) :
+L'optocoupleur interne des drivers DM556 nécessite $V_f \approx 1{,}4 \text{ V}$ avec $I_F = 10 \text{ mA}$ pour déclencher. La résistance de série du DM556 est de $270\,\Omega$. Avec $3{,}0$ V (ESP32 en charge) :
 \begin{equation}
-    \textbf{AN : } I_{\text{entree}} = \frac{V_{uP} - V_f}{R} = \frac{3,0 - 1,4}{270} \approx \boxed{5,9 \text{ mA}}
+    I_{entree} = \frac{V_{uP} - V_f}{R} = \frac{3{,}0 - 1{,}4}{270} \approx \boxed{5{,}9 \text{ mA}} \quad < 10\text{ mA requis}
 \end{equation}
-Ce courant de $5.9 \text{ mA}$ est suffisant "en théorie" pour allumer lentement l'optocoupleur, mais le bord montant de l'onde carrée (\textit{Rise Time} $t_r$) va se ramollir considérablement (passant à plus de $2 \mu s$), induisant des retards ou des impulsions manquées.
-Afin d'obtenir une onde parfaite ($\mathbf{5 \text{ V}}$) garantissant $13.3 \text{ mA}$ par canal et un $t_r \approx 10 \text{ ns}$, nous avons intégré sur la carte mère (PCB personnalisé) un circuit adaptateur de niveau à portes logiques unidirectionnelles type \textbf{SN74AHCT125N}.
+Ce courant insuffisant dégrade le \textit{Rise Time} de l'optocoupleur à $> 2\,\mu s$, induisant des impulsions manquées à haute fréquence. Le Level Shifter \textbf{SN74AHCT125N} ($5\text{ V}$ en sortie) garantit $I_{out} = 13{,}3\text{ mA}$ et un $t_r \approx 10\text{ ns}$, résolvant le problème.
 
-\subsection{Régime Micro-stepping du DM556}
-Le driver assure également l'antiparasitage des ponts en H internes commandés en PWM ($20 \text{ kHz}$ hacheur de courant constant). Nous l'avons configuré sur un sous-découpage de l'onde électrique de $1/16$ pas.
-Bien que la résolution mécanique s'accroît, nous l'utilisons spécifiquement pour gommer les harmoniques de résonance du moteur de basculement A, qui, s'il entre en résonance autour de sa fréquence propre (souvent $\approx 150 \text{ Hz}$ en NEMA 17), ferait vibrer tout le portique (effet \textit{chatter} de fraisage récalcitrant).
+\subsection{Régime Micro-stepping du DM556 et Anti-Résonance}
+Le driver DM556 est configuré en micro-stepping $1/16$ pas. Outre l'amélioration de résolution angulaire, cette configuration remplit une fonction anti-résonance critique. Les moteurs NEMA 17 présentent une fréquence de résonance mécanique autour de $\approx 150 \text{ Hz}$, qui correspond à environ 600 pas/seconde en mode pas entier. En mode $1/16$, cette résonance est fortement atténuée car l'excitation par palier est beaucoup plus douce, réduisant les harmoniques de vibration transmises au portique et à la pièce.
 
 % ========================================================
 \section{Bilan de Puissance et Dimensionnement des Alimentations}
 
-Un principe inviolable de conception est la séparation stricte de l'énergie de puissance bruyante et de la source de commande pure.
-
 \subsection{Dimensionnement de l'Alimentation Principale (PSU 36V)}
-Pour garantir la dynamique de couples calculée au Chapitre 3, les drivers moteurs sont alimentés  $36 \text{ V DC}$.
-Considérons l'appel de courant en crête (lorsque tous les axes opèrent en pleine accélération - 100\% d'usage - le pire cas).
-* Courant Max par moteur NEMA 17 : $2 \text{ A}$.
-* Nombre de moteurs : $n = 5$.
+Le courant RMS total en régime critique (5 axes en pleine accélération) :
 \begin{equation}
-    \textbf{AN : } I_{total\_RMS} \approx 0,707 \cdot n \cdot I_{max} \approx 0,707 \times 5 \times 2 = \boxed{7,07 \text{ A}}
+    I_{total\_RMS} \approx 0{,}707 \cdot n \cdot I_{max} = 0{,}707 \times 5 \times 2 = \boxed{7{,}07 \text{ A}}
 \end{equation}
-La puissance nominale à dissiper de l'alimentation SMPS (Switch-Mode Power Supply) sera donc :
+La puissance nominale de l'alimentation avec coefficient de sécurité ($\times 1{,}25$) :
 \begin{equation}
-    \textbf{AN : } P_{PSU} = V \times I \times K_{\text{sécu}} = 36 \times 7,07 \times 1,25 \approx \boxed{318 \text{ Watts}}
+    P_{PSU} = 36 \times 7{,}07 \times 1{,}25 \approx \boxed{318 \text{ Watts}}
 \end{equation}
-Une alimentation à découpage industrielle (ex. MeanWell $350\text{W} - 36\text{V}$) a été intégrée pour le réseau exclusif des Moteurs.
+L'alimentation à découpage industrielle \textbf{MeanWell LRS-350-36 (36V / 9{,}7A / 350W)} a été retenue.
 
-\subsection{Dimensionnement des Capacités de Découplage Logique (Réseau 5V / 3.3V)}
-Le deuxième réseau est le bus $5 \text{ V}$ gérant la logique (ESP32 via le LDO Interne, et Level Shifters).
-Lors de la transmission d'une trame Wi-Fi par l'ESP32, la puce Radio subit un pic radiofréquence absorbant subitement une grosse quantité de courant ($\Delta I \approx 500 \text{ mA}$ sur quelques microsecondes). Si la résistance propre de la piste en cuivre est mal gérée, la loi des nœuds de Kirchhoff entraîne une chute de la tension CPU ($\Delta U = R \times \Delta I$), menant instantanément à un "Brown-out Reset" (redémarrage d'urgence) catastrophique effaçant tout l'usinage.
-
-On prévient celà en implémentant une \textit{Bulk Capacitance} (Condensateur Chute de tension) calculée ainsi :
+\subsection{Dimensionnement du Condensateur de Découplage Anti-Brown-Out}
+Lors de la transmission Wi-Fi par l'ESP32, un pic de courant $\Delta I \approx 500 \text{ mA}$ est absorbé en $\Delta t = 20\,\mu s$. Pour limiter la chute de tension CPU à $\Delta V_{tolere} = 100 \text{ mV}$ :
 \begin{equation}
-    C_{bulk} = I_{pic} \times \frac{\Delta t}{\Delta V_{tolere}}
+    C_{bulk} = I_{pic} \times \frac{\Delta t}{\Delta V_{tolere}} = 0{,}5 \times \frac{20 \times 10^{-6}}{0{,}1} = \boxed{100\,\mu\text{F}}
 \end{equation}
-Pour limiter la l'effondrement de tension CPU à seulement $100 \text{ mV}$ sous un burst temporel réseau d'une durée de $\Delta t = 20 \mu s$ en déchargeant $0.5 \text{ A}$ :
-\begin{equation}
-    \textbf{AN : } C_{bulk} = 0,5 \times \frac{20 \cdot 10^{-6}}{0,1} = 100 \cdot 10^{-6} \text{ F} = \boxed{100 \mu \text{F}}
-\end{equation}
-Un gros condensateur électrolytique \textit{Low-ESR} de $470 \mu \text{F}$ couplé en parallèle à un condensateur céramique ($100 \text{ nF}$) ont été brasés directement aux pattes $V_{in}$ et $GND$ de l'ESP32 sur la carte.
+Un condensateur électrolytique Low-ESR de $470\,\mu\text{F}$ couplé à $100\,\text{nF}$ céramique ont été brasés directement sur le PCB aux bornes de l'ESP32.
 
 % ========================================================
-\section{Ingénierie de Sûreté : L'Arrêt d'Urgence E-STOP et Relais}
-L'Arrêt d'Urgence est le point névralgique homologant la sécurité. En mode 5 axes, le risque de collision entre la fraise de carbure rotative (broche à $20~000$ Tr/min) et le solide socle Trunnion basculant en axe A est élevé.
+\section{Ingénierie de Sûreté : L'Arrêt d'Urgence E-STOP}
+
+\subsection{Câblage en «Catégorie d'Arrêt 0» (Coupure non-conditionnelle)}
+Conformément à la norme EN ISO 13850 (\textit{Safety of machinery - Emergency stop}), notre intégration observe une coupure matérielle pure (Catégorie 0). L'appui sur le champignon rouge (Contact NC) brise l'auto-maintien du contacteur et coupe simultanément :
+\begin{enumerate}
+    \item La liaison $220\text{ V AC}$ de l'alimentation PSU 36V.
+    \item Le signal \texttt{ENABLE} des 5 drivers DM556 (relâchement électromagnétique des rotors).
+    \item Un pin d'interruption vers l'ESP32 pour suspension logicielle.
+\end{enumerate}
 
 \begin{figure}[htbp]
     \centering
@@ -128,70 +215,38 @@ L'Arrêt d'Urgence est le point névralgique homologant la sécurité. En mode 5
         \draw[line] (estop) -- (relais) node[midway, above, font=\footnotesize] {Rupture maintien};
         \draw[line] (relais) -- (psu) node[midway, above, font=\footnotesize] {Coupure hard};
         \draw[line, dashed] (relais) -- (esp) node[midway, right, font=\footnotesize] {Alerte Stop};
-
     \end{tikzpicture}
     \caption{Logigramme de la chaîne matérielle de coupure d'urgence (Catégorie 0)}
     \label{fig:estop_logic}
 \end{figure}
 
-\subsection{Câblage en "Catégorie d'Arrêt 0" (Coupure non-conditionnelle)}
-Appuyer sur l'E-STOp ne peut se contenter d'envoyer un signal logique de $0$ V à l'ESP32 (Le code pourrait bugger (Deadlock) et ignorer cet appel de fonction d'interruption).
-Notre intégration observe un fonctionnement par relais "Hard-Cut".
-L'appui physique sur le bouton d'arrêt (NC : Normalement Fermé) brise l'auto-maintien de la bobine d'un relais de puissance AC (Contacteur). 
-Ce contacteur s'ouvre magnétiquement brisant instantanément :
-\begin{enumerate}
-    \item La liaison $220 \text{ V} / AC$ de l'alimentation PSU 36V, figeant brutalement les balourds d'inertie magnétiques des NEMA.
-    \item La liaison logique $ENABLE$ de tous les pilotes de puissance DM556, relâchant l'attraction électromagnétique interne de la cage des rotors.
-    \item Un pin d'interruption vers l'ESP32 afin qu'il suspende de lui-même la lecture des coordonnées Flutter.
-\end{enumerate}
-Le réenclenchement mécanique manuel du champignon rouge est obligatoirement requis, couplé à un appui sur le bouton "Reset/Resume" de l'armoire, interdisant de ce fait tout redémarrage inopiné intempestif préjudiciable physiquement.
-
-\section{Problématiques CEM et Intégrité des Signaux}
-La commutation rapide des courants (PWM à $20 \text{ kHz}$) dans les câbles des moteurs génère des champs électromagnétiques parasites susceptibles de corrompre les signaux de commande TTL de l'ESP32.
-
-\subsection{Couplage et Blindage}
-Afin de minimiser le couplage capacitif et inductif, nous avons adopté une stratégie de blindage rigoureuse : 
-\begin{itemize}
-    \item \textbf{Séparation des câbles :} Les lignes de puissance et de signal sont physiquement espacées d'au moins $10 \text{ cm}$.
-    \item \textbf{Câbles blindés (Braided Shield) :} Le moteur de broche (inverter) utilise des câbles dont le blindage est relié à la terre protectrice ($PE$) d'un seul côté pour éviter les boucles de masse.
-    \item \textbf{Ferrites de protection :} Des anneaux de ferrite ont été placés sur les lignes Step/Dir pour absorber les pics de haute fréquence.
-\end{itemize}
-
-\subsection{Bilan Thermique et Analyse du Flux d'Air}
-Les cinq drivers DM556 et l'alimentation PSU dissipent une énergie calorifique non négligeable par effet Joule. Pour éviter le "Thermal Throttling" ou la destruction des composants, un ventilateur d'extraction a été calculé. 
-La puissance totale dissipée estimée est $P_{diss} \approx 40 \text{ W}$. Pour maintenir une élévation de température $\Delta T < 15^\circ\text{C}$ à l'intérieur du coffret, le débit d'air nécessaire $Q$ est :
-\begin{equation}
-    \textbf{AN : } Q = \frac{3 \times P_{diss}}{\Delta T} \approx \frac{3 \times 40}{15} = \boxed{8 \text{ m}^3\text{/h}}
-\end{equation}
-Un ventilateur de $80 \times 80 \text{ mm}$ (débit $40 \text{ m}^3\text{/h}$) a été installé, garantissant une marge de sécurité thermique confortable.
-
-\section{Dimensionnement Électrique et Bilan de Puissance}
-
-Une commande numérique 5 axes présente un cumul critique de consommateurs de courant (les cinq moteurs PàP fonctionnent quasi-simultanément). Le calcul rigoureux du bilan énergétique est impératif pour dimensionner l'Alimentation à Découpage (SMPS) principale et éviter une chute de tension (Brown-out) risquant de faire décrocher un moteur en plein usinage.
-
-\subsection{Consommation théorique (Bilan d'intensité)}
-Les composants actifs nécessitant une évaluation de puissance sont :
-\begin{itemize}
-    \item \textbf{Moteurs NEMA 17 (x5) :} Le courant nominal maximal par phase d'un `17HS4401` est $I_m = 1.7 \text{ A}$. Nous utilisons une configuration Bipolaire avec un réglage de V-Ref sur le driver limitant le courant efficace RMS à environ $1.4 \text{ A}$ pour limiter l'échauffement Joule. La consommation totale des moteurs bloqués (Holding Torque) est de : $P_{moteurs} = 5 \times 1.4 \text{ A} = 7.0 \text{ A}$.
-    \item \textbf{Électronique de Supervision (ESP32 + Wi-Fi) :} L'activation de la radio RF de l'ESP32 requiert un courant en crête $I_{pic} = 500 \text{ mA}$ sur la ligne $3.3 \text{ V}$, soit une dissipation indirecte (via le convertisseur DC-DC Step-Down $36V \rightarrow 5V$) négligeable de $0.2 \text{ A}$ (coté 36V).
-    \item \textbf{Pertes et ventilateurs :} Les composants passifs, les LEDs et les ventilateurs annexes tirent environ $0.5 \text{ A}$.
-\end{itemize}
-
-\subsection{Sélection de l'Alimentation Primaire (SMPS)}
-
-L'intensité totale projetée au régime critique est :
-\begin{equation}
-    \textbf{AN : } I_{total\_RMS} = \sum I = 7,0 + 0,2 + 0,5 = \boxed{7,7 \text{ Ampères}}
-\end{equation}
-
-Pour l'alimentation des moteurs pas à pas, on opte pour une tension de $36 \text{ VDC}$ au lieu de $12 \text{ VDC}$ ou $24 \text{ VDC}$. L'augmentation de la tension diminue drastiquement le temps d'établissement du courant dans l'inductance (di/dt) des bobines, permettant au moteur de garder son couple résistant même à très haute vitesse angulaire.
-Le besoin en puissance électrique brute au primaire est donc :
-\begin{equation}
-    \textbf{AN : } P_{calcul} \approx 36 \text{ V} \times 7,7 \text{ A} = \boxed{277 \text{ Watts}}
-\end{equation}
-
-Afin d'appliquer un coefficient de sécurité industriel ($\times 1.25$) qui empêchera l'alimentation de chauffer en fonctionnant à la limite de ses condensateurs, la \textbf{SMPS choisie est un modèle LRS-350-36 (36 V / 9.7 A / 350 W)}.
-
 % ========================================================
+\section{Compatibilité Électromagnétique (CEM)}
+
+La commutation rapide des courants (PWM à $20\text{ kHz}$) dans les câbles des moteurs génère des champs électromagnétiques parasites. Une analyse CEM rigoureuse est indispensable pour garantir l'intégrité des signaux de commande.
+
+\subsection{Modélisation des émissions rayonnées}
+
+Les câbles moteurs de longueur $\ell \approx 0{,}5\text{ m}$ agissent comme des antennes non intentionnelles. La fréquence de résonance d'une antenne demi-onde est :
+\begin{equation}
+    f_{resonance} = \frac{c}{2\ell} = \frac{3 \times 10^8}{2 \times 0{,}5} = \boxed{300 \text{ MHz}}
+\end{equation}
+Cette fréquence est dans la bande de la radio FM et peut perturber les radios environnantes. L'atténuation est obtenue par :
+\begin{itemize}
+    \item Ferrites de mode commun ($Z_{ferrite} > 100\,\Omega$ à 100 MHz) sur chaque câble moteur.
+    \item Blindage des câbles (tresse cuivre reliée au PE en un seul point = côté coffret).
+    \item Condensateurs de découplage $100\,\text{nF}$ céramique sur chaque sortie de driver.
+\end{itemize}
+
+\subsection{Stratégie de câblage (Star Grounding)}
+La stratégie de mise à la terre en étoile (\textit{Star Grounding}) consiste à relier tous les points de masse au même point central (la barre de terre du coffret), évitant les courants de boucle parasite. En particulier, les blindages des câbles moteurs ne sont connectés à la masse que du côté coffret (point unique), l'autre extrémité (côté moteur) restant flottante. Cette mesure réduit les courants harmoniques circulant dans les blindages et donc les perturbations injectées sur le bus de signal de l'ESP32.
+
+\subsection{Bilan Thermique du Coffret}
+Les cinq drivers DM556 et l'alimentation PSU dissipent une énergie calorifique par effet Joule. La puissance totale dissipée estimée est $P_{diss} \approx 40\text{ W}$. Pour maintenir $\Delta T < 15°\text{C}$ :
+\begin{equation}
+    Q = \frac{3 \times P_{diss}}{\Delta T} = \frac{3 \times 40}{15} = \boxed{8\text{ m}^3\text{/h}}
+\end{equation}
+Un ventilateur $80 \times 80\text{ mm}$ (débit $40\text{ m}^3\text{/h}$) a été installé, garantissant un coefficient de sécurité thermique de $\times 5$.
+
 \section{Conclusion sur l'infrastructure Mécatronique}
-L'infrastructure mécatronique mise en œuvre surcarte n'est pas qu'un amalgame de câbles : elle conditionne la vie ou la mort du signal algorithmique.  C’est seulement par l'optimisation des fronts temporels avec des Level Shifters, l'étanchéité absolue de l’isolement galvanique, et la provision d'un courant ininterrompu via condensateur, que nous autorisons le système d'exploitation de l'ESP32 à se consacrer intégralement à son immense tache conceptuelle : le calcul de la Cinématique Inverse pure. Le Chapitre 5 qui suit se plonge précisément au cœur de l'algèbre algorithmique de ce microcontrôleur dual-core et de son pendant Interface (l'IHM Flutter).
+L'infrastructure mécatronique mise en œuvre n'est pas qu'un amalgame de câbles : elle conditionne la fiabilité du signal algorithmique. C'est seulement par l'optimisation des fronts temporels avec des Level Shifters, l'étanchéité absolue de l'isolement galvanique, la provision d'un courant ininterrompu via condensateur, et la maîtrise des émissions CEM, que nous autorisons le système d'exploitation de l'ESP32 à se consacrer intégralement à son immense tâche : le calcul de la Cinématique Inverse pure en temps réel. Le chapitre 5 qui suit se plonge précisément au cœur de l'algèbre algorithmique de ce microcontrôleur dual-core et de son Interface Homme-Machine Flutter.

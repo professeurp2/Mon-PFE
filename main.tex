@@ -23,15 +23,49 @@
 \usepackage{tikz}
 \usepackage{pgfgantt}
 \usepackage{circuitikz}
-\usetikzlibrary{shapes.geometric, arrows.meta, positioning, calc, fit, backgrounds}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, calc, fit, backgrounds, patterns}
 
 % --- Packages de mise en forme professionnelle ---
+\usepackage{longtable}          % Charger longtable AVANT xcolor[table]
 \usepackage[table,xcdraw]{xcolor}
 \usepackage{tcolorbox}
 \usepackage{enumitem}
 \usepackage{titlesec}
 \usepackage{tocloft}
 \usepackage[colorlinks=true, allcolors=macouleur]{hyperref} % Liens cliquables professionnels
+
+% --- Packages additionnels (enrichissement PFE) ---
+\usepackage{colortbl}           % Couleurs dans les tableaux (rowcolor)
+\usepackage{booktabs}           % Traits de tableaux professionnels
+\usepackage{multirow}           % Fusion de cellules dans les tableaux
+\usepackage{array}              % Options de colonnes dans les tableaux
+\usepackage{pgfplots}           % Graphiques et histogrammes PGF
+\pgfplotsset{compat=1.18}
+\usepackage{pgf-umlsd}          % Diagrammes de séquence UML
+\usepackage{siunitx}            % Unités SI normalisées
+\usepackage{fancyhdr}           % En-têtes et pieds de page personnalisés
+\setlength{\headheight}{15pt}   % Évite le warning fancyhdr
+\sisetup{locale=FR, output-decimal-marker={,}}
+\usepackage{listings}           % Affichage du code source (C++, Dart)
+\lstset{
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{orange!70!black},
+    frame=single, 
+    rulecolor=\color{macouleur!30},
+    numbers=left,
+    numberstyle=\tiny\color{gray}
+}
+\usepackage{caption}            % Mise en forme des légendes de figures/tableaux
+\usepackage{subcaption}         % Sous-figures (a), (b), etc.
+\usepackage{float}              % Placement H absolu des flottants
+\usepackage{mdframed}           % Encadrés améliorés
+\usepackage{verbatim}           % Blocs de code verbatim
+\usepackage[T1]{fontenc}
+\usepackage{lipsum}             % Texte de test
+\tcbuselibrary{skins, breakable}% TColorBox étendu
 
 % Définition de la couleur bleue pro (similaire aux exemples)
 \definecolor{macouleur}{RGB}{31, 78, 121}
@@ -48,6 +82,18 @@
 \renewcommand{\cfttoctitlefont}{\hfill\Huge\bfseries\color{macouleur}}
 \renewcommand{\cftloftitlefont}{\hfill\Huge\bfseries\color{macouleur}}
 \renewcommand{\cftlottitlefont}{\hfill\Huge\bfseries\color{macouleur}}
+
+% Configuration des en-têtes et pieds de page pro (Fancyhdr)
+\pagestyle{fancy}
+\fancyhf{} % Nettoie les en-têtes et pieds de page
+\fancyhead[L]{\bfseries\color{macouleur}\nouppercase{\leftmark}} % Chapitre à gauche
+\fancyhead[R]{\bfseries\color{macouleur}\nouppercase{\rightmark}} % Section à droite
+\fancyfoot[C]{\textbf{\thepage}} % Numéro de page centré
+\fancyfoot[R]{\footnotesize\color{gray}ENI-ABT -- PFE CNC 5-Axes} % Texte en pied de page
+\renewcommand{\headrulewidth}{0.8pt} % Épaisseur de la ligne d'en-tête
+\renewcommand{\footrulewidth}{0.4pt} % Épaisseur de la ligne de pied
+\renewcommand{\headrule}{\color{macouleur}\hrule width \headwidth height \headrulewidth \vskip-\headrulewidth} % Ligne d'en-tête bleue
+\renewcommand{\footrule}{\color{macouleur}\hrule width \headwidth height \footrulewidth \vskip-\footrulewidth} % Ligne de pied bleue
 
 % --- Début du document ---
 \begin{document}
@@ -70,13 +116,19 @@
 \addcontentsline{toc}{chapter}{Liste des tableaux}
 
 \newpage
-\include{chap1_introduction} % Appel du fichier chapitre
-\include{chap2_revue_litterature} % Appel du fichier chapitre
-\include{chap3_conception_mec} % Appel du fichier chapitre
-\include{chap4_realisation_mecatro} % Appel du fichier chapitre
-\include{chap5_developpement_logiciel} % Appel du fichier logiciel et cinématique
-\include{chap6_tests_conclusion} % Appel des tests et conclusion
+\include{chap1_introduction}            % Introduction et Contexte du Projet
+\include{chap2_revue_litterature}       % État de l'art et Revue de Littérature
+\include{chap3_conception_mec}          % Étude Mécanique et Dimensionnement
+\include{chap4_realisation_mecatro}     % Architecture Électronique et Mécatronique
+\include{chap5_developpement_logiciel}  % Développement Logiciel et Cinématique UML
+\include{chap6_tests_conclusion}        % Tests, Validation et Analyse Économique
 
-\include{99_backmatter}
+% ===================== BACKMATTER =====================
+\include{99_backmatter}                 % Bibliographie et Annexe Code (Look-Ahead)
+
+% ===================== ANNEXES ========================
+\newpage
+\appendix
+\include{99_annexe_documentation}      % Annexes Techniques : Code, Datasheets, Données Brutes, Manuel
 
 \end{document}

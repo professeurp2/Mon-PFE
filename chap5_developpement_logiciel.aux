@@ -1,40 +1,48 @@
 \relax 
+\providecommand\zref@newlabel[2]{}
 \providecommand\hyper@newdestlabel[2]{}
-\@writefile{toc}{\contentsline {chapter}{\numberline {4}Développement Logiciel et Modélisation UML}{39}{chapter.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {4}Développement Logiciel, Modélisation UML et Cinématique}{46}{chapter.4}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\newlabel{chap:logiciel}{{4}{39}{Développement Logiciel et Modélisation UML}{chapter.4}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4.1}Modélisation UML du Système Global}{39}{section.4.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1.1}Diagramme de Séquence : Cycle de vie d'un Usinage}{39}{subsection.4.1.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1.2}Diagramme de Classes (Firmware ESP32)}{39}{subsection.4.1.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1.3}Diagramme d'États (Machine à États Finis de l'ESP32)}{39}{subsection.4.1.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {4.1}{\ignorespaces Diagramme de Séquence UML des interactions Client-Serveur-Moteurs}}{40}{figure.4.1}\protected@file@percent }
-\newlabel{fig:uml_sequence}{{4.1}{40}{Diagramme de Séquence UML des interactions Client-Serveur-Moteurs}{figure.4.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4.2}{\ignorespaces Diagramme de Classes UML de l'architecture logicielle embarquée}}{40}{figure.4.2}\protected@file@percent }
-\newlabel{fig:uml_classes}{{4.2}{40}{Diagramme de Classes UML de l'architecture logicielle embarquée}{figure.4.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4.3}{\ignorespaces Diagramme d'États UML du contrôleur interne de la CNC}}{40}{figure.4.3}\protected@file@percent }
-\newlabel{fig:state_machine}{{4.3}{40}{Diagramme d'États UML du contrôleur interne de la CNC}{figure.4.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4.2}Algorithmique de Génération de Mouvements}{41}{section.4.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2.1}DDA (Digital Differential Analyzer) vs Timers Hardware}{41}{subsection.4.2.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2.2}Gestion du Flux : Logique Look-Ahead}{41}{subsection.4.2.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4.3}Implémentation du Code : Micrologiciel (ESP32)}{41}{section.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.3.1}L'Architecture Dual-Core (FreeRTOS)}{41}{subsection.4.3.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.3.2}Cinématique Inverse et Paramétrage Denavit-Hartenberg}{42}{subsection.4.3.2}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {4.1}{\ignorespaces Paramètres de Denavit-Hartenberg Modifiés de la Table Trunnion 5 Axes}}{42}{table.4.1}\protected@file@percent }
-\newlabel{tab:dh_parameters}{{4.1}{42}{Paramètres de Denavit-Hartenberg Modifiés de la Table Trunnion 5 Axes}{table.4.1}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4.4}L'Interface Homme-Machine (Flutter)}{43}{section.4.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.4.1}Le Parseur G-Code (Logigramme UML)}{43}{subsection.4.4.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {4.4}{\ignorespaces Logigramme de parsing, sérialisation et transmission du G-Code sous Flutter}}{43}{figure.4.4}\protected@file@percent }
-\newlabel{fig:gcode_parser}{{4.4}{43}{Logigramme de parsing, sérialisation et transmission du G-Code sous Flutter}{figure.4.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.4.2}Architecture Logicielle de l'App Flutter (Diagramme de Classes)}{44}{subsection.4.4.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {4.5}{\ignorespaces Diagramme de Classes UML de l'application Flutter (Pattern Provider/Riverpod)}}{44}{figure.4.5}\protected@file@percent }
-\newlabel{fig:uml_flutter}{{4.5}{44}{Diagramme de Classes UML de l'application Flutter (Pattern Provider/Riverpod)}{figure.4.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.4.3}State Management : La pureté de Riverpod}{44}{subsection.4.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4.5}Conclusion de la conception logicielle}{44}{section.4.5}\protected@file@percent }
+\newlabel{chap:logiciel}{{4}{46}{Développement Logiciel, Modélisation UML et Cinématique}{chapter.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.1}Architecture Générale du Logiciel}{46}{section.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1.1}Diagramme de Composants UML}{46}{subsection.4.1.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.1}{\ignorespaces Diagramme de Composants UML -- Architecture générale du logiciel CNC 5 axes}}{47}{figure.caption.27}\protected@file@percent }
+\newlabel{fig:uml_components}{{4.1}{47}{Diagramme de Composants UML -- Architecture générale du logiciel CNC 5 axes}{figure.caption.27}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.2}Modélisation du Firmware ESP32 (UML)}{47}{section.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2.1}Diagramme de Machine à États (FSM) -- Machine à États Finis}{47}{subsection.4.2.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.2}{\ignorespaces Diagramme de Machine à États Finis (FSM) du firmware ESP32 avec ses 5 états nominaux}}{47}{figure.caption.28}\protected@file@percent }
+\newlabel{fig:fsm_firmware}{{4.2}{47}{Diagramme de Machine à États Finis (FSM) du firmware ESP32 avec ses 5 états nominaux}{figure.caption.28}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2.2}Diagramme de Classes UML -- Firmware}{48}{subsection.4.2.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.3}{\ignorespaces Diagramme de Classes simplifié du firmware ESP32 (4 classes principales)}}{48}{figure.caption.29}\protected@file@percent }
+\newlabel{fig:uml_classes_fw}{{4.3}{48}{Diagramme de Classes simplifié du firmware ESP32 (4 classes principales)}{figure.caption.29}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.3}Cinématique Inverse de la Configuration Trunnion}{48}{section.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3.1}Système de Coordonnées et Paramètres de Denavit-Hartenberg}{48}{subsection.4.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3.2}Algorithme de Résolution (Cinématique Inverse Analytique)}{48}{subsection.4.3.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4.1}{\ignorespaces Paramètres de Denavit-Hartenberg de la configuration Trunnion (Axes A et B)}}{49}{table.caption.30}\protected@file@percent }
+\newlabel{tab:dh_params}{{4.1}{49}{Paramètres de Denavit-Hartenberg de la configuration Trunnion (Axes A et B)}{table.caption.30}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.4}L'Algorithme «Look-Ahead» et le Profil d'Accélération S-Curve}{49}{section.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4.1}Limitations du Profil Trapézoïdal}{49}{subsection.4.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4.2}Le Profil S-Curve (Jerk Limité)}{50}{subsection.4.4.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4.2}{\ignorespaces Les 7 phases cinématiques du profil de déplacement en S-Curve}}{50}{table.caption.31}\protected@file@percent }
+\newlabel{tab:s_curve_phases}{{4.2}{50}{Les 7 phases cinématiques du profil de déplacement en S-Curve}{table.caption.31}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4.3}La Fenêtre «Look-Ahead» (Planification Anticipative)}{50}{subsection.4.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.5}Modélisation UML de l'Application Flutter (IHM)}{50}{section.4.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5.1}Architecture Provider / Notifier (Riverpod)}{51}{subsection.4.5.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.4}{\ignorespaces Architecture en 3 couches de l'IHM Flutter avec Riverpod}}{51}{figure.caption.32}\protected@file@percent }
+\newlabel{fig:flutter_archi}{{4.4}{51}{Architecture en 3 couches de l'IHM Flutter avec Riverpod}{figure.caption.32}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5.2}Diagramme de Séquence UML : Envoi d'une commande Jog}{51}{subsection.4.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.6}Sécurité du Code Embarqué}{51}{section.4.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.6.1}Validation des Entrées (Input Sanitization)}{51}{subsection.4.6.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.5}{\ignorespaces Flux de données pour une commande Jog depuis l'IHM Flutter jusqu'aux moteurs}}{52}{figure.caption.33}\protected@file@percent }
+\newlabel{fig:seq_jog}{{4.5}{52}{Flux de données pour une commande Jog depuis l'IHM Flutter jusqu'aux moteurs}{figure.caption.33}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.6.2}Protection contre les Débordements (MISRA-C Guidelines)}{52}{subsection.4.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.6.3}Intégrité des Communications (Checksum)}{52}{subsection.4.6.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.7}Conclusion du Chapitre Logiciel}{52}{section.4.7}\protected@file@percent }
 \@setckpt{chap5_developpement_logiciel}{
-\setcounter{page}{46}
-\setcounter{equation}{0}
-\setcounter{enumi}{3}
+\setcounter{page}{54}
+\setcounter{equation}{8}
+\setcounter{enumi}{9}
 \setcounter{enumii}{0}
 \setcounter{enumiii}{0}
 \setcounter{enumiv}{0}
@@ -42,21 +50,42 @@
 \setcounter{mpfootnote}{0}
 \setcounter{part}{0}
 \setcounter{chapter}{4}
-\setcounter{section}{5}
+\setcounter{section}{7}
 \setcounter{subsection}{0}
 \setcounter{subsubsection}{0}
 \setcounter{paragraph}{0}
 \setcounter{subparagraph}{0}
 \setcounter{figure}{5}
-\setcounter{table}{1}
+\setcounter{table}{2}
 \setcounter{parentequation}{0}
+\setcounter{LT@tables}{1}
+\setcounter{LT@chunks}{4}
 \setcounter{tcbbreakpart}{1}
 \setcounter{tcblayer}{0}
-\setcounter{tcolorbox@number}{3}
+\setcounter{tcolorbox@number}{4}
 \setcounter{lofdepth}{1}
 \setcounter{lotdepth}{1}
 \setcounter{section@level}{0}
-\setcounter{Item}{12}
+\setcounter{Item}{24}
 \setcounter{Hfootnote}{0}
-\setcounter{bookmark@seq@number}{81}
+\setcounter{bookmark@seq@number}{95}
+\setcounter{preinst}{0}
+\setcounter{instnum}{0}
+\setcounter{threadnum}{0}
+\setcounter{seqlevel}{0}
+\setcounter{callevel}{0}
+\setcounter{callselflevel}{0}
+\setcounter{blocklevel}{0}
+\setcounter{lstnumber}{1}
+\setcounter{caption@flags}{2}
+\setcounter{continuedfloat}{0}
+\setcounter{subfigure}{0}
+\setcounter{subtable}{0}
+\setcounter{float@type}{16}
+\setcounter{mdf@globalstyle@cnt}{0}
+\setcounter{mdfcountframes}{0}
+\setcounter{mdf@env@i}{0}
+\setcounter{mdf@env@ii}{0}
+\setcounter{mdf@zref@counter}{0}
+\setcounter{lstlisting}{0}
 }

@@ -1,332 +1,314 @@
 % !TEX root = ../main.tex
-\chapter{Développement Logiciel et Modélisation UML}
+\chapter{Développement Logiciel, Modélisation UML et Cinématique}
 \label{chap:logiciel}
 
-L'intelligence du système réside dans son architecture logicielle distribuée. Ce chapitre détaille la conception informatique par la modélisation UML (\textit{Unified Modeling Language}) et l'implémentation de la dualité entre l'interface haut niveau (Flutter) et le micrologiciel temps réel (ESP32).
+Ce chapitre traite l'implémentation logicielle à deux niveaux : la programmation temps réel du firmware ESP32 (Couche bas-niveau) et le développement de l'Application Flutter (Couche utilisateur). L'ensemble est modélisé en UML structurel et comportemental conformément à la norme ISO/IEC 19501.
 
-% ========================================================
-\section{Modélisation UML du Système Global}
+% =====================================================
+\section{Architecture Générale du Logiciel}
 
-\subsection{Diagramme de Séquence : Cycle de vie d'un Usinage}
-Le fraisage d'une pièce nécessite une orchestration parfaite entre l'opérateur, l'App de contrôle, le serveur Wi-Fi et les actionneurs physiques.
+Le système logiciel se divise en deux domaines distincts communiquant via un protocole réseau:
+
+\begin{enumerate}
+    \item \textbf{Le Firmware ESP32 (Côté Machine)} : Écrit en C++ bare-metal avec FreeRTOS, ce code s'exécute sur le microcontrôleur embarqué. Il gère la réception G-Code, la planification des mouvements, la cinématique inverse et la génération des signaux Step/Direction.
+    \item \textbf{L'Application Flutter IHM (Côté Utilisateur)} : Écrite en Dart/Flutter, elle tourne sur un ordinateur ou une tablette. Elle transmet les blocs G-Code, reçoit les coordonnées courantes et présente un interface utilisateur réactif et multi-plateforme.
+\end{enumerate}
+ 
+\subsection{Diagramme de Composants UML}
+Ce diagramme illustre les grandes composantes logicielles du système et leurs dépendances.
+
+\begin{figure}[htbp]
+    \centering
+    \resizebox{0.95\textwidth}{!}{
+    \begin{tikzpicture}[
+        comp/.style={rectangle, draw, rounded corners=3pt, fill=blue!5, minimum height=1.8cm, text width=4cm, align=center, thick},
+        interf/.style={draw, circle, fill=white, minimum size=0.4cm},
+        line/.style={draw, {open triangle 60}-{Stealth[scale=1.2]}, thick},
+        depend/.style={draw, dashed, -{Stealth[scale=1.2]}, thick}
+    ]
+        % Flutter IHM
+        \node[comp, fill=orange!10] (flutter) at (-6,0) {\textbf{Flutter IHM}\\ \footnotesize (Dart/Riverpod)\\[2pt] \tiny G-Code Editor\\ Jog Controller\\ 3D Viewer (gl\_flutter)};
+        
+        % UDP Layer
+        \node[comp, fill=gray!10] (udp) at (0,0) {\textbf{UDP Layer}\\ \footnotesize (Wi-Fi 802.11n)\\[2pt] \tiny Port 2222\\JSON-Formatted\\Max Latency: 5ms};
+        
+        % Firmware ESP32
+        \node[comp, fill=green!10] (firmware) at (6,0) {\textbf{Firmware ESP32}\\ \footnotesize (C++ / FreeRTOS)\\[2pt] \tiny G-Code Parser\\ Planner (Look-Ahead)\\ IK Calculator\\ Step Gen ISR};
+        
+        % Hardware
+        \node[comp, fill=red!10] (hw) at (6,-4) {\textbf{Hardware}\\ \footnotesize (Drivers + Motors)\\[2pt] \tiny DM556 × 5\\ NEMA 17 × 5\\ Endstops × 5};
+        
+        \draw[depend] (flutter.east) -- (udp.west) node[midway, above, font=\scriptsize] {G-Code blocks};
+        \draw[line] (udp.east) -- (firmware.west) node[midway, above, font=\scriptsize] {ACK / Coordinates};
+        \draw[depend] (firmware.south) -- (hw.north) node[midway, right, font=\scriptsize] {Step/Dir (GPIO)};
+    \end{tikzpicture}
+    }
+    \caption{Diagramme de Composants UML -- Architecture générale du logiciel CNC 5 axes}
+    \label{fig:uml_components}
+\end{figure}
+
+% =====================================================
+\section{Modélisation du Firmware ESP32 (UML)}
+
+\subsection{Diagramme de Machine à États (FSM) -- Machine à États Finis}
+Le firmware ESP32 ne maintient qu'un seul état de fonctionnement global à la fois. Ce mécanisme est implémenté par une Finite State Machine (FSM) dont les transitions sont déclenchées par des événements.
 
 \begin{figure}[htbp]
     \centering
     \resizebox{\textwidth}{!}{
     \begin{tikzpicture}[
-        node distance=3.5cm,
-        lifeline/.style={draw, thick, dashed},
-        actor/.style={rectangle, draw=macouleur, fill=blue!10, text width=2cm, align=center, minimum height=1cm, thick},
-        msg/.style={-{Stealth[scale=1.2]}, thick},
-        reply/.style={dashed, -{Stealth[scale=1.2]}, thick}
+        state/.style={ellipse, draw=macouleur, thick, fill=white, minimum width=3cm, minimum height=1cm, align=center},
+        line/.style={draw, -{Stealth[scale=1.2]}, thick},
+        auto, node distance=4cm
     ]
-        % Acteurs
-        \node[actor] (user) {Opérateur};
-        \node[actor, right=of user] (app) {App Flutter\\(IHM)};
-        \node[actor, right=of app] (esp_core0) {ESP32 (Core 0)\\Serveur TCP};
-        \node[actor, right=of esp_core0] (esp_core1) {ESP32 (Core 1)\\Planner / IRS};
-        \node[actor, right=of esp_core1] (moteur) {Moteurs NEMA};
+        \node[state, fill=macouleur!20] (idle) at (0,0) {\textbf{IDLE}};
+        \node[state] (homing) at (-5,3) {\textbf{HOMING}};
+        \node[state] (run) at (5,3) {\textbf{RUN}};
+        \node[state] (hold) at (5,-3) {\textbf{HOLD}};
+        \node[state, fill=red!20] (alarm) at (-5,-3) {\textbf{ALARM}};
 
-        % Lignes de vie
-        \draw[lifeline] (user.south) -- ++(0, -9.5);
-        \draw[lifeline] (app.south) -- ++(0, -9.5);
-        \draw[lifeline] (esp_core0.south) -- ++(0, -9.5);
-        \draw[lifeline] (esp_core1.south) -- ++(0, -9.5);
-        \draw[lifeline] (moteur.south) -- ++(0, -9.5);
-
-        % Messages
-        \draw[msg] ([yshift=-1cm]user.south) -- ([yshift=-1cm]app.south) node[midway, above, font=\footnotesize] {Charge G-Code};
-        \draw[msg] ([yshift=-2cm]app.south) -- ([yshift=-2cm]esp_core0.south) node[midway, above, font=\footnotesize] {Send : `{"cmd":"G1", "X":15}`};
+        \draw[line] (idle) -- (homing) node[midway, above left, font=\footnotesize]{Cmd \$H};
+        \draw[line] (idle) -- (run) node[midway, above right, font=\footnotesize]{Cycle Start};
+        \draw[line] (homing) -- (idle) node[midway, below left, font=\footnotesize]{Homing OK};
+        \draw[line] (run) -- (hold) node[midway, right, font=\footnotesize]{Feedhold \!};
+        \draw[line] (hold) -- (run) node[midway, left=0.3cm, font=\footnotesize]{Cycle Resume \textasciitilde};
+        \draw[line] (hold) -- (idle) node[midway, below right, font=\footnotesize]{Cycle Stop};
         
-        \draw[msg] ([yshift=-3cm]esp_core0.south) -- ([yshift=-3cm]esp_core1.south) node[midway, above, font=\footnotesize] {Push Ring Buffer};
-        \draw[reply] ([yshift=-4cm]esp_core1.south) -- ([yshift=-4cm]esp_core0.south) node[midway, above, font=\footnotesize] {Buffer OK};
-        
-        \draw[reply] ([yshift=-5cm]esp_core0.south) -- ([yshift=-5cm]app.south) node[midway, above, font=\footnotesize] {ACK (JSON)};
-        
-        \draw[msg] ([yshift=-6cm]esp_core1.south) -- ([yshift=-6cm]moteur.south) node[midway, above, font=\footnotesize] {Pulsations (Step/Dir)};
-        \draw[reply] ([yshift=-7cm]esp_core1.south) -- ([yshift=-7cm]app.south) node[midway, above, near end, font=\footnotesize, fill=white] {Stream Position Actuelle};
-        
-        \draw[msg] ([yshift=-8.5cm]user.south) -- ([yshift=-8.5cm]app.south) node[midway, above, font=\footnotesize] {E-Stop (Logiciel)};
-        \draw[msg] ([yshift=-9cm]app.south) -- ([yshift=-9cm]esp_core1.south) node[midway, above, near end, font=\footnotesize, fill=white, text=red] {Interrupt Mouvement !};
-
+        \draw[line, draw=red] (run) .. controls (0,5) .. (alarm) node[midway, above, font=\footnotesize, color=red]{Endstop / E-STOP};
+        \draw[line, draw=red] (homing) .. controls (-7,0) .. (alarm) node[midway, left, font=\footnotesize, color=red]{Endstop Fault};
+        \draw[line] (alarm) -- (idle) node[midway, below, font=\footnotesize]{\$X Unlock};
     \end{tikzpicture}
     }
-    \caption{Diagramme de Séquence UML des interactions Client-Serveur-Moteurs}
-    \label{fig:uml_sequence}
+    \caption{Diagramme de Machine à États Finis (FSM) du firmware ESP32 avec ses 5 états nominaux}
+    \label{fig:fsm_firmware}
 \end{figure}
 
-\subsection{Diagramme de Classes (Firmware ESP32)}
-Le code source ESP32 s'affranchit du code "spaghetti" séquentiel grâce à une structuration en Programmation Orientée Objet (C++).
-
-\begin{figure}[htbp]
-    \centering
-    \resizebox{0.8\textwidth}{!}{
-    \begin{tikzpicture}[
-        class/.style={rectangle, draw=black, thick, fill=white, text width=5.2cm, rounded corners, align=left, font=\footnotesize},
-        title/.style={font=\bfseries, align=center, fill=gray!20, draw, thick, rounded corners=0pt, minimum width=5.2cm, minimum height=0.7cm},
-        line/.style={-{Diamond[scale=1.5, open]}, thick}
-    ]
-        % CNC Controller
-        \node[class] (cnc) at (0,0) {
-            \vspace{0.7cm}\\ 
-            - state: MachineState\\
-            - queue: RingBuffer*\\
-            + init()\\
-            + emergencyStop()
-        };
-        \node[title, anchor=north] at (cnc.north) {CncController};
-
-        % GCodeParser
-        \node[class] (parser) at (-5, -4) {
-            \vspace{0.7cm}\\ 
-            - jsonDoc: StaticJsonDocument\\
-            + parseLine(String text)\\
-            + validateSyntax(): bool
-        };
-        \node[title, anchor=north] at (parser.north) {GcodeParser};
-
-        % Kinematics
-        \node[class] (ik) at (0, -4) {
-            \vspace{0.7cm}\\ 
-            - Ly: float\\
-            - Lz: float\\
-            + calculateTrunnion(float X, ...)\\
-            + getMotorSteps(): long[]
-        };
-        \node[title, anchor=north] at (ik.north) {KinematicsSolver};
-
-        % Motor
-        \node[class] (motor) at (5, -4) {
-            \vspace{0.7cm}\\ 
-            - stepPin: int\\
-            - dirPin: int\\
-            + generatePulse()\\
-            + setDirection(bool dir)
-        };
-        \node[title, anchor=north] at (motor.north) {StepperMotor};
-
-        % Relations
-        \draw[line] (parser.north) -- (-5, -0.6) -- (cnc.west);
-        \draw[line] (ik.north) -- (cnc.south);
-        \draw[line] (motor.north) -- (5, -0.6) -- (cnc.east);
-
-    \end{tikzpicture}
-    }
-    \caption{Diagramme de Classes UML de l'architecture logicielle embarquée}
-    \label{fig:uml_classes}
-\end{figure}
-
-% ========================================================
-\subsection{Diagramme d'États (Machine à États Finis de l'ESP32)}
-
-Afin de garantir une sécurité opérationnelle absolue, le C++ embarqué refuse catégoriquement d'exécuter un mouvement si la machine n'entre pas dans le bon état (\textit{State Machine}).
-
-\begin{figure}[htbp]
-    \centering
-    \begin{tikzpicture}[
-        state/.style={rectangle, draw=black, rounded corners=12pt, fill=blue!5, text width=2.5cm, align=center, thick, minimum height=1.2cm},
-        trans/.style={-{Stealth[scale=1.2]}, thick, draw=macouleur},
-        textNode/.style={fill=white, font=\scriptsize, align=center}
-    ]
-        \node[state, fill=red!10] (alarm) at (0, 3) {ALARM\\(Stop / Défaut)};
-        \node[state, fill=yellow!10] (idle) at (0, 0) {IDLE\\(Prêt / Attente)};
-        \node[state, fill=green!10] (run) at (5, 0) {RUN\\(Usinage)};
-        \node[state, fill=orange!10] (homing) at (-5, 0) {HOMING\\(Origines)};
-        
-        \draw[trans, bend left] (idle) to node[textNode, above] {Reçoit G-Code} (run);
-        \draw[trans, bend left] (run) to node[textNode, below] {Buffer vide} (idle);
-        \draw[trans] (run) -- (alarm) node[textNode, midway] {Collision\\Fin de course};
-        \draw[trans] (idle) -- (alarm) node[textNode, midway] {Bouton\\E-Stop};
-        \draw[trans, bend left] (alarm) to node[textNode, above] {Unlock\\(\texttt{\$X})} (idle);
-        
-        \draw[trans, bend right] (idle) to node[textNode, below] {Cmd \texttt{\$H}} (homing);
-        \draw[trans, bend right] (homing) to node[textNode, above] {Fins de\\courses OK} (idle);
-    \end{tikzpicture}
-    \caption{Diagramme d'États UML du contrôleur interne de la CNC}
-    \label{fig:state_machine}
-\end{figure}
-
-Le passage à l'état \texttt{RUN} active la lecture du Ring Buffer, confiant la génération impulsionnelle au Core 1.
-
-\section{Algorithmique de Génération de Mouvements}
-
-\subsection{DDA (Digital Differential Analyzer) vs Timers Hardware}
-La génération de pas pour 5 axes simultanés impose un synchronisme parfait. Deux approches algorithmiques ont été évaluées :
-\begin{itemize}
-    \item \textbf{L'algorithme de Bresenham / DDA :} Il s'agit d'une méthode logicielle où une boucle principale incrémente une erreur de position. Bien que simple, elle consomme des cycles CPU et peut être perturbée par d'autres interruptions logicielles, créant de la gigue (jitter).
-    \item \textbf{La Génération par Timers (Choix retenu) :} Nous utilisons les Timers 64 bits de l'ESP32. À chaque interruption matérielle (ISR), le calcul de la vitesse actuelle (S-Curve) détermine le délai exact avant la prochaine impulsion. Cette méthode est totalement déterministe et permet d'atteindre des fréquences de découpage de $100 \text{ kHz}$ sans dérive temporelle.
-\end{itemize}
-
-\subsection{Gestion du Flux : Logique Look-Ahead}
-Le fraisage 5 axes continu génère des milliers de micro-segments G-Code. Si le contrôleur s'arrêtait à chaque fin de ligne, le mouvement serait saccadé.
-Nous avons implémenté un buffer de \textbf{Look-Ahead} (Anticipation). L'algorithme analyse les 20 segments à venir pour calculer l'angle de jonction entre les vecteurs. Si l'angle est faible, le Planner maintient une vitesse élevée ("Cornering speed"). Si le changement de direction est brutal (ex. angle vif), il calcule une rampe de décélération préventive pour respecter les limites de couple des moteurs et éviter les pertes de pas par inertie.
-
-\section{Implémentation du Code : Micrologiciel (ESP32)}
-
-\subsection{L'Architecture Dual-Core (FreeRTOS)}
-Le SoC (System on Chip) ESP32 dispose de deux cœurs Tensilica $240 \text{ MHz}$. Pour ne rater aucune \textit{Microseconde} de pulsation vers les drivers de moteurs lors d'un calcul complexe ou d'un transfert réseau, les tâches ont été assignées statiquement sous l'OS temps réel \textbf{FreeRTOS}.
-
-\begin{itemize}
-    \item \textbf{Core 0 (Protocole et Logique) :} Gère la pile TCP/IP (Wi-Fi), reçoit les packets JSON, exécute la classe \texttt{GcodeParser} et empile les commandes validées dans le \textit{Ring Buffer}.
-    \item \textbf{Core 1 (Temps Réel et ISR) :} Dédié au \texttt{KinematicsSolver}. Il lit le Buffer, génère la trajectoire "Look-Ahead" et pilote les interruptions matérielles (Hardware Timers) \textit{exactement} aux cadences requises pour les pins STEP.
-\end{itemize}
-
-\subsection{Cinématique Inverse et Paramétrage Denavit-Hartenberg}
-
-Le cœur de la transformation Table-Table réside dans la résolution de la cinématique inverse. Pour localiser précisément n'importe quel point de la pièce soumise aux rotations A et B, le firmware embarque les matrices des paramètres de Denavit-Hartenberg (D-H) modifiés.
-
-Le tableau D-H liant l'outil au système de coordonnées du plateau rotatif s'établit avec les excentricités d'assemblage mesurées physiquement (Offsets $L_{x}, L_{y}, L_{z}$) :
-
-\begin{table}[htbp]
-    \centering
-    \begin{tabular}{|c|c|c|c|c|l|}
-    \hline
-    \textbf{Axe $i$} & \textbf{Articul.} & \textbf{$\alpha_{i-1}$ ($^\circ$)} & \textbf{$a_{i-1}$ (mm)} & \textbf{$\theta_i$ ($^\circ$)} & \textbf{$d_i$ (mm)} \\ \hline
-    0 $\rightarrow$ X  & Linéaire  & 0 & 0 & 0 & $X_{moteur}$ \\ \hline
-    X $\rightarrow$ Y  & Linéaire  & -90 & 0 & -90 & $Y_{moteur}$ + Offset $L_{y}$ \\ \hline
-    Y $\rightarrow$ Z  & Linéaire  & -90 & 0 & 0 & $Z_{moteur}$ + Offset $L_{z}$ \\ \hline
-    Z $\rightarrow$ A  & Rotatif (Tilt) & 90 & 0 & $\theta_A$ & 0 \\ \hline
-    A $\rightarrow$ B  & Rotatif (Pan)  & -90 & 0 & $\theta_B$ & Hauteur Pièce \\ \hline
-    \end{tabular}
-    \caption{Paramètres de Denavit-Hartenberg Modifiés de la Table Trunnion 5 Axes}
-    \label{tab:dh_parameters}
-\end{table}
-
-Le produit des matrices de transformations intermédiaires $^0T_n = \prod_{i=1}^n {^{i-1}T_i}$ est implémenté en C++ à l'aide de \textit{Look-Up Tables (LUT)} trigonométriques. Au lieu d'utiliser la fonction mathématique lourde \texttt{sin(theta)}, l'ESP32 pointe vers un tableau RAM pré-calculé :
-\begin{verbatim}
-// Extrait de l'algorithme d'interpolation de la Cinématique Inverse
-void calculateInverseKinematics(float x, float y, float z, float a, float b) {
-    float sin_b = lut_sin[int(b * 100)];
-    float cos_b = lut_cos[int(b * 100)];
-    float sin_a = lut_sin[int(a * 100)];
-    float cos_a = lut_cos[int(a * 100)];
-    
-    // Compensation vectorielle Trunnion selon matrice D-H
-    motor_X = x*cos_b - y*sin_b;
-    motor_Y = (x*sin_b + y*cos_b)*cos_a - (z+Lz)*sin_a + Ly;
-    motor_Z = (x*sin_b + y*cos_b)*sin_a + (z+Lz)*cos_a - Lz;
-}
-\end{verbatim}
-
-% ========================================================
-\section{L'Interface Homme-Machine (Flutter)}
-
-L'application Dart/Flutter \textit{Single Codebase} (Windows, Linux, Android) fournit un \textit{dashboard} (tableau de bord) esthétique et réactif.
-
-\subsection{Le Parseur G-Code (Logigramme UML)}
-Contrairement aux architectures classiques, l'intelligence d'interprétation du G-Code lourd (fichiers `.nc` de plusieurs Mégaoctets) est déportée sur le poste maître (Téléphone ou PC Flutter) afin de soulager la RAM de l'ESP32. 
-L'application Flutter utilise les \textit{Expressions Régulières (Regex)} pour isoler chaque commande, calcule la faisabilité, et sérialise la trame en JSON allégé.
-
-\begin{figure}[htbp]
-    \centering
-    \begin{tikzpicture}[
-        process/.style={rectangle, draw=black, rounded corners=5pt, fill=blue!10, text width=3cm, align=center, thick, minimum height=1cm},
-        decision/.style={diamond, aspect=2, draw=black, fill=yellow!10, text width=2.5cm, align=center, thick, inner sep=0pt},
-        data/.style={trapezium, trapezium left angle=70, trapezium right angle=110, draw=black, fill=green!10, text width=2.5cm, align=center, thick},
-        arrow/.style={-{Stealth[scale=1.2]}, thick}
-    ]
-        \node[data] (file) at (0, 4) {Fichier G-Code (.nc)};
-        \node[process] (read) at (0, 2.5) {Lecture ligne par ligne Async};
-        \node[process] (regex) at (0, 1) {Regex: \texttt{G[0-1] X([0-9.]+)...}};
-        \node[decision] (valid) at (0, -1) {Syntaxe valide ?};
-        
-        \node[process, fill=orange!10] (error) at (-4, -1) {Ignorer / Log};
-        \node[process] (json) at (0, -3.5) {Sérialisation JSON\\ \texttt{\{"c":"G1","X":5\}}};
-        \node[decision] (buffer) at (0, -6) {ESP Buffer > 80\% ?};
-        \node[process, fill=red!10] (wait) at (-4, -6) {Attente (Delay)};
-        \node[data, fill=macouleur!20] (tx) at (0, -8.5) {Transmission UDP vers ESP32};
-        
-        \draw[arrow] (file) -- (read);
-        \draw[arrow] (read) -- (regex);
-        \draw[arrow] (regex) -- (valid);
-        
-        \draw[arrow] (valid) -- node[above, font=\scriptsize] {Non} (error);
-        \draw[arrow] (valid) -- node[right, font=\scriptsize] {Oui} (json);
-        
-        \draw[arrow] (json) -- (buffer);
-        \draw[arrow] (buffer) -- node[above, font=\scriptsize] {Oui} (wait);
-        \draw[arrow] (wait) |- (buffer.west); % boucle d'attente
-        \draw[arrow] (buffer) -- node[right, font=\scriptsize] {Non} (tx);
-    \end{tikzpicture}
-    \caption{Logigramme de parsing, sérialisation et transmission du G-Code sous Flutter}
-    \label{fig:gcode_parser}
-\end{figure}
-
-\subsection{Architecture Logicielle de l'App Flutter (Diagramme de Classes)}
-L'application mobile et desktop suit un patron d'architecture réactive orientée données, articulée autour du State Management.
+\subsection{Diagramme de Classes UML -- Firmware}
+Le firmware C++ est structuré selon une décomposition en classes spécialisées. Chacune encapsule sa responsabilité.
 
 \begin{figure}[htbp]
     \centering
     \resizebox{0.9\textwidth}{!}{
     \begin{tikzpicture}[
-        class/.style={rectangle, draw=black, thick, fill=white, text width=6.8cm, rounded corners, align=left, font=\footnotesize},
-        title/.style={font=\bfseries, align=center, fill=blue!10, draw, thick, rounded corners=0pt, minimum width=6.8cm, minimum height=0.7cm},
-        line/.style={-{Stealth[scale=1.2]}, thick},
-        assoc/.style={-{Diamond[scale=1.5, open]}, thick}
+        cls/.style={draw=black, thick, fill=white},
+        hdr/.style={fill=macouleur!30, draw=macouleur, thick, font=\bfseries\small},
+        sep/.style={draw, dashed}
     ]
-        % UI Layer
-        \node[class] (ui) at (0,0) {
-            \vspace{0.7cm}\\ 
-            + build(context): Widget\\
-            + onPlayPressed()\\
-            + onStopPressed()
+        \draw[cls] (0,0) rectangle (5,5);
+        \node[hdr, minimum width=5cm, anchor=north] at (2.5,5) {\texttt{GCodeParser}};
+        \node[anchor=north west, font=\footnotesize, align=left] at (0.2,4.3) {
+            \texttt{+parseBlock(String): Block}\\
+            \texttt{+extractFloat(char,String): float}\\
+            \texttt{+getLastError(): ErrorCode}
         };
-        \node[title, anchor=north] at (ui.north) {MainDashboardView};
-
-        % State Layer
-        \node[class] (provider) at (0, -4) {
-            \vspace{0.7cm}\\ 
-            - state: MachineState\\
-            + updatePosition(JSON)\\
-            + sendCommand(GCode)
+        
+        \draw[cls] (6.5,0) rectangle (11.5,5);
+        \node[hdr, minimum width=5cm, anchor=north] at (9,5) {\texttt{Planner5Axes}};
+        \node[anchor=north west, font=\footnotesize, align=left] at (6.7,4.3) {
+            \texttt{+bufferBlock(Block): bool}\\
+            \texttt{+recalculateTrapezoid(): void}\\
+            \texttt{+getLookAheadBuffer(): Buffer[]}\\
+            \texttt{-calcJunctionSpeed(): float}
         };
-        \node[title, anchor=north] at (provider.north) {MachineStateNotifier};
-
-        % Service Layer
-        \node[class] (service) at (6, -4) {
-            \vspace{0.7cm}\\ 
-            - socket: RawDatagramSocket\\
-            + listen(): Stream\\
-            + sendUDP(trame)
+        
+        \draw[cls] (0,-5) rectangle (5,-0.5);
+        \node[hdr, minimum width=5cm, anchor=north] at (2.5,-0.5) {\texttt{InvKinematics}};
+        \node[anchor=north west, font=\footnotesize, align=left] at (0.2,-1.2) {
+            \texttt{+solve(X,Y,Z,A,B): MotorPos}\\
+            \texttt{+forwardKinema(): CartPos}\\
+            \texttt{+getTCPOffset(): Vector3}
         };
-        \node[title, anchor=north] at (service.north) {UdpCommunicationService};
-
-        % Data Model
-        \node[class] (model) at (-6, -4) {
-            \vspace{0.7cm}\\ 
-            + x, y, z: double\\
-            + a, b: double\\
-            + status: String
+        
+        \draw[cls] (6.5,-5) rectangle (11.5,-0.5);
+        \node[hdr, minimum width=5cm, anchor=north] at (9,-0.5) {\texttt{StepGenerator}};
+        \node[anchor=north west, font=\footnotesize, align=left] at (6.7,-1.2) {
+            \texttt{+onTimerISR(): void}\\
+            \texttt{+enableAxis(int): void}\\
+            \texttt{+setStepFreq(int, float): void}
         };
-        \node[title, anchor=north] at (model.north) {MachineModel};
-
-        % Relations
-        \draw[line] (ui.south) -- (provider.north) node[midway, right, font=\scriptsize] {watch/read};
-        \draw[assoc] (model.east) -- (provider.west);
-        \draw[line] (service.west) -- (provider.east);
-
+        
+        \draw[-{Stealth[scale=1.2]}, thick] (5,2.5) -- (6.5,2.5) node[midway, above, font=\footnotesize]{uses};
+        \draw[-{Stealth[scale=1.2]}, thick] (5,-2.5) -- (6.5,-2.5) node[midway, above, font=\footnotesize]{drives};
+        \draw[-{Stealth[scale=1.2]}, thick] (2.5,0) -- (2.5,-0.5) node[midway, right, font=\footnotesize]{calls};
     \end{tikzpicture}
     }
-    \caption{Diagramme de Classes UML de l'application Flutter (Pattern Provider/Riverpod)}
-    \label{fig:uml_flutter}
+    \caption{Diagramme de Classes simplifié du firmware ESP32 (4 classes principales)}
+    \label{fig:uml_classes_fw}
 \end{figure}
 
-\subsection{State Management : La pureté de Riverpod}
-Le Widget de coordonnées, interrogeant l'ESP32 $50 \text{ fois par seconde}$, noierait le Thread de rendu graphique d'un téléphone si nous utilisions la commande racine \texttt{setState()}.
-L'intégration du package \textbf{Riverpod} (Modèle \texttt{StateNotifier}) est la solution d'ingénierie adoptée. Le Stream UDP de l'ESP32 est écouté par un \texttt{StreamProvider}.
-Seuls les widgets d'affichage enveloppés dans un \texttt{ConsumerWidget} et abonnés spécifiquement ("$watch$") à la portion de la classe d'état \texttt{MachinePosition} se redessinent, réduisant la consommation CPU du téléphone Android à $< 2\%$.
+% =====================================================
+\section{Cinématique Inverse de la Configuration Trunnion}
 
-\begin{verbatim}
-// Utilisation de Riverpod pour isoler le rafraîchissement
-class AxesDisplayWidget extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // Ne se reconstruit QUE si la coordonnée X ou Y change
-    final machineState = ref.watch(machineStateProvider);
-    return Text("X: ${machineState.x.toStringAsFixed(3)} mm");
-  }
-}
-\end{verbatim}
+\subsection{Système de Coordonnées et Paramètres de Denavit-Hartenberg}
+La cinématique inverse est l'opération mathématique qui permet de déterminer les positions angulaires des moteurs A et B à partir d'une position TCP cible exprimée dans le repère de la pièce. Ces calculs doivent être effectués en temps réel $< 1\,\mu s$ par block de G-code.
 
-\section{Conclusion de la conception logicielle}
-L'architecture de programmation illustrée par l'UML confirme que la conception 5 axes n'est pas limitée à la mécanique, mais dépend d'un système informationnel à haute disponibilité. Le pont entre le C++ Temps réel embarqué et la modernité réactive de Flutter garantit une expérience utilisateur digne des commandes numériques industrielles modernes.
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\rowcolor{macouleur!20}
+\textbf{Articulation} & \textbf{Axe} & $\theta_i$ & $d_i$ & $a_i$ & $\alpha_i$ \\
+\hline
+$i = 0$ & Référence Machine & $0$ & $0$ & $0$ & $0^\circ$ \\
+\hline
+$i = 1$ & Axe B (Rotation Pan) & $\theta_B$ & $H_{berceau}$ & $0$ & $90^\circ$ \\
+\hline
+$i = 2$ & Axe A (Basculement Tilt) & $\theta_A$ & $0$ & $L_{\text{pivot}}$ & $0^\circ$ \\
+\hline
+$i = 3$ & TCP (Surface pièce) & $0$ & $R_{\text{plateau}}$ & $0$ & $0^\circ$ \\
+\hline
+\end{tabular}
+\caption{Paramètres de Denavit-Hartenberg de la configuration Trunnion (Axes A et B)}
+\label{tab:dh_params}
+\end{table}
+
+\subsection{Algorithme de Résolution (Cinématique Inverse Analytique)}
+La résolution analytique est préférable à une résolution numérique itérative (Jacobienne) pour des raisons de déterminisme temporel. En projetant les rotations successives :
+
+\textbf{Étape 1 : Calcul de la compensation TCP sur Z en fonction de A}
+\begin{equation}
+    \Delta Z_{TCP} = R_{plateau} \cdot (1 - \cos\theta_A)
+\end{equation}
+\textbf{Étape 2 : Compensation TCP sur Y en fonction de A}
+\begin{equation}
+    \Delta Y_{TCP} = R_{plateau} \cdot \sin\theta_A
+\end{equation}
+\textbf{Étape 3 : Application de la rotation B sur les offsets}
+
+En 3D, la rotation d'angle $\theta_B$ autour de l'axe Z transforme le vecteur d'offset $(\Delta Y_{TCP}, 0)$ :
+\begin{equation}
+    \begin{pmatrix} \Delta X_{machine} \\ \Delta Y_{machine} \\ \Delta Z_{machine} \end{pmatrix} =
+    \begin{pmatrix}
+        \cos\theta_B & -\sin\theta_B & 0 \\
+        \sin\theta_B & \cos\theta_B & 0 \\
+        0 & 0 & 1
+    \end{pmatrix}
+    \begin{pmatrix} 0 \\ \Delta Y_{TCP} \\ \Delta Z_{TCP} \end{pmatrix}
+\end{equation}
+\textbf{Étape 4 : Positions machines finales}
+\begin{align}
+    X_{machine} &= X_{piece} - \Delta X_{machine} \\
+    Y_{machine} &= Y_{piece} - \Delta Y_{machine} \\
+    Z_{machine} &= Z_{piece} - \Delta Z_{machine}
+\end{align}
+
+% =====================================================
+\section{L'Algorithme «Look-Ahead» et le Profil d'Accélération S-Curve}
+
+\subsection{Limitations du Profil Trapézoïdal}
+Le profil d'accélération «trapézoïdal» (vitesse croît linéairement jusqu'à $V_{max}$) génère des discontinuités de la dérivée de la vitesse (le «jerk»). Sur machine 5 axes, cette discontinuité excite les modes propres du portique, générant des vibrations visibles sur la surface usinée (effet «ringing»).
+
+\subsection{Le Profil S-Curve (Jerk Limité)}
+Notre firmware implémente un profil d'accélération en S (Sigmoid-type), dit «Jerk Limité», qui lisse la transition entre les phases d'accélération et de vitesse constante. Mathématiquement, la vitesse en fonction du temps est :
+\begin{equation}
+    v(t) = V_{max} \cdot \left(1 - e^{-k \cdot t}\right)
+\end{equation}
+Où $k$ est la constante de jerk. L'implémentation discrète sur l'ESP32 utilise une machine à états avec 7 phases de mouvement :
+
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|l|l|}
+\hline
+\rowcolor{macouleur!20}
+\textbf{Phase} & \textbf{Nom} & \textbf{Caractéristique cinématique} \\
+\hline
+1 & Jerk positif croissant & Accélération $a$ croît de $0$ à $a_{max}$ \\
+\hline
+2 & Accélération constante & $a = a_{max}$ (partie centrale du S) \\
+\hline
+3 & Jerk négatif décroissant & Accélération $a$ décroît de $a_{max}$ à $0$ \\
+\hline
+4 & Vitesse croisière & $v = V_{target}$ (vitesse d'usinage) \\
+\hline
+5 & Jerk positif de décélération & Décélération commence (miroir de Phase 3) \\
+\hline
+6 & Décélération constante & $a = -a_{max}$ \\
+\hline
+7 & Jerk négatif de décélération & Retour à $v = 0$ (ou $v = v_{junction}$) \\
+\hline
+\end{tabular}
+\caption{Les 7 phases cinématiques du profil de déplacement en S-Curve}
+\label{tab:s_curve_phases}
+\end{table}
+
+\subsection{La Fenêtre «Look-Ahead» (Planification Anticipative)}
+Le planificateur de trajectoire maintient un buffer circulaire de $N_{blocks} = 24$ blocs en mémoire. En anticipant les vitesses de jonction aux angles du parcours, il peut ralentir suffisamment en avance avant un virage aigu :
+\begin{equation}
+    V_{junction} = \min\left(V_{nominal},\, \sqrt{\frac{J_{max} \cdot a_{max}}{1 - \cos(\theta_{angle})}}\right)
+\end{equation}
+Cette formule, adaptée de l'algorithme Grbl original, garantit que la machine ne génère jamais d'à-coup mécanique brutal lors du changement de direction.
+
+% =====================================================
+\section{Modélisation UML de l'Application Flutter (IHM)}
+
+\subsection{Architecture Provider / Notifier (Riverpod)}
+L'application Flutter utilise Riverpod comme gestionnaire d'état globale. Ce pattern sépare la logique métier de la représentation UI.
+
+\begin{figure}[htbp]
+    \centering
+    \resizebox{0.95\textwidth}{!}{
+    \begin{tikzpicture}[
+        layer/.style={draw, rounded corners=5pt, minimum height=2cm, text width=6cm, align=center, thick},
+        line/.style={draw, -{Stealth[scale=1.2]}, thick},
+        dline/.style={draw, dashed, -{Stealth[scale=1.2]}, thick}
+    ]
+        \node[layer, fill=blue!10] (ui) at (0,4) {\textbf{Couche Présentation (Widgets)}\\\footnotesize DashboardPage, JogPage, GCodeEditorPage,\\SettingsPage, HomingPage};
+        
+        \node[layer, fill=orange!10] (provider) at (0,1) {\textbf{Couche Logique (Riverpod Providers)}\\\footnotesize MachineStateNotifier, GCodeQueueProvider,\\ConnectionProvider, UdpStreamProvider};
+        
+        \node[layer, fill=green!10] (service) at (0,-2) {\textbf{Couche Services (Dart)}\\\footnotesize UdpCommunicationService,\\GCodeParserService, PositionTrackingService};
+        
+        \draw[dline] (ui.south) -- (provider.north) node[midway, right, font=\footnotesize]{watch()/read()};
+        \draw[line] (provider.south) -- (service.north) node[midway, right, font=\footnotesize]{appel direct};
+        \draw[dline] (service.east) .. controls (4,-2) and (4,1) .. (provider.east) node[midway, right, font=\footnotesize]{résultats asynchrones};
+    \end{tikzpicture}
+    }
+    \caption{Architecture en 3 couches de l'IHM Flutter avec Riverpod}
+    \label{fig:flutter_archi}
+\end{figure}
+
+\subsection{Diagramme de Séquence UML : Envoi d'une commande Jog}
+Ce diagramme illustre le flux d'exécution d'une commande de déplacement manuel (Jog) depuis l'appui sur le bouton tactile jusqu'au mouvement physique du moteur.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tcolorbox}[colback=white, colframe=macouleur, title=Séquence de transmission (Jog)]
+    \begin{enumerate}
+        \item \textbf{Opérateur} : Appuie sur le bouton "X+" de l'IHM Flutter.
+        \item \textbf{Flutter (JogProvider)} : Génère la commande \texttt{G91 G01 X10 F500}.
+        \item \textbf{Dart (UdpService)} : Envoie le paquet JSON via Wi-Fi UDP.
+        \item \textbf{ESP32 (Core 0)} : Reçoit, parse et valide le G-Code.
+        \item \textbf{ESP32 (Planner)} : Calcule la cinématique inverse et insère le bloc de mouvement dans le buffer temporel.
+        \item \textbf{ESP32 (Core 1)} : Le Hardware Timer génère les impulsions \texttt{Step/Dir} physiques, le moteur NEMA 17 tourne.
+        \item \textbf{ESP32 (Core 0)} : Renvoie un accusé de réception (ACK) avec les nouvelles coordonnées $X=+10.0$ au réseau.
+        \item \textbf{Flutter (UdpService)} : Met à jour l'état Riverpod.
+        \item \textbf{Flutter (UI)} : L'écran se rafraîchit et affiche $X: +10.000$ mm.
+    \end{enumerate}
+    \end{tcolorbox}
+    \caption{Flux de données pour une commande Jog depuis l'IHM Flutter jusqu'aux moteurs}
+    \label{fig:seq_jog}
+\end{figure}
+
+% =====================================================
+\section{Sécurité du Code Embarqué}
+
+\subsection{Validation des Entrées (Input Sanitization)}
+Une vulnérabilité critique des firmwares CNC est l'absence de validation des valeurs reçues par le réseau. Un champ de vitesse corrompu ($F = -999~999 \text{ mm/min}$) pourrait détruire la machine. Notre firmware valide chaque paramètre :
+
+\begin{itemize}
+    \item Coordonnées : $X \in [-220, +220]$, $Y \in [-220, +220]$, $Z \in [-170, 0]$ mm.
+    \item Angles : $A \in [-95, +95]°$, $B \in [-360, +360]°$.
+    \item Vitesse d'avance : $F \in [1, 3000]$ mm/min.
+    \item Vitesse de broche : $S \in [0, 24~000]$ tr/min.
+\end{itemize}
+
+\subsection{Protection contre les Débordements (MISRA-C Guidelines)}
+Notre code suit les recommandations MISRA-C Rule 21.1 (ne pas utiliser \texttt{atof()} sans validation préalable). Le parsing de G-Code a été réécrit avec une machine à états caractère par caractère, évitant les débordements de \textit{buffer stack}. Les tableaux sont initialisés statiquement. Aucune allocation dynamique (\texttt{malloc()}) n'est utilisée dans les ISR.
+
+\subsection{Intégrité des Communications (Checksum)}
+Les paquets UDP peuvent être tronqués ou corrompus durant la transmission sans-fil. Notre protocole JSON intègre un champ \texttt{"crc"} (Checksum CRC-16/CCITT) calculé sur la charge utile. L'ESP32 recalcule le checksum avant traitement et rejette silencieusement les paquets invalides.
+
+\section{Conclusion du Chapitre Logiciel}
+Le code développé met en œuvre une architecture multi-couche rigoureuse, couvrant le déterminisme temps-réel de la génération de signaux STEP sur les Hardware Timers, la cinématique inverse analytique de la table Trunnion, et l'interface Flutter dont toute la réactivité UI dépend de la propagation des états Riverpod. Chaque composant logiciel a été conçu en tenant compte des contraintes de sécurité (MISRA guidelines, validation géométrique, intégrité UDP) depuis sa conception. Les tests et validations de l'ensemble de ce pipeline de commande sont détaillés dans le chapitre suivant.

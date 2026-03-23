@@ -4,96 +4,130 @@
 \contentsline {chapter}{Dédicaces}{3}{chapter*.2}%
 \contentsline {chapter}{Remerciements}{4}{chapter*.3}%
 \contentsline {chapter}{Présentation de l'ENI-ABT}{5}{chapter*.4}%
-\contentsline {chapter}{Sigles et abréviations}{7}{chapter*.5}%
-\contentsline {chapter}{Liste des figures}{11}{chapter*.5}%
-\contentsline {chapter}{Liste des tableaux}{12}{chapter*.5}%
-\contentsline {chapter}{Introduction Générale}{13}{chapter*.6}%
-\contentsline {chapter}{\numberline {1}État de l'art et Revue de la Littérature}{17}{chapter.1}%
-\contentsline {section}{\numberline {1.1}Généralités sur la Commande Numérique par Calculateur (CNC)}{17}{section.1.1}%
-\contentsline {subsection}{\numberline {1.1.1}Principe d'asservissement d'un système CNC}{17}{subsection.1.1.1}%
-\contentsline {section}{\numberline {1.2}Classification Architecturale des Machines CNC 5 Axes}{18}{section.1.2}%
-\contentsline {subsection}{\numberline {1.2.1}Configuration "Table-Table" (Trunnion Table ou Table Basculante)}{18}{subsection.1.2.1}%
-\contentsline {subsection}{\numberline {1.2.2}Configuration "Head-Head" (Tête Pivotante ou Bi-Rotative)}{18}{subsection.1.2.2}%
-\contentsline {subsection}{\numberline {1.2.3}Configuration "Head-Table" (Hybride)}{19}{subsection.1.2.3}%
-\contentsline {section}{\numberline {1.3}Problématiques Avancées : Singularités et TCP}{19}{section.1.3}%
-\contentsline {subsection}{\numberline {1.3.1}Les Singularités Cinématiques (Gimbal Lock)}{19}{subsection.1.3.1}%
-\contentsline {subsection}{\numberline {1.3.2}Le Concept de TCP (Tool Center Point Control)}{19}{subsection.1.3.2}%
-\contentsline {section}{\numberline {1.4}L'Écosystème Logiciel et le Langage G-Code 5 Axes}{20}{section.1.4}%
-\contentsline {subsection}{\numberline {1.4.1}La Chaîne Numérique 5 Axes}{20}{subsection.1.4.1}%
-\contentsline {subsection}{\numberline {1.4.2}Le Langage G-Code (Norme ISO 6983)}{20}{subsection.1.4.2}%
-\contentsline {section}{\numberline {1.5}État de l'art de l'Unité de Traitement Logiciel (Le Choix du Cerveau)}{20}{section.1.5}%
-\contentsline {section}{\numberline {1.6}Conclusion du chapitre}{21}{section.1.6}%
-\contentsline {chapter}{\numberline {2}Étude Technique et Dimensionnement Mécanique (RDM)}{22}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Analyse Fonctionnelle du Besoin (AFB)}{22}{section.2.1}%
-\contentsline {subsection}{\numberline {2.1.1}Saisie du besoin et Graphe des interactions}{22}{subsection.2.1.1}%
-\contentsline {subsection}{\numberline {2.1.2}Arborescence technique (Diagramme FAST)}{24}{subsection.2.1.2}%
-\contentsline {subsection}{\numberline {2.1.3}Justification des Solutions Technologiques}{24}{subsection.2.1.3}%
-\contentsline {subsection}{\numberline {2.1.4}Cahier des Charges Qualitatif et Quantitatif}{25}{subsection.2.1.4}%
-\contentsline {section}{\numberline {2.2}Architecture retenue : La table basculante (Trunnion)}{26}{section.2.2}%
-\contentsline {section}{\numberline {2.3}Étude des efforts de coupe (Modélisation de la force de coupe)}{26}{section.2.3}%
-\contentsline {subsection}{\numberline {2.3.1}Formalisation par les Torseurs d'Action Mécanique}{26}{subsection.2.3.1}%
-\contentsline {section}{\numberline {2.4}Résistance des Matériaux (RDM) et Analyse de Contraintes}{27}{section.2.4}%
-\contentsline {subsection}{\numberline {2.4.1}Vérification au Critère de Von Mises}{27}{subsection.2.4.1}%
-\contentsline {section}{\numberline {2.5}Dimensionnement des Arbres de Transmission (Vis à billes)}{27}{section.2.5}%
-\contentsline {subsection}{\numberline {2.5.1}Détermination de la force axiale sur la Vis}{27}{subsection.2.5.1}%
-\contentsline {subsection}{\numberline {2.5.2}Vérification au Flambage (Critère d'Euler)}{28}{subsection.2.5.2}%
-\contentsline {subsection}{\numberline {2.5.3}L'Effet Bras de Levier (Table Trunnion) et Couple de Renversement}{28}{subsection.2.5.3}%
-\contentsline {section}{\numberline {2.6}Dimensionnement des moteurs d'entraînement (NEMA)}{29}{section.2.6}%
-\contentsline {section}{\numberline {2.7}Dimensionnement des Transmissions Rotatives (Axes A et B)}{30}{section.2.7}%
-\contentsline {subsection}{\numberline {2.7.1}Problématique d'entraînement rotatif et "Backlash angulaire"}{30}{subsection.2.7.1}%
-\contentsline {subsection}{\numberline {2.7.2}Solutions de réduction}{30}{subsection.2.7.2}%
-\contentsline {section}{\numberline {2.8}Étude de Résistance Des Matériaux (RDM) de l'Infrastructure}{30}{section.2.8}%
-\contentsline {subsection}{\numberline {2.8.1}Déflexion maximale du Portique (Axe X)}{31}{subsection.2.8.1}%
-\contentsline {section}{\numberline {2.9}Conclusion sur l'Étude Mécanique}{31}{section.2.9}%
-\contentsline {chapter}{\numberline {3}Architecture Électronique et Ingénierie des Signaux}{32}{chapter.3}%
-\contentsline {section}{\numberline {3.1}L'Unité de Traitement Embarquée (Le "Cerveau")}{32}{section.3.1}%
-\contentsline {subsection}{\numberline {3.1.1}Analyse Critique des Microcontrôleurs}{32}{subsection.3.1.1}%
-\contentsline {subsection}{\numberline {3.1.2}Allocation Mémoire et Tâches (FreeRTOS)}{33}{subsection.3.1.2}%
-\contentsline {section}{\numberline {3.2}Chaîne de Puissance et Drivers Moteurs}{33}{section.3.2}%
-\contentsline {subsection}{\numberline {3.2.1}Dimensionnement de l'Interface de Logique (Level Shifter)}{33}{subsection.3.2.1}%
-\contentsline {subsection}{\numberline {3.2.2}Régime Micro-stepping du DM556}{34}{subsection.3.2.2}%
-\contentsline {section}{\numberline {3.3}Bilan de Puissance et Dimensionnement des Alimentations}{34}{section.3.3}%
-\contentsline {subsection}{\numberline {3.3.1}Dimensionnement de l'Alimentation Principale (PSU 36V)}{34}{subsection.3.3.1}%
-\contentsline {subsection}{\numberline {3.3.2}Dimensionnement des Capacités de Découplage Logique (Réseau 5V / 3.3V)}{35}{subsection.3.3.2}%
-\contentsline {section}{\numberline {3.4}Ingénierie de Sûreté : L'Arrêt d'Urgence E-STOP et Relais}{35}{section.3.4}%
-\contentsline {subsection}{\numberline {3.4.1}Câblage en "Catégorie d'Arrêt 0" (Coupure non-conditionnelle)}{36}{subsection.3.4.1}%
-\contentsline {section}{\numberline {3.5}Problématiques CEM et Intégrité des Signaux}{36}{section.3.5}%
-\contentsline {subsection}{\numberline {3.5.1}Couplage et Blindage}{36}{subsection.3.5.1}%
-\contentsline {subsection}{\numberline {3.5.2}Bilan Thermique et Analyse du Flux d'Air}{37}{subsection.3.5.2}%
-\contentsline {section}{\numberline {3.6}Dimensionnement Électrique et Bilan de Puissance}{37}{section.3.6}%
-\contentsline {subsection}{\numberline {3.6.1}Consommation théorique (Bilan d'intensité)}{37}{subsection.3.6.1}%
-\contentsline {subsection}{\numberline {3.6.2}Sélection de l'Alimentation Primaire (SMPS)}{38}{subsection.3.6.2}%
-\contentsline {section}{\numberline {3.7}Conclusion sur l'infrastructure Mécatronique}{38}{section.3.7}%
-\contentsline {chapter}{\numberline {4}Développement Logiciel et Modélisation UML}{39}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Modélisation UML du Système Global}{39}{section.4.1}%
-\contentsline {subsection}{\numberline {4.1.1}Diagramme de Séquence : Cycle de vie d'un Usinage}{39}{subsection.4.1.1}%
-\contentsline {subsection}{\numberline {4.1.2}Diagramme de Classes (Firmware ESP32)}{39}{subsection.4.1.2}%
-\contentsline {subsection}{\numberline {4.1.3}Diagramme d'États (Machine à États Finis de l'ESP32)}{39}{subsection.4.1.3}%
-\contentsline {section}{\numberline {4.2}Algorithmique de Génération de Mouvements}{41}{section.4.2}%
-\contentsline {subsection}{\numberline {4.2.1}DDA (Digital Differential Analyzer) vs Timers Hardware}{41}{subsection.4.2.1}%
-\contentsline {subsection}{\numberline {4.2.2}Gestion du Flux : Logique Look-Ahead}{41}{subsection.4.2.2}%
-\contentsline {section}{\numberline {4.3}Implémentation du Code : Micrologiciel (ESP32)}{41}{section.4.3}%
-\contentsline {subsection}{\numberline {4.3.1}L'Architecture Dual-Core (FreeRTOS)}{41}{subsection.4.3.1}%
-\contentsline {subsection}{\numberline {4.3.2}Cinématique Inverse et Paramétrage Denavit-Hartenberg}{42}{subsection.4.3.2}%
-\contentsline {section}{\numberline {4.4}L'Interface Homme-Machine (Flutter)}{43}{section.4.4}%
-\contentsline {subsection}{\numberline {4.4.1}Le Parseur G-Code (Logigramme UML)}{43}{subsection.4.4.1}%
-\contentsline {subsection}{\numberline {4.4.2}Architecture Logicielle de l'App Flutter (Diagramme de Classes)}{44}{subsection.4.4.2}%
-\contentsline {subsection}{\numberline {4.4.3}State Management : La pureté de Riverpod}{44}{subsection.4.4.3}%
-\contentsline {section}{\numberline {4.5}Conclusion de la conception logicielle}{44}{section.4.5}%
-\contentsline {chapter}{\numberline {5}Réalisation, Assemblage, Tests et Qualification}{46}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Processus d'Assemblage Métrologique}{46}{section.5.1}%
-\contentsline {subsection}{\numberline {5.1.1}L'Équerrage du Portique (Squaring process)}{46}{subsection.5.1.1}%
-\contentsline {subsection}{\numberline {5.1.2}Câblage en Étoile (\textit {Star Grounding}) et Anti-Interférences}{47}{subsection.5.1.2}%
-\contentsline {section}{\numberline {5.2}Étalonnage Logiciel (Homing et Offsets Cinématiques)}{47}{section.5.2}%
-\contentsline {subsection}{\numberline {5.2.1}La conversion logico-mécanique ($Steps/mm$)}{47}{subsection.5.2.1}%
-\contentsline {subsection}{\numberline {5.2.2}Palpage du \textit {Tool Center Point} (Offsets Trunnion)}{48}{subsection.5.2.2}%
-\contentsline {section}{\numberline {5.3}Validation Métrologique par l'Usinage (Tests Pratiques)}{48}{section.5.3}%
-\contentsline {subsection}{\numberline {5.3.1}Essai 1 : Contourage 2.5D (Rigidité et Répétabilité)}{48}{subsection.5.3.1}%
-\contentsline {subsection}{\numberline {5.3.2}Essai 2 : Usinage Positionnel "3+2 axes"}{48}{subsection.5.3.2}%
-\contentsline {subsection}{\numberline {5.3.3}Essai 3 : Interpolation Simultanée 5 Axes "Continue"}{48}{subsection.5.3.3}%
-\contentsline {section}{\numberline {5.4}Analyse Technico-Économique (BOM)}{49}{section.5.4}%
-\contentsline {section}{\numberline {5.5}Sécurité Industrielle et Analyse des Risques (AMDEC)}{50}{section.5.5}%
-\contentsline {section}{Conclusion Générale et Perspectives}{50}{table.5.2}%
-\contentsline {chapter}{Bibliographie et Nétographie}{52}{Item.17}%
-\contentsline {chapter}{\numberline {A}Annexes techniques}{53}{appendix.A}%
-\contentsline {section}{\numberline {A.1}Extrait de l'algorithme "Look-Ahead" du Planner (C++)}{53}{section.A.1}%
+\contentsline {chapter}{Sigles et Abréviations}{8}{chapter*.6}%
+\contentsline {chapter}{Notations et Symboles Mathématiques}{11}{chapter*.7}%
+\contentsline {chapter}{Liste des figures}{17}{chapter*.7}%
+\contentsline {chapter}{Liste des tableaux}{18}{chapter*.7}%
+\contentsline {chapter}{Introduction Générale}{19}{chapter*.8}%
+\contentsline {chapter}{\numberline {1}État de l'art et Revue de la Littérature}{23}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Généralités sur la Commande Numérique par Calculateur (CNC)}{23}{section.1.1}%
+\contentsline {subsection}{\numberline {1.1.1}Évolution historique des systèmes CNC}{23}{subsection.1.1.1}%
+\contentsline {subsection}{\numberline {1.1.2}Principe d'asservissement d'un système CNC}{23}{subsection.1.1.2}%
+\contentsline {section}{\numberline {1.2}Classification Architecturale des Machines CNC 5 Axes}{24}{section.1.2}%
+\contentsline {subsection}{\numberline {1.2.1}Configuration «Table-Table» (Trunnion Table)}{25}{subsection.1.2.1}%
+\contentsline {subsection}{\numberline {1.2.2}Configuration «Head-Head» (Tête Pivotante Bi-Rotative)}{25}{subsection.1.2.2}%
+\contentsline {subsection}{\numberline {1.2.3}Configuration «Head-Table» (Hybride)}{25}{subsection.1.2.3}%
+\contentsline {section}{\numberline {1.3}Comparatif des Machines CNC 5 Axes Accessibles}{25}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Problématiques Avancées : Singularités et TCP}{26}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Les Singularités Cinématiques (Gimbal Lock)}{26}{subsection.1.4.1}%
+\contentsline {subsection}{\numberline {1.4.2}Le Concept de TCP (Tool Center Point Control)}{27}{subsection.1.4.2}%
+\contentsline {section}{\numberline {1.5}L'Écosystème Logiciel et le Langage G-Code 5 Axes}{27}{section.1.5}%
+\contentsline {subsection}{\numberline {1.5.1}La Chaîne Numérique 5 Axes}{27}{subsection.1.5.1}%
+\contentsline {subsection}{\numberline {1.5.2}Le Langage G-Code (Norme ISO 6983)}{27}{subsection.1.5.2}%
+\contentsline {section}{\numberline {1.6}Analyse Comparative des Protocoles de Communication Industrielle}{27}{section.1.6}%
+\contentsline {section}{\numberline {1.7}État de l'Art des Firmwares CNC Open-Source}{29}{section.1.7}%
+\contentsline {section}{\numberline {1.8}Matériaux Usinables et Usinabilité}{29}{section.1.8}%
+\contentsline {section}{\numberline {1.9}Conclusion du chapitre}{30}{section.1.9}%
+\contentsline {chapter}{\numberline {2}Étude Technique et Dimensionnement Mécanique (RDM)}{31}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Analyse Fonctionnelle du Besoin (AFB)}{31}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Saisie du besoin et Graphe des interactions}{31}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Arborescence technique (Diagramme FAST)}{32}{subsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.1.3}Cahier des Charges Qualitatif et Quantitatif}{32}{subsection.2.1.3}%
+\contentsline {section}{\numberline {2.2}Architecture retenue : La table basculante (Trunnion)}{33}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Justification des Solutions Technologiques}{33}{subsection.2.2.1}%
+\contentsline {section}{\numberline {2.3}Étude des efforts de coupe (Modélisation de la force de coupe)}{34}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Calcul de la force de coupe tangentielle}{34}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Formalisation par les Torseurs d'Action Mécanique}{34}{subsection.2.3.2}%
+\contentsline {section}{\numberline {2.4}Résistance des Matériaux (RDM) et Analyse de Contraintes}{35}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Vérification au Critère de Von Mises}{35}{subsection.2.4.1}%
+\contentsline {section}{\numberline {2.5}Dimensionnement des Arbres de Transmission (Vis à billes)}{35}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}Détermination de la force axiale sur la Vis}{35}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}Vérification au Flambage (Critère d'Euler)}{35}{subsection.2.5.2}%
+\contentsline {subsection}{\numberline {2.5.3}L'Effet Bras de Levier (Table Trunnion) et Couple de Renversement}{36}{subsection.2.5.3}%
+\contentsline {section}{\numberline {2.6}Dimensionnement des moteurs d'entraînement (NEMA)}{36}{section.2.6}%
+\contentsline {section}{\numberline {2.7}Dimensionnement des Transmissions Rotatives (Axes A et B)}{37}{section.2.7}%
+\contentsline {subsection}{\numberline {2.7.1}Problématique d'entraînement rotatif et «Backlash angulaire»}{37}{subsection.2.7.1}%
+\contentsline {subsection}{\numberline {2.7.2}Calcul de la résolution angulaire après réduction 1:50}{37}{subsection.2.7.2}%
+\contentsline {section}{\numberline {2.8}Durée de Vie des Guidages Linéaires (ISO 281)}{37}{section.2.8}%
+\contentsline {subsection}{\numberline {2.8.1}Charges appliquées sur les patins HGR15}{38}{subsection.2.8.1}%
+\contentsline {subsection}{\numberline {2.8.2}Calcul de la durée de vie L$_{10}$}{38}{subsection.2.8.2}%
+\contentsline {section}{\numberline {2.9}Étude de Résistance Des Matériaux (RDM) de l'Infrastructure}{38}{section.2.9}%
+\contentsline {subsection}{\numberline {2.9.1}Déflexion maximale du Portique (Axe X)}{38}{subsection.2.9.1}%
+\contentsline {subsection}{\numberline {2.9.2}Vérification par simulation FEA (Éléments Finis)}{39}{subsection.2.9.2}%
+\contentsline {section}{\numberline {2.10}Conclusion sur l'Étude Mécanique}{39}{section.2.10}%
+\contentsline {chapter}{\numberline {3}Architecture Électronique et Ingénierie des Signaux}{40}{chapter.3}%
+\contentsline {section}{\numberline {3.1}L'Unité de Traitement Embarquée (Le «Cerveau»)}{40}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}Analyse Critique des Microcontrôleurs}{40}{subsection.3.1.1}%
+\contentsline {subsection}{\numberline {3.1.2}Allocation Mémoire et Tâches (FreeRTOS)}{41}{subsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.1.3}Carte Mère Personnalisée (PCB)}{41}{subsection.3.1.3}%
+\contentsline {section}{\numberline {3.2}Chaîne de Puissance et Drivers Moteurs}{42}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Dimensionnement de l'Interface de Logique (Level Shifter)}{42}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Régime Micro-stepping du DM556 et Anti-Résonance}{43}{subsection.3.2.2}%
+\contentsline {section}{\numberline {3.3}Bilan de Puissance et Dimensionnement des Alimentations}{43}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Dimensionnement de l'Alimentation Principale (PSU 36V)}{43}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Dimensionnement du Condensateur de Découplage Anti-Brown-Out}{43}{subsection.3.3.2}%
+\contentsline {section}{\numberline {3.4}Ingénierie de Sûreté : L'Arrêt d'Urgence E-STOP}{44}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Câblage en «Catégorie d'Arrêt 0» (Coupure non-conditionnelle)}{44}{subsection.3.4.1}%
+\contentsline {section}{\numberline {3.5}Compatibilité Électromagnétique (CEM)}{44}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}Modélisation des émissions rayonnées}{44}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.2}Stratégie de câblage (Star Grounding)}{45}{subsection.3.5.2}%
+\contentsline {subsection}{\numberline {3.5.3}Bilan Thermique du Coffret}{45}{subsection.3.5.3}%
+\contentsline {section}{\numberline {3.6}Conclusion sur l'infrastructure Mécatronique}{45}{section.3.6}%
+\contentsline {chapter}{\numberline {4}Développement Logiciel, Modélisation UML et Cinématique}{46}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Architecture Générale du Logiciel}{46}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Diagramme de Composants UML}{46}{subsection.4.1.1}%
+\contentsline {section}{\numberline {4.2}Modélisation du Firmware ESP32 (UML)}{47}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Diagramme de Machine à États (FSM) -- Machine à États Finis}{47}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Diagramme de Classes UML -- Firmware}{48}{subsection.4.2.2}%
+\contentsline {section}{\numberline {4.3}Cinématique Inverse de la Configuration Trunnion}{48}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Système de Coordonnées et Paramètres de Denavit-Hartenberg}{48}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Algorithme de Résolution (Cinématique Inverse Analytique)}{48}{subsection.4.3.2}%
+\contentsline {section}{\numberline {4.4}L'Algorithme «Look-Ahead» et le Profil d'Accélération S-Curve}{49}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Limitations du Profil Trapézoïdal}{49}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}Le Profil S-Curve (Jerk Limité)}{50}{subsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.4.3}La Fenêtre «Look-Ahead» (Planification Anticipative)}{50}{subsection.4.4.3}%
+\contentsline {section}{\numberline {4.5}Modélisation UML de l'Application Flutter (IHM)}{50}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}Architecture Provider / Notifier (Riverpod)}{51}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}Diagramme de Séquence UML : Envoi d'une commande Jog}{51}{subsection.4.5.2}%
+\contentsline {section}{\numberline {4.6}Sécurité du Code Embarqué}{51}{section.4.6}%
+\contentsline {subsection}{\numberline {4.6.1}Validation des Entrées (Input Sanitization)}{51}{subsection.4.6.1}%
+\contentsline {subsection}{\numberline {4.6.2}Protection contre les Débordements (MISRA-C Guidelines)}{52}{subsection.4.6.2}%
+\contentsline {subsection}{\numberline {4.6.3}Intégrité des Communications (Checksum)}{52}{subsection.4.6.3}%
+\contentsline {section}{\numberline {4.7}Conclusion du Chapitre Logiciel}{52}{section.4.7}%
+\contentsline {chapter}{\numberline {5}Réalisation, Tests et Validation — Analyse Technico-Économique}{54}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Procédures de Métrologie et de Calibration (Norme ISO 230-1)}{54}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Principe et Méthodologie}{54}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}Protocole de Mesure (Méthodologie Adoptée)}{54}{subsection.5.1.2}%
+\contentsline {subsection}{\numberline {5.1.3}Résultats des Tests de Précision et Répétabilité Axiale}{55}{subsection.5.1.3}%
+\contentsline {section}{\numberline {5.2}Analyse Statistique de la Capabilité Machine ($C_{pk}$)}{55}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Théorie de la Capabilité (ISO 22514)}{56}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Calcul du $C_{pk}$ pour l'Axe Y (Cas Critique)}{56}{subsection.5.2.2}%
+\contentsline {section}{\numberline {5.3}Tests d'Usinage (Validation Fonctionnelle Pratique)}{56}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}Test 1 : Gravure 2.5D (Validation Axes Linéaires)}{56}{subsection.5.3.1}%
+\contentsline {subsection}{\numberline {5.3.2}Test 2 : Poche 3+2 (Validation Positionnement Axe A+B)}{57}{subsection.5.3.2}%
+\contentsline {subsection}{\numberline {5.3.3}Test 3 : Usinage Continu 5 Axes (Validation Cinématique)}{57}{subsection.5.3.3}%
+\contentsline {section}{\numberline {5.4}Analyse des Modes de Défaillance (AMDEC)}{57}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Analyse Technico-Économique}{57}{section.5.5}%
+\contentsline {subsection}{\numberline {5.5.1}Bilan de la Nomenclature Financière (BOM)}{57}{subsection.5.5.1}%
+\contentsline {subsection}{\numberline {5.5.2}Analyse de la Valeur et Comparaison Marché}{57}{subsection.5.5.2}%
+\contentsline {subsection}{\numberline {5.5.3}Analyse de Rentabilité (ROI) pour une PME Locale}{59}{subsection.5.5.3}%
+\contentsline {section}{\numberline {5.6}Conclusion Générale du Projet}{59}{section.5.6}%
+\contentsline {paragraph}{Bilan des performances atteintes :}{59}{paragraph*.39}%
+\contentsline {paragraph}{Perspectives d'amélioration :}{59}{paragraph*.40}%
+\contentsline {chapter}{Bibliographie et Nétographie}{61}{Item.33}%
+\contentsline {chapter}{\numberline {A}Annexes techniques}{62}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Extrait de l'algorithme "Look-Ahead" du Planner (C++)}{62}{section.A.1}%
+\contentsline {chapter}{\numberline {A}Annexes Techniques et Documentation}{64}{appendix.A}%
+\contentsline {section}{\numberline {A.1}A.1 — Code Source Commenté du Firmware ESP32}{64}{section.A.1}%
+\contentsline {subsection}{\numberline {A.1.1}A.1.1 — Fichier Principal : \texttt {main.cpp}}{65}{subsection.A.1.1}%
+\contentsline {subsection}{\numberline {A.1.2}A.1.2 — Algorithme de Cinématique Inverse : \texttt {InvKinematics.cpp}}{67}{subsection.A.1.2}%
+\contentsline {subsection}{\numberline {A.1.3}A.1.3 — Interface Utilisateur Flutter : \texttt {dashboard\_page.dart}}{69}{subsection.A.1.3}%
+\contentsline {section}{\numberline {A.2}A.2 — Fiches Techniques des Composants Principaux}{70}{section.A.2}%
+\contentsline {subsection}{\numberline {A.2.1}A.2.1 — Extrait de la Fiche Technique ESP32-WROOM-32U (Espressif Systems)}{70}{subsection.A.2.1}%
+\contentsline {subsection}{\numberline {A.2.2}A.2.2 — Extrait de la Fiche Technique Driver DM556 (Leadshine)}{70}{subsection.A.2.2}%
+\contentsline {subsection}{\numberline {A.2.3}A.2.3 — Caractéristiques du Moteur NEMA 17HS4401}{70}{subsection.A.2.3}%
+\contentsline {section}{\numberline {A.3}A.3 — Données Brutes des Tests de Métrologie (Axe Y -- 20 Mesures)}{70}{section.A.3}%
+\contentsline {section}{\numberline {A.4}A.4 — Manuel Opérateur (Guide de Démarrage Rapide)}{72}{section.A.4}%
+\contentsline {subsection}{\numberline {A.4.1}A.4.1 — Procédure de Démarrage}{72}{subsection.A.4.1}%
+\contentsline {subsection}{\numberline {A.4.2}A.4.2 — Procédure d'Arrêt d'Urgence}{73}{subsection.A.4.2}%
+\contentsline {subsection}{\numberline {A.4.3}A.4.3 — Planning de Maintenance Préventive}{73}{subsection.A.4.3}%

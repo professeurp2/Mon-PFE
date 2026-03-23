@@ -5,16 +5,44 @@
 \section{Généralités sur la Commande Numérique par Calculateur (CNC)}
 La Commande Numérique par Calculateur (CNC) se définit comme le pilotage automatisé des mouvements et des fonctions auxiliaires d'une machine-outil par microprocesseur, via l'interprétation d'un programme d'instructions textuelles (G-Code). Depuis les travaux pionniers de John T. Parsons (qui a utilisé des cartes perforées pour usiner des pales d'hélicoptère dans les années 1940), la CNC a évolué de systèmes câblés immenses et rigides vers des architectures logicielles distribuées, flexibles et miniaturisées.
 
+\subsection{Évolution historique des systèmes CNC}
+L'histoire de la commande numérique est intrinsèquement liée à l'évolution de l'informatique industrielle. Le tableau~\ref{tab:histoire_cnc} retrace les grandes ruptures technologiques qui ont conduit aux systèmes modernes ouverts.
+
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|p{2.5cm}|p{6cm}|p{4.5cm}|}
+\hline
+\rowcolor{macouleur!20}
+\textbf{Décennie} & \textbf{Technologie} & \textbf{Innovation principale} & \textbf{Limites identifiées} \\
+\hline
+1940--1950 & Cartes perforées & Travaux de Parsons / MIT : premier usinage de pale d'hélicoptère & Pas de rétroaction, séquentiel pur \\
+\hline
+1960--1970 & NC câblé & Contrôleurs à relais, tubes à vide & Rigides, non-reprogrammables \\
+\hline
+1970--1980 & CNC 8 bits & Microprocesseur Intel 8080 / Z80, DNC & Un seul cœur, pas de multi-axes \\
+\hline
+1980--1990 & Propriétaire & FANUC, Siemens, Heidenhain — OS fermés & Coût prohibitif, dépendance \\
+\hline
+1990--2010 & PC-Based (Linux) & Interface PC + carte FPGA (Mesa Cards) & Configuration complexe, coût \\
+\hline
+2015--2024 & RTOS 32-bits open & ESP32, STM32 + FreeRTOS, GRBL-ESP32 & Notre domaine d'innovation \\
+\hline
+\end{tabular}
+\caption{Évolution historique des architectures de commande numérique}
+\label{tab:histoire_cnc}
+\end{table}
+
 \subsection{Principe d'asservissement d'un système CNC}
 Un système CNC moderne s'articule autour d'une chaîne de commande comportant trois unités principales agissant en synergie :
 \begin{enumerate}
-    \item \textbf{L'Unité de Traitement des Données (Data Processing Unit - DPU) :} Elle correspond au logiciel IHM. Elle lit le fichier de commande numérique, l'analyse, simule la trajectoire et l'envoie de manière séquencée.
-    \item \textbf{L'Unité de Contrôle (Control Loop Unit - CLU) :} C'est le « cerveau interne » (le microcontrôleur sur la machine). Il reçoit les données du DPU, calcule la cinématique, gère les accélérations (planner) et génère les signaux électriques logiques (Step/Direction ou signaux PWM).
+    \item \textbf{L'Unité de Traitement des Données (Data Processing Unit -- DPU) :} Elle correspond au logiciel IHM. Elle lit le fichier de commande numérique, l'analyse, simule la trajectoire et l'envoie de manière séquencée.
+    \item \textbf{L'Unité de Contrôle (Control Loop Unit -- CLU) :} C'est le « cerveau interne » (le microcontrôleur sur la machine). Il reçoit les données du DPU, calcule la cinématique, gère les accélérations (planner) et génère les signaux électriques logiques (Step/Direction ou signaux PWM).
     \item \textbf{L'Unité de Puissance et d'Actionnement :} Composée de drivers (variateurs) qui amplifient les signaux logiques de la CLU, et de moteurs électriques transmettant les couples et mouvements aux axes physiques.
 \end{enumerate}
 
 \section{Classification Architecturale des Machines CNC 5 Axes}
-Le passage d'une machine 3 axes à une machine 5 axes introduit une complexité majeure dans la chaîne cinématique. Pour qu'une fraise puisse atteindre n'importe quel point d'une pièce sous n'importe quel angle, deux axes de rotation (généralement nommés A, B ou C) doivent s'ajouter aux trois translations (X, Y, Z). Il existe trois grandes familles d'architectures pour les machines 5 axes, classées selon l'emplacement de ces deux axes rotatifs. Chaque configuration présente des avantages mécaniques spécifiques.
+Le passage d'une machine 3 axes à une machine 5 axes introduit une complexité majeure dans la chaîne cinématique. Pour qu'une fraise puisse atteindre n'importe quel point d'une pièce sous n'importe quel angle, deux axes de rotation (généralement nommés A, B ou C) doivent s'ajouter aux trois translations (X, Y, Z). Il existe trois grandes familles d'architectures pour les machines 5 axes, classées selon l'emplacement de ces deux axes rotatifs.
 
 \begin{figure}[htbp]
     \centering
@@ -25,68 +53,96 @@ Le passage d'une machine 3 axes à une machine 5 axes introduit une complexité 
         desc/.style={font=\footnotesize, text width=3.8cm, align=center},
         arrow/.style={-{Stealth[scale=1.2]}, thick, color=gray!80}
     ]
-        % Table-Table
         \node[box] (table_table) {
             \textbf{Table-Table}\\(Trunnion)
         };
-        \node[below=0.2cm of table_table, desc, align=center] {Rotations A et C sur la table.\\Meilleure rigidité.};
+        \node[below=0.2cm of table_table, desc, align=center] {Rotations A et C sur la table.\\ Meilleure rigidité.};
         
-        % Head-Head
         \node[box, right=1cm of table_table] (head_head) {
             \textbf{Head-Head}\\(Tête Pivotante)
         };
-        \node[below=0.2cm of head_head, desc, align=center] {Rotations A et C sur la broche.\\Pièces volumineuses.};
+        \node[below=0.2cm of head_head, desc, align=center] {Rotations A et C sur la broche.\\ Pièces volumineuses.};
         
-        % Head-Table
         \node[box, right=1.5cm of head_head] (head_table) {
             \textbf{Head-Table}\\(Hybride)
         };
         \node[below=0.2cm of head_table, desc] {Répartition des rotations\\(mixte Tête / Table).};
         
-        % Flèches
         \draw[arrow] (table_table.east) -- (head_head.west) node[midway, above, font=\scriptsize, color=black] {Cinématique};
         \draw[arrow] (head_head.east) -- (head_table.west) node[midway, above, font=\scriptsize, color=black] {Compromis};
-
     \end{tikzpicture}
     \caption{Comparaison schématique des topologies CNC 5 axes}
     \label{fig:topo_5axes}
 \end{figure}
-\subsection{Configuration "Table-Table" (Trunnion Table ou Table Basculante)}
-Dans cette architecture, les deux axes rotatifs (souvent l'axe A pour le basculement et l'axe B ou C pour la rotation continue) sont emboîtés l'un dans l'autre et supportent la table de travail sur laquelle la pièce est fixée.
+
+\subsection{Configuration «Table-Table» (Trunnion Table)}
+Dans cette architecture, les deux axes rotatifs (souvent l'axe A pour le basculement et l'axe B pour la rotation continue) sont emboîtés l'un dans l'autre et supportent la table de travail.
 \begin{itemize}
     \item \textbf{Cinématique :} L'outil se déplace linéairement en X, Y et Z. C'est la pièce à usiner qui tourne (Pan) et bascule (Tilt) face à l'outil.
-    \item \textbf{Avantages :} Cette configuration offre la meilleure rigidité globale (la tête de broche ne bouge pas, évitant les porte-à-faux) et garantit une excellente précision sur les petites pièces compactes.
-    \item \textbf{Limites :} Le volume de la pièce et son poids sont strictement limités par le diamètre du plateau rotatif et le couple des moteurs de basculement.
+    \item \textbf{Avantages :} Meilleure rigidité globale et excellente précision sur les petites pièces compactes.
+    \item \textbf{Limites :} Le volume de la pièce et son poids sont strictement limités par le diamètre du plateau rotatif.
 \end{itemize}
 C'est l'architecture que nous avons retenue pour notre projet didactique.
 
-\subsection{Configuration "Head-Head" (Tête Pivotante ou Bi-Rotative)}
-Ici, la table supportant la pièce est fixe (ou ne se déplace qu'en translation). Les deux axes rotatifs sont intégrés intégralement dans la tête qui supporte la broche.
+\subsection{Configuration «Head-Head» (Tête Pivotante Bi-Rotative)}
+Ici, la table supportant la pièce est fixe. Les deux axes rotatifs sont intégrés dans la tête qui supporte la broche.
 \begin{itemize}
-    \item \textbf{Cinématique :} L'outil se déplace en translation et s'incline dans toutes les directions.
-    \item \textbf{Avantages :} Parfaitement adaptée à l'usinage de pièces de très grandes dimensions et très lourdes (moules géants, longerons d'avion) car le poids de la pièce n'influe pas sur la dynamique spatiale.
-    \item \textbf{Limites :} En raison de l'empilement complexe dans la tête (moteurs, broche lourde), la rigidité angulaire diminue. Le bras de levier important amplifie considérablement la moindre erreur angulaire, exigeant des éléments mécaniques hors de prix.
+    \item \textbf{Avantages :} Parfaitement adaptée à l'usinage de pièces de très grandes dimensions et très lourdes.
+    \item \textbf{Limites :} Rigidité angulaire diminuée. Le bras de levier important amplifie considérablement la moindre erreur angulaire.
 \end{itemize}
 
-\subsection{Configuration "Head-Table" (Hybride)}
-Cette architecture répartit les rotations. Généralement, l'axe de basculement est fixé sur la tête de la broche, et l'axe de rotation continue est placé sur une table tournante. Cette solution hybride permet un compromis intéressant pour les machines de taille moyenne, mais complexifie sérieusement les algorithmes de compensation et de Homing.
+\subsection{Configuration «Head-Table» (Hybride)}
+Cette architecture répartit les rotations. Généralement, l'axe de basculement est fixé sur la tête de la broche, et l'axe de rotation continue est placé sur une table tournante. Cette solution hybride permet un compromis intéressant pour les machines de taille moyenne.
+
+\section{Comparatif des Machines CNC 5 Axes Accessibles}
+Afin de situer notre projet dans le paysage industriel actuel, le tableau~\ref{tab:comparatif_cnc} compare les caractéristiques de notre prototype avec celles de machines de référence.
+
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|p{2.5cm}|p{2cm}|p{2cm}|p{2.5cm}|p{2.5cm}|}
+\hline
+\rowcolor{macouleur!20}
+\textbf{Critère} & \textbf{PFE (Nous)} & \textbf{PocketNC} & \textbf{Haas UMC-500} & \textbf{Candle+GRBL} \\
+\hline
+\textbf{Architecture} & Trunnion A+B & Trunnion A+B & Trunnion A+C & 3 axes \\
+\hline
+\textbf{Volume} & 20cm cube & 12cm cube & 50cm cube & Variable \\
+\hline
+\textbf{Contrôleur} & ESP32 RTOS & Propriétaire & Haas CNC & Arduino \\
+\hline
+\textbf{Précision} & $\pm 0{,}05$ mm & $\pm 0{,}025$ mm & $\pm 0{,}005$ mm & $\pm 0{,}1$ mm \\
+\hline
+\textbf{Open-Source} & Oui (100\%) & Non & Non & Oui (firm) \\
+\hline
+\textbf{Coût} & $\approx 0{,}5 M$ & $\approx 7 M$ & $\approx 300 M$ & $\approx 0{,}1 M$ \\
+\hline
+\textbf{IHM} & Flutter App & Kinetic & Tactile HAAS & PC Candle \\
+\hline
+\end{tabular}
+\caption{Tableau comparatif des machines CNC 5 axes du marché vs. notre prototype}
+\label{tab:comparatif_cnc}
+\end{table}
+
+L'analyse de ce tableau démontre que notre prototype, bien qu'inférieur en précision et en volume aux machines industrielles, se positionne comme la \textbf{seule solution entièrement open-source} dotée d'une IHM multi-plateforme moderne (Flutter) et d'une connectivité sans fil. Le rapport \textbf{performance/coût} est sans équivalent dans le segment éducatif africain.
 
 \section{Problématiques Avancées : Singularités et TCP}
-
 L'usinage 5 axes introduit des défis théoriques absents des machines cartésiennes classiques : la gestion des singularités et le contrôle du point de contact outil.
 
 \subsection{Les Singularités Cinématiques (Gimbal Lock)}
 Une singularité cinématique survient lorsque deux axes de rotation s'alignent, entraînant la perte d'un degré de liberté. Pour une table Trunnion (Axe A et B), cela se produit généralement lorsque l'Axe B est vertical et que l'angle de l'Axe A atteint une valeur critique (souvent $0^\circ$).
-À ce point précis, une infinité de combinaisons d'angles peut donner la même position spatiale, ce qui peut provoquer des accélérations infinies théoriques des moteurs et des marques de vibration sur la pièce. Le logiciel de contrôle doit intégrer des algorithmes d'évitement ou de lissage de trajectoire aux abords de ces zones critiques.
+À ce point précis, une infinité de combinaisons d'angles peut donner la même position spatiale, ce qui peut provoquer des accélérations infinies théoriques des moteurs et des marques de vibration sur la pièce (\textit{chatter}). Le logiciel de contrôle doit intégrer des algorithmes d'évitement ou de lissage de trajectoire aux abords de ces zones critiques.
+
+Il existe trois types principaux de singularités rencontrées en usinage 5 axes :
+\begin{enumerate}
+    \item \textbf{Singularité de configuration (Gimbal Lock) :} Perte d'un degré de liberté par alignement des axes de rotation. Se manifeste par des vitesses angulaires théoriquement infinies.
+    \item \textbf{Singularité de frontière :} Le vecteur outil atteint la limite physique d'une articulation (débattement angulaire maximal). Un interverrouillage logiciel est nécessaire.
+    \item \textbf{Singularité de chemin :} Le parcours CAO génère une trajectoire passant exactement par un point singulier. Le post-processeur FAO doit détecter ces cas et déranger légèrement la trajectoire.
+\end{enumerate}
 
 \subsection{Le Concept de TCP (Tool Center Point Control)}
 Dans un système 3 axes, la position de l'outil est directement liée aux coordonnées X, Y, Z. En 5 axes, toute rotation de la table (Axe A ou B) déplace physiquement la pièce par rapport à la pointe de l'outil.
-Le \textbf{TCP Control} est la capacité du contrôleur à compenser automatiquement ces décalages géométriques. Au lieu de programmer les positions des moteurs, le programmeur définit la trajectoire de la \textbf{pointe de l'outil} par rapport à la pièce. C'est l'intelligence embarquée (le microcontrôleur) qui recalcule en temps réel les compensations linéaires $\Delta X, \Delta Y, \Delta Z$ nécessaires pour "suivre" le mouvement de rotation sans quitter le contact avec la matière.
-Dans une CNC 5 axes, la moindre imprécision locale fausse l'entièreté de l'assemblage (accumulation d'erreurs). Le passage du mouvement de rotation des actionneurs au mouvement linéaire doit être le plus parfait possible.
-\begin{enumerate}
-    \item \textbf{Les Courroies Crantées (ex: GT2) :} Très répandues dans le prototypage 3D, elles sont rapides et économiques. Toutefois, leur manque de rigidité (élongation sous charge, effet élastique) les rend inadaptées aux résonances vibratoires inhérentes au fraisage, et encore moins au poids contraint d'une architecture Trunnion.
-    \item \textbf{Les Vis à Billes (Ball Screws) :} L'écrou circule sur la vis garnie de billes en acier recyclant perpétuellement dans un circuit fermé. Cette technologie offre un rendement supérieur à $90\%$, une friction presque nulle, une rigidité très élevée face aux charges axiales (efforts de coupe) et une usure insignifiante. Leur utilisation est impérative pour garantir la précision requise par l'usinage 5 axes.
-\end{enumerate}
+Le \textbf{TCP Control} est la capacité du contrôleur à compenser automatiquement ces décalages géométriques. Au lieu de programmer les positions des moteurs, le programmeur définit la trajectoire de la \textbf{pointe de l'outil} par rapport à la pièce. C'est l'intelligence embarquée (le microcontrôleur) qui recalcule en temps réel les compensations linéaires $\Delta X, \Delta Y, \Delta Z$ nécessaires pour maintenir l'outil sur le point de contact nominal avec la surface.
 
 \section{L'Écosystème Logiciel et le Langage G-Code 5 Axes}
 
@@ -94,22 +150,164 @@ Dans une CNC 5 axes, la moindre imprécision locale fausse l'entièreté de l'as
 Le flux de données d'une pièce usinée numériquement passe par trois phases :
 \begin{itemize}
     \item \textbf{CAO (Conception Assistée par Ordinateur) :} Le concepteur crée le modèle 3D de la pièce.
-    \item \textbf{FAO (Fabrication Assistée par Ordinateur) :} Le programmeur génère les parcours d'outil. En 5 axes, on distingue deux méthodes d'usinage : le \textit{3+2 axes} (Usinage Positionnel) où l'outil s'incline puis usine, et le \textit{5 axes continus} (simultané).
+    \item \textbf{FAO (Fabrication Assistée par Ordinateur) :} Le programmeur génère les parcours d'outil. En 5 axes, on distingue deux méthodes : le \textit{3+2 axes} (Usinage Positionnel) et le \textit{5 axes continus} (simultané).
     \item \textbf{Le Post-Processeur :} Il traduit la géométrie (vecteurs de l'outil I, J, K) en positions angulaires réelles (A, B) des moteurs de la machine spécifique.
 \end{itemize}
 
 \subsection{Le Langage G-Code (Norme ISO 6983)}
-C'est le langage universel de la commande numérique. Un programme est une suite alphabétique de blocs d'instructions. En multi-axes, un bloc ressemble à ceci : 
+C'est le langage universel de la commande numérique. Un programme est une suite alphabétique de blocs d'instructions. En multi-axes, un bloc ressemble à ceci :
 \texttt{G01 X15.5 Y0.0 Z-5.0 A45.0 B90.0 F800}
-Le logiciel interpréteur (Parser) que nous développerons devra décoder méticuleusement chacune de ces lignes asynchrones.
 
-\section{État de l'art de l'Unité de Traitement Logiciel (Le Choix du Cerveau)}
-L'intelligence de la machine réside dans son unité de traitement. Pour opérer une machine 5 axes "open-source", trois grandes écoles s'affrontent :
-\begin{itemize}
-    \item \textbf{L'école Arduino 8 bits (GRBL Classique) :} Extrêmement populaire pour les graveurs lasers 3 axes, l'Arduino Uno n'a qu'un cœur, 32 ko de mémoire, et ne possède pas assez de Timers matériels indépendants pour générer simultanément des signaux propres pour 5 moteurs. Totalement inadapté à notre projet.
-    \item \textbf{L'école PC + FPGA (LinuxCNC) :} Solution industrielle robuste mais très complexe à configurer et onéreuse.
-    \item \textbf{L'école Architecture 32-bits RTOS (L'ESP32) :} C'est le compromis parfait et le choix validé pour ce PFE. Le microcontrôleur ESP32 possède deux cœurs opérant à 240 MHz. L'utilisation d'un RTOS permet de dédier le Cœur 0 aux communications réseau et à l'IHM, tandis que le Cœur 1 ne s'occupe QUE du calcul de la cinématique et de la génération des impulsions (Stepper Pulses).
-\end{itemize}
+Le tableau~\ref{tab:gcode_5axes} présente les codes G et M principaux utilisés dans notre logiciel :
+
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|l|p{6cm}|l|}
+\hline
+\rowcolor{macouleur!20}
+\textbf{Code} & \textbf{Fonction} & \textbf{Utilisation} \\
+\hline
+G00 & Déplacement rapide (Rapid) en XYZ & Positionnement \\
+\hline
+G01 & Interpolation linéaire à vitesse contrôlée & Usinage rectiligne \\
+\hline
+G02 & Interpolation circulaire sens horaire & Congé, rayon \\
+\hline
+G03 & Interpolation circulaire sens anti-horaire & Congé, rayon \\
+\hline
+G17/18/19 & Sélection du plan de travail (XY, XZ, YZ) & Fraisage de poches \\
+\hline
+G28 & Retour à l'origine machine (Homing) & Initialisation \\
+\hline
+G54--G59 & Systèmes de coordonnées pièce & Multi-fixtures \\
+\hline
+G91 & Mode de programmation incrémentale & Jog relatif \\
+\hline
+G92 & Définition de l'origine pièce courante & Palpage TCP \\
+\hline
+M03 / M04 & Mise en marche de la broche (sens direct / inverse) & Fraisage \\
+\hline
+M05 & Arrêt de la broche & Fin pass \\
+\hline
+M08 / M09 & Arrosage ON / OFF & Refroidissement \\
+\hline
+M30 & Fin de programme + retour au début & Fin cycle \\
+\hline
+\$H & Homing ESP32 (FluidNC/GRBL étendu) & Calibration \\
+\hline
+\$X & Déverrouillage de l'état ALARM & Reprise \\
+\hline
+\end{tabular}
+\caption{Tableau des principaux codes G et M supportés par notre contrôleur ESP32}
+\label{tab:gcode_5axes}
+\end{table}
+
+\section{Analyse Comparative des Protocoles de Communication Industrielle}
+
+Le choix du protocole de communication entre l'IHM Flutter et le microcontrôleur ESP32 est central pour les performances temps réel du système. Le tableau~\ref{tab:protocoles} compare les principales solutions envisageables.
+
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{|l|c|c|c|c|p{4cm}|}
+\hline
+\rowcolor{macouleur!20}
+\textbf{Protocole} & \textbf{Latence} & \textbf{Débit max} & \textbf{Connectivité} & \textbf{Overhead} & \textbf{Adéquation CNC} \\
+\hline
+\textbf{USB-Serial (GRBL)} & $< 10$ ms & 115 200 baud & Filaire & Faible & Limité (câble obligatoire) \\
+\hline
+\textbf{TCP (WebSocket)} & $5$--$50$ ms & 100 Mbps & Wi-Fi/Eth & Moyen & Bon (handshake) \\
+\hline
+\textbf{UDP (choix retenu)} & $1$--$5$ ms & 100 Mbps & Wi-Fi & Très faible & \textbf{Optimal} (pas d'ACK) \\
+\hline
+\textbf{Modbus RTU} & $10$--$100$ ms & 1 Mbps & RS-485 & Moyen & Industriel, trop lent \\
+\hline
+\textbf{EtherCAT} & $< 0{,}1$ ms & 100 Mbps & Ethernet & Faible & Professionnel, complexe \\
+\hline
+\textbf{Profibus} & $1$--$10$ ms & 12 Mbps & RS-485 & Élevé & Obsolète, propriétaire \\
+\hline
+\end{tabular}
+}
+\caption{Tableau comparatif des protocoles de communication pour systèmes CNC}
+\label{tab:protocoles}
+\end{table}
+
+\textbf{Justification du choix UDP :} La bande passante théorique nécessaire pour notre application est calculée comme suit. En supposant un taux de rafraîchissement de $f_{refresh} = 50$ trames/seconde et une taille de trame JSON compressée de $T_{trame} = 128$ octets :
+\begin{equation}
+    BW_{required} = N_{trames} \times T_{trame} \times 8 = 50 \times 128 \times 8 = \boxed{51~200 \text{ bps} \approx 51 \text{ kbps}}
+\end{equation}
+Ce débit est négligeable face aux 100 Mbps disponibles en Wi-Fi 802.11n. L'UDP est donc choisi pour sa latence minimale ($< 2$ ms) et l'absence d'overhead d'accusé de réception (ACK), critique lors de l'envoi en rafale des blocs G-Code.
+
+\section{État de l'Art des Firmwares CNC Open-Source}
+
+L'intelligence de la machine réside dans son micrologiciel (firmware). Pour opérer une machine 5 axes open-source, plusieurs grands firmwares existent. Le tableau~\ref{tab:firmwares} les compare.
+
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{|l|c|c|c|p{5cm}|}
+\hline
+\rowcolor{macouleur!20}
+\textbf{Firmware} & \textbf{Contrôleur} & \textbf{Axes max} & \textbf{5 axes continus} & \textbf{Limitation principale} \\
+\hline
+\textbf{GRBL (classique)} & Arduino Uno (AVR 8-bit) & 3 & Non & Insufficient Timers. Inadapté. \\
+\hline
+\textbf{Marlin 2.x} & AVR 32-bit / ARM & 6 & Limité & Conçu pour impression 3D, pas pour fraisage. \\
+\hline
+\textbf{Klipper} & Raspberry Pi + MCU & 6 & Partiel & Complexe, nécessite Linux et Python. \\
+\hline
+\textbf{FluidNC / GRBL-ESP32} & ESP32 & 6 & Oui (avec plugin) & Configuration YAML ; pas de cinématique Trunnion native. \\
+\hline
+\textbf{LinuxCNC} & PC + FPGA Mesa & Illimité & Oui & Très complexe, onéreux, nécessite un PC dédié sous Linux RT. \\
+\hline
+\textbf{Notre firmware (Custom)} & ESP32 Dual-Core & 5 & Oui & Spécifique à l'architecture Trunnion de ce PFE (avantage). \\
+\hline
+\end{tabular}
+}
+\caption{Comparatif des firmwares CNC open-source pour machine 5 axes}
+\label{tab:firmwares}
+\end{table}
+
+Ce tableau confirme la nécessité d'un développement ``from scratch'' du firmware ESP32. Aucun des firmwares existants ne gère nativement la cinématique inverse d'une table Trunnion (axes A+B emboîtés) avec compensation TCP en temps réel.
+
+\section{Matériaux Usinables et Usinabilité}
+
+Le choix des matériaux d'essai est guidé par leur usinabilité et leur pertinence industrielle dans le contexte malien. Le tableau~\ref{tab:usinabilite} présente les paramètres de coupe recommandés pour notre broche de 500\,W et notre fraise de $6\,\text{mm}$.
+
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\rowcolor{macouleur!20}
+\textbf{Matériau} & \textbf{Dureté (HB)} & \textbf{$k_c$ (N/mm²)} & \textbf{$V_c$ (m/min)} & \textbf{$f_z$ (mm/dent)} & \textbf{$a_p$ max (mm)} & \textbf{Indice Usinab.} \\
+\hline
+Résine Epoxy (Cibatool) & 15--25 & 200 & 300--500 & 0,10 & 3,0 & Très Facile \\
+\hline
+Bois dur (Chêne, Iroko) & 25--35 & 350 & 200--400 & 0,12 & 4,0 & Facile \\
+\hline
+HDPE (Polyéthylène HD) & 60--70 & 400 & 200--350 & 0,08 & 3,0 & Facile \\
+\hline
+Aluminium AW-2017A & 95--105 & 700 & 100--200 & 0,05 & 1,0 & Moyen \\
+\hline
+Aluminium AW-5052 & 60 & 600 & 150--250 & 0,06 & 1,5 & Moyen \\
+\hline
+Laiton CuZn37 & 70--80 & 800 & 80--150 & 0,04 & 0,8 & Moyen \\
+\hline
+Cuivre pur & 45--55 & 600 & 80--120 & 0,05 & 0,8 & Difficile (adhérent) \\
+\hline
+Acier doux (S235) & 120 & 1\,500 & 20--50 & 0,02 & 0,3 & Hors capacité broche \\
+\hline
+\end{tabular}
+}
+\caption{Paramètres d'usinabilité et vitesses de coupe pour les matériaux testables avec notre CNC}
+\label{tab:usinabilite}
+\end{table}
 
 \section{Conclusion du chapitre}
-Le passage de 3 à 5 axes exige une refonte totale de la géométrie de la machine (table Trunnion), des solutions de transmissions strictes (Vis à billes), et surtout, d'une rupture architecturale en matière de puissance de calcul embarquée (ESP32). Le chapitre suivant s'attachera à formaliser précisément ce besoin et à déterminer les calculs de sollicitations mécaniques de la future CNC.
+
+Ce chapitre a établi le socle théorique et comparatif sur lequel repose notre démarche de conception. Le passage de 3 à 5 axes exige une refonte totale de la géométrie de la machine (table Trunnion), des solutions de transmissions strictes (Vis à billes), et surtout, d'une rupture architecturale en matière de puissance de calcul embarquée (ESP32 Dual-Core). L'analyse comparative des protocoles de communication, des firmwares open-source et des matériaux usinables a permis de valider et justifier chaque choix technologique majeur du projet. Le chapitre suivant s'attachera à formaliser précisément ces besoins et à déterminer les calculs de sollicitations mécaniques de la future CNC 5 axes.
