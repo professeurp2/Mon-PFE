@@ -167,6 +167,21 @@ Où $\vec{R}$ est la résultante composée des forces tangentielle ($F_c$), d'av
 \end{equation}
 Par convention de sécurité, nous retenons $\|\vec{R}\| = 100\text{ N}$ pour tous les calculs suivants (coefficient de sécurité intégré de $\approx 1{,}28$).
 
+\subsection{Dimensionnement de la Puissance de la Broche (Spindle)}
+La modélisation de la force de coupe $F_c = 70\text{ N}$ permet de dimensionner directement la puissance mécanique de coupe $P_c$ requise à l'outil. Avec une vitesse de coupe $V_c = 150 \text{ m/min}$ ($2{,}5 \text{ m/s}$) :
+\begin{equation}
+    P_c = F_c \times V_c = 70 \times 2{,}5 = \boxed{175 \text{ W}}
+\end{equation}
+En considérant un rendement de transmission interne de l'électrobroche $\eta_{broche} \approx 0{,}8$, la puissance électrique motrice $P_m$ nécessaire est :
+\begin{equation}
+    P_m = \frac{P_c}{\eta_{broche}} = \frac{175}{0{,}8} \approx \boxed{218 \text{ W}}
+\end{equation}
+Le couple de coupe $C_c$, pour une vitesse de rotation de $20~000\text{ Tr/min}$ ($\approx 2094\text{ rad/s}$), s'établit à :
+\begin{equation}
+    C_c = \frac{P_c}{\omega} = \frac{175}{2094} \approx \boxed{0{,}083 \text{ Nm}}
+\end{equation}
+Ce dimensionnement justifie l'utilisation d'une électrobroche \textbf{Brushless DC de 300W à 500W}, qui offre une marge de sécurité confortable (facteur $>1{,}5$) pour palier aux pics de charge (arrachements plus profonds ou défauts de matière).
+
 \section{Résistance des Matériaux (RDM) et Analyse de Contraintes}
 La structure doit supporter cette charge sans déformation plastique permanente.
 
@@ -237,12 +252,29 @@ L'équation fondamentale d'accouplement moteur-vis à billes relie l'effort axia
     C_{r\_continu} = \frac{F_{ax} \cdot P_h}{2\pi \cdot \eta} = \frac{105 \times 0{,}005}{2\pi \times 0{,}9} = \boxed{0{,}093 \text{ Nm}}
 \end{equation}
 
-Le couple d'inertie lors des accélérations impose environ $C_J \approx 0{,}15 \text{ Nm}$. Le couple de maintien requis est :
+Afin d'obtenir le couple total, il convient de dimensionner rigoureusement le couple d'inertie $C_J$ lors des phases d'accélération. 
+L'inertie totale ramenée au moteur $J_{tot}$ est la somme de l'inertie de la vis à billes ($J_{vis}$) et de l'inertie de la masse en translation ($J_{trans}$). Pour une vis de diamètre nominal $16\text{ mm}$, de longueur $400\text{ mm}$ (masse $m_{vis} \approx 0{,}63\text{ kg}$) et une masse mobile $M \approx 10\text{ kg}$ :
 \begin{equation}
-    C_{maintien\_Requis} = (C_{r\_continu} + C_J) \times 1{,}5 = (0{,}093 + 0{,}15) \times 1{,}5 \approx \boxed{0{,}36 \text{ Nm}}
+    J_{vis} = \frac{1}{2} m_{vis} \cdot R^2 = \frac{1}{2} (0{,}63) (0{,}008)^2 \approx 2{,}02 \times 10^{-5} \text{ kg.m}^2
+\end{equation}
+\begin{equation}
+    J_{trans} = M \left(\frac{P_h}{2\pi}\right)^2 = 10 \left(\frac{0{,}005}{2\pi}\right)^2 \approx 6{,}33 \times 10^{-6} \text{ kg.m}^2
+\end{equation}
+En estimant l'inertie du rotor du moteur $J_{mot} \approx 5{,}0 \times 10^{-6} \text{ kg.m}^2$, on obtient une inertie totale $J_{tot} \approx 3{,}15 \times 10^{-5} \text{ kg.m}^2$.
+
+Pour une forte accélération linéaire de $a = 1\text{ m/s}^2$, l'accélération angulaire de la vis est $\alpha = a \times \frac{2\pi}{P_h} = 1 \times \frac{2\pi}{0{,}005} \approx 1256 \text{ rad/s}^2$. 
+Le couple d'accélération requis est calculé par le Principe Fondamental de la Dynamique :
+\begin{equation}
+    C_J = J_{tot} \cdot \alpha = 3{,}15 \times 10^{-5} \times 1256 \approx \boxed{0{,}04 \text{ Nm}}
 \end{equation}
 
-Le \textbf{moteur NEMA 17 (17HS4401)} délivrant un Holding Torque de $0{,}45 \text{ Nm}$ satisfait intégralement ce critère.
+Le couple nominal total requis en régime dynamique est donc $C_{nom} = C_{r\_continu} + C_J = 0{,}093 + 0{,}04 = 0{,}133 \text{ Nm}$.
+En appliquant un coefficient de sécurité dynamique de $2{,}5$ pour éviter les pertes de pas (décrochage), le couple de maintien (Holding Torque) minimal requis est :
+\begin{equation}
+    C_{maintien\_Requis} = C_{nom} \times 2{,}5 = 0{,}133 \times 2{,}5 \approx \boxed{0{,}33 \text{ Nm}}
+\end{equation}
+
+Le \textbf{moteur NEMA 17 (17HS4401)} délivrant un \textit{Holding Torque} de $0{,}42 \text{ Nm}$ satisfait rigoureusement cette condition cinématique et permet un fonctionnement pérenne sans glissement.
 
 % ========================================================
 \section{Dimensionnement des Transmissions Rotatives (Axes A et B)}
@@ -268,6 +300,14 @@ L'erreur linéaire correspondante en bout du plateau est alors :
     \Delta L_{resolution} = 100 \times \tan(0{,}00225^\circ) \approx \boxed{0{,}004 \text{ mm}}
 \end{equation}
 Cette résolution de 4 microns entre parfaitement dans les tolérances exigées de $\pm 0{,}05$ mm.
+
+\subsection{Dimensionnement Dynamique du Couple Moteur (Axes A et B)}
+Le moment de renversement de la table, calculé précédemment à $M_{renversement} = 20\text{ Nm}$, dicte le choix du moteur de l'axe A.
+Ce couple extrinsèque s'applique directement sur l'axe de basculement. Grâce au réducteur à courroie crantée fermée (ratio $i = 50$) et en considérant un rendement de transmission $\eta_{trans} = 0{,}9$, le couple de résistance que doit fournir le moteur pour s'opposer au basculement est :
+\begin{equation}
+    C_{moteur\_A} = \frac{M_{renversement}}{i \times \eta_{trans}} = \frac{20}{50 \times 0{,}9} \approx \boxed{0{,}44 \text{ Nm}}
+\end{equation}
+Pour s'assurer d'un maintien parfait en position bloquée (\textit{Holding Mode}) sans sauter de micro-pas, l'actionneur de l'axe A nécessite donc un moteur capable de fournir en permanence ce couple. Un NEMA 17 standard ($0{,}42\text{ Nm}$) se trouvant à la limite de la perte de pas, l'architecture 5 axes privilégie soit un \textbf{NEMA 17 long version} ($0{,}55\text{ Nm}$) soit idéalement un \textbf{NEMA 23} ($1{,}26\text{ Nm}$) pour l'Axe A, offrant une marge structurelle indéfectible face aux vibrations d'usinage.
 
 % ========================================================
 \section{Durée de Vie des Guidages Linéaires (ISO 281)}
@@ -319,6 +359,18 @@ Les résultats de la simulation confirment les calculs analytiques :
     \item \textbf{Déflexion maximale (nœud critique) :} $\delta_{FEA} = 0{,}038 \text{ mm}$ (vs $\delta_{analytique} = 0{,}041 \text{ mm}$ — écart de 7{,}3\%, acceptable).
     \item \textbf{Fréquence propre (1er mode de vibration) :} $f_1 = 143 \text{ Hz}$, largement supérieure à la fréquence d'excitation de la broche ($\approx 300 \text{ Hz}$ à $18~000 \text{ Tr/min}$). La résonance mécanique est évitée.
 \end{itemize}
+
+% ========================================================
+\section{Vérification RDM des Paliers de l'Axe de Basculement (Trunnion)}
+Le plateau basculant (Axe A) est fondamentalement soutenu par deux ensembles de paliers. Il doit absorber intégralement la force tangentielle d'usinage (100 N) ainsi que le moment de renversement massif de $20\text{ Nm}$.
+
+Si la distance radiale d'espacement des paliers sur le berceau est $L_{paliers} = 150\text{ mm}$ ($0{,}15\text{ m}$), la force radiale de réaction $F_r$ exercée sur chaque palier pour résister au moment de renversement s'établit à :
+\begin{equation}
+    F_r = \frac{M_{renversement}}{L_{paliers}} = \frac{20}{0{,}15} \approx \boxed{133 \text{ N}}
+\end{equation}
+La charge radiale équivalente maximale $P_r$ supportée par un palier, en y ajoutant la masse statique du bloc divisée par deux (approx. $15\text{ N}$) et la force d'usinage, reste largement en deçà de $300\text{ N}$.
+
+L'emploi de \textbf{Roulements à billes à gorges profondes de type 6008} (diamètre intérieur 40 mm), avec une charge statique nominale $C_0 \approx 11~000\text{ N}$, exhibe un coefficient de sécurité de l'ordre de $s \approx 36$. Il n'y a dès lors aucun risque de poinçonnement (déformation plastique locale des billes dans leurs bagues) et la rigidité structurelle du joint tournant est qualifiée de monolithique.
 
 % ========================================================
 \section{Conclusion sur l'Étude Mécanique}

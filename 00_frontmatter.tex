@@ -4,83 +4,122 @@
 \chapter*{Présentation de l'ENI-ABT}
 \addcontentsline{toc}{chapter}{Présentation de l'ENI-ABT}
 
-\begin{tcolorbox}[colback=white, colframe=black, sharp corners, halign=center, boxrule=1.5pt]
-    \textbf{\Large\textcolor{macouleur}{Présentation de L'ENI-ABT}}
+\begin{tcolorbox}[colback=macouleur!5, colframe=macouleur, arc=4mm, outer arc=1mm, boxrule=1.5pt, halign=center]
+    {\Huge \faUniversity} \quad \textbf{\Large\textcolor{macouleur}{École Nationale d'Ingénieurs — Abderhamane Baba Touré}}
 \end{tcolorbox}
 
-\vspace{0.5cm}
-Créée le 14 avril 1939 l'\textbf{Ecole Nationale d'Ingénieurs – Abderhamane Baba Touré} (ENI-ABT) a subi plusieurs mutations allant de l'\textbf{Ecole des Travaux Publics} formant des dessinateurs jusqu'à la formation des ingénieurs de conception dans plusieurs domaines. Elle commença comme l'\textbf{Ecole des Travaux Publics} (ETP) de l'A.O.P destinée à former des adjoints techniques en Travaux Publics. La première réforme de l'enseignement érigea l'ETP en \textbf{Ecole Nationale d'Ingénieurs} (ENI) en 1962, en Septembre 1973 le recrutement à l'ENI fut conditionné au Baccalauréat, pour la formation des ingénieurs des sciences appliquées en industrie, génie civil, géologie et en topographie. En 2002 l'ENI, à l'instar des autres grandes écoles (IPR/IFRA, ENSUP), a été directement rattachée à la Direction Nationale de l'Enseignement Supérieur et de la Recherche Scientifique (DNESRS) suivant l'Ordonnance N° 02-054/P-RM du 04 juin 2002. Elle a alors été régie dans son organisation et son fonctionnement par le décret N° 96-378/P-RM du 31 décembre 1996. En juin 2006 l'ENI fut baptisée au nom de son premier Directeur Malien Abderhamane Baba Touré (ENI\textendash ABT).
+\vspace{0.8cm}
 
-\vspace{0.5cm}
-L'ENI-ABT occupe une place centrale dans la politique industrielle du Mali. En formant des ingénieurs capables de concevoir, de fabriquer et de maintenir des systèmes mécaniques complexes, elle répond directement aux besoins d'une économie en pleine mutation vers l'industrialisation. Le présent Projet de Fin d'Études (PFE) s'inscrit dans cette vision : démontrer qu'il est possible de concevoir et de réaliser localement, à l'ENI-ABT, une machine-outil de précision à 5 axes, en exploitant des technologies de l'Industrie 4.0, sans dépendance aux systèmes propriétaires étrangers. L'ENI-ABT dispose à ce jour d'un atelier mécanique équipé de tours parallèles, de fraiseuses conventionnelles et d'une imprimante 3D FDM, ce qui constitue un socle technique sur lequel ce projet vient greffer une dimension CNC numérique avancée.
+\begin{center}
+\begin{tikzpicture}[node distance=2cm]
+    % Ligne principale
+    \draw[line width=3pt, macouleur!30, -{Stealth[length=4mm]}] (0,0) -- (14.5,0);
+    
+    % Jalons (Timeline)
+    \foreach \x/\year/\text in {
+        0.5/1939/\textbf{ETP} \\ (Dessin),
+        3.5/1962/\textbf{ENI} \\ (Ingénieurs),
+        6.5/1973/\textbf{Réforme} \\ (Bac requis),
+        9.5/2002/\textbf{DNESRS} \\ (Tutelle),
+        12.5/2006/\textbf{ENI-ABT} \\ (Nom final)
+    } {
+        \filldraw[macouleur] (\x,0) circle (3pt);
+        \node[above, macouleur, font=\bfseries\large] at (\x,0.4) {\year};
+        \node[below, text width=2.4cm, align=center, font=\small] at (\x,-0.3) {\text};
+    }
+\end{tikzpicture}
+\end{center}
 
-\vspace{1cm}
-\begin{figure}[htbp]
-    \centering
-    \caption{Vues des bâtiments de l'ENI-ABT, Bamako, Mali}
-    \label{fig:eni_abt}
-\end{figure}
+\vspace{0.8cm}
+
+\noindent
+\begin{minipage}{0.65\textwidth}
+    \textbf{Un héritage d'excellence...}\\
+    Créée le 14 avril 1939, l'\textbf{ENI-ABT} a sculpté le paysage technique du Mali. De l'école des Travaux Publics coloniale à l'institut polytechnique moderne, elle forme aujourd'hui les cadres qui pilotent l'industrie nationale. Son évolution reflète l'ambition d'indépendance et de progrès du pays.
+\end{minipage}
+\hfill
+\begin{minipage}{0.3\textwidth}
+    \begin{tcolorbox}[colback=macouleur!10, colframe=macouleur, sharp corners, boxrule=1pt, title=Chiffres Clés]
+        \small
+        \textbf{Création :} 1939\\
+        \textbf{Tutelle :} DNESRS\\
+        \textbf{Système :} LMD\\
+        \textbf{Statut :} Grande École
+    \end{tcolorbox}
+\end{minipage}
+
+\vspace{0.8cm}
+
+\begin{tcolorbox}[colback=white, colframe=macouleur!50, arc=0mm, title=\textbf{Notre Vision : Souveraineté Technologique}, fonttitle=\bfseries]
+    L'ENI-ABT occupe une place centrale dans la politique industrielle du Mali. Ce PFE en est l'illustration : démontrer qu'il est possible de concevoir et de réaliser localement une \textbf{machine-outil CNC 5 axes} de haute technologie, en s'affranchissant des systèmes propriétaires étrangers.
+\end{tcolorbox}
 
 \newpage
 % --- Structuration pédagogique ---
 \section*{\textcolor{macouleur}{Structuration pédagogique}}
 
-Depuis la rentrée 2014-2015, l'ENI-ABT applique le système LMD à travers une nouvelle structuration comportant six DER pour six filières de départ :
+Depuis la rentrée 2014-2015, l'ENI-ABT applique le système LMD à travers une nouvelle structuration.
 
-\vspace{0.5cm}
-\noindent
-\begin{minipage}[t]{0.48\textwidth}
-    \begin{tcolorbox}[colback=white, colframe=gray, boxrule=1pt, sharp corners, halign=center]
-        \textbf{L'ENI-ABT avec le système}\\
-        \textbf{«CLASSIQUE»}
-    \end{tcolorbox}
-    \vspace{0.3cm}
-    \textbf{Deux niveaux de formations :}
-    \begin{itemize}[label=\raisebox{0.25ex}{\tiny$\blacktriangleright$}, itemsep=2pt]
-        \item Cycle Ingénieur ;
-        \item Cycle Technicien Supérieur.
-    \end{itemize}
-    \vspace{0.5cm}
-    \textbf{Quatre DER :}
-    \begin{itemize}[label=\raisebox{0.25ex}{\tiny$\blacktriangleright$}, itemsep=2pt]
-        \item Génie civil ;
-        \item Génie Industriel ;
-        \item Géodésie ;
-        \item Géologie.
-    \end{itemize}
-\end{minipage}
-\hfill
-\vrule
-\hfill
-\begin{minipage}[t]{0.48\textwidth}
-    \begin{tcolorbox}[colback=gray!10, colframe=gray, boxrule=1pt, sharp corners, halign=center]
-        \textbf{L'ENI-ABT avec le système}\\
-        \textbf{«LMD»}
-    \end{tcolorbox}
-    \vspace{0.3cm}
-    \textbf{Trois niveaux de formations :}
-    \begin{itemize}[label=\raisebox{0.25ex}{\tiny$\blacktriangleright$}, itemsep=2pt]
-        \item Licence ;
-        \item Master ;
-        \item Doctorat.
-    \end{itemize}
-    \vspace{0.5cm}
-    \textbf{Six DER :}
-    \begin{itemize}[label=\raisebox{0.25ex}{\tiny$\blacktriangleright$}, itemsep=2pt]
-        \item Génie civil ;
-        \item Génie Electrique/Industrie ;
-        \item Génie Mécanique et Energie ;
-        \item Génie Informatique et Télécommunication ;
-        \item Géodésie/Sciences Géographiques.
-    \end{itemize}
-\end{minipage}
+\begin{center}
+\begin{tikzpicture}
+    % Système Classique
+    \node[draw, macouleur!50, dashed, ultra thick, fill=white, rounded corners, inner sep=10pt, text width=6cm, align=center] (classic) at (0,0) {
+        \textbf{\large Système Classique}\\
+        \vspace{2pt}
+        \hrule
+        \vspace{5pt}
+        \begin{itemize}[leftmargin=15pt, label=\small\faHistory]
+            \item Ingénieurs de Conception
+            \item Technicien Supérieur
+        \end{itemize}
+    };
+    
+    % Flèche de Transition
+    \draw[-{Stealth[length=5mm]}, line width=4pt, macouleur!30] (3.5,0) -- (4.5,0);
+    \node[above, font=\bfseries\small] at (4,0.3) {Réforme LMD};
+    
+    % Système LMD
+    \node[draw, macouleur, ultra thick, fill=macouleur!5, rounded corners, inner sep=10pt, text width=6cm, align=center] (lmd) at (8,0) {
+        \textbf{\large Système LMD (Actuel)}\\
+        \vspace{2pt}
+        \hrule
+        \vspace{5pt}
+        \begin{itemize}[leftmargin=15pt, label=\small\faCheckCircle]
+            \item \textbf{L}icence (Bac+3)
+            \item \textbf{M}aster (Bac+5)
+            \item \textbf{D}octorat (Bac+8)
+        \end{itemize}
+    };
+\end{tikzpicture}
+\end{center}
 
-\vspace{1cm}
-\noindent L'ENI-ABT mène également des activités :
-\begin{itemize}[label=\raisebox{0.25ex}{\tiny$\blacktriangleright$}]
-    \item De formation continue diplômante et qualifiante à travers son Service de la Formation Continue (SFC) ;
-    \item D'expertise et de production à travers son Unité d'Expertise et de Production (UEP).
-\end{itemize}
+\vspace{0.6cm}
+
+\noindent \textbf{Répartition des Départements (DER) :}\\
+L'établissement est structuré en 6 Départements d'Enseignement et de Recherche (DER) thématiques :
+
+\begin{center}
+\begin{tikzpicture}[node distance=0.5cm]
+    \tikzstyle{der} = [rectangle, fill=macouleur!15, text=black, font=\footnotesize\bfseries, minimum width=4.5cm, minimum height=0.8cm, rounded corners=2pt, align=center]
+    
+    \node[der] (d1) {Génie Civil};
+    \node[der, right=of d1] (d2) {Génie Électromécanique};
+    \node[der, right=of d2] (d3) {Génie Mécanique / Énergie};
+    
+    \node[der, below=of d1] (d4) {Informatique / Télécoms};
+    \node[der, right=of d4] (d5) {Géodésie / Topographie};
+    \node[der, right=of d5] (d6) {Génie Industriel};
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.6cm}
+
+\begin{tcolorbox}[colback=gray!5, colframe=gray!40, leftrule=5pt, arc=0mm, title=Missions Complémentaires, fonttitle=\bfseries\color{black}]
+    \begin{itemize}[label=\textcolor{macouleur}{\faLongArrowAltRight}]
+        \item \textbf{Expertise :} Unité d'Expertise et de Production (UEP) pour les prestations externes.
+        \item \textbf{Formation Continue :} Service dédié (SFC) pour les professionnels.
+    \end{itemize}
+\end{tcolorbox}
 
 \newpage
 % ===================================================

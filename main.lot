@@ -1,29 +1,29 @@
 \babel@toc {french}{}\relax 
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {1.1}{\ignorespaces Évolution historique des architectures de commande numérique}}{24}{table.caption.11}%
-\contentsline {table}{\numberline {1.2}{\ignorespaces Tableau comparatif des machines CNC 5 axes du marché vs. notre prototype}}{26}{table.caption.13}%
-\contentsline {table}{\numberline {1.3}{\ignorespaces Tableau des principaux codes G et M supportés par notre contrôleur ESP32}}{28}{table.caption.14}%
-\contentsline {table}{\numberline {1.4}{\ignorespaces Tableau comparatif des protocoles de communication pour systèmes CNC}}{28}{table.caption.15}%
-\contentsline {table}{\numberline {1.5}{\ignorespaces Comparatif des firmwares CNC open-source pour machine 5 axes}}{29}{table.caption.16}%
-\contentsline {table}{\numberline {1.6}{\ignorespaces Paramètres d'usinabilité et vitesses de coupe pour les matériaux testables avec notre CNC}}{30}{table.caption.17}%
+\contentsline {table}{\numberline {1.1}{\ignorespaces Évolution historique des architectures de commande numérique}}{24}{table.caption.10}%
+\contentsline {table}{\numberline {1.2}{\ignorespaces Tableau comparatif des machines CNC 5 axes du marché vs. notre prototype}}{26}{table.caption.12}%
+\contentsline {table}{\numberline {1.3}{\ignorespaces Tableau des principaux codes G et M supportés par notre contrôleur ESP32}}{28}{table.caption.13}%
+\contentsline {table}{\numberline {1.4}{\ignorespaces Tableau comparatif des protocoles de communication pour systèmes CNC}}{28}{table.caption.14}%
+\contentsline {table}{\numberline {1.5}{\ignorespaces Comparatif des firmwares CNC open-source pour machine 5 axes}}{29}{table.caption.15}%
+\contentsline {table}{\numberline {1.6}{\ignorespaces Paramètres d'usinabilité et vitesses de coupe pour les matériaux testables avec notre CNC}}{30}{table.caption.16}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {2.1}{\ignorespaces Cahier des charges mécatronique complet de la CNC 5 axes Trunnion.}}{33}{table.caption.20}%
+\contentsline {table}{\numberline {2.1}{\ignorespaces Cahier des charges mécatronique complet de la CNC 5 axes Trunnion.}}{33}{table.caption.19}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {3.1}{\ignorespaces Comparatif des microcontrôleurs candidats pour le contrôleur CNC 5 axes}}{41}{table.caption.22}%
-\contentsline {table}{\numberline {3.2}{\ignorespaces Allocation des tâches FreeRTOS par cœur ESP32}}{41}{table.caption.23}%
-\contentsline {table}{\numberline {3.3}{\ignorespaces Table de correspondance des broches (Pinout) de l'ESP32 sur le PCB personnalisé}}{42}{table.caption.24}%
+\contentsline {table}{\numberline {3.1}{\ignorespaces Comparatif des microcontrôleurs candidats pour le contrôleur CNC 5 axes}}{43}{table.caption.21}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Allocation des tâches FreeRTOS par cœur ESP32}}{43}{table.caption.22}%
+\contentsline {table}{\numberline {3.3}{\ignorespaces Table de correspondance des broches (Pinout) de l'ESP32 sur le PCB personnalisé}}{44}{table.caption.23}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {4.1}{\ignorespaces Paramètres de Denavit-Hartenberg de la configuration Trunnion (Axes A et B)}}{49}{table.caption.30}%
-\contentsline {table}{\numberline {4.2}{\ignorespaces Les 7 phases cinématiques du profil de déplacement en S-Curve}}{50}{table.caption.31}%
+\contentsline {table}{\numberline {4.1}{\ignorespaces Paramètres de Denavit-Hartenberg de la configuration Trunnion (Axes A et B)}}{51}{table.caption.29}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Les 7 phases cinématiques du profil de déplacement en S-Curve}}{52}{table.caption.30}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {5.1}{\ignorespaces Résultats des tests de précision et répétabilité selon ISO 230-1 sur les 5 axes}}{57}{table.caption.37}%
-\contentsline {table}{\numberline {5.2}{\ignorespaces AMDEC de la CNC 5 axes (Criticité $C = P \times G \times D$, seuil d'alerte: $C > 15$)}}{60}{table.caption.39}%
-\contentsline {table}{\numberline {5.3}{\ignorespaces BOM (Bill of Materials) complet de la CNC 5 axes Trunnion}}{60}{table.caption.40}%
-\contentsline {table}{\numberline {5.4}{\ignorespaces Analyse de valeur : Notre prototype vs solutions commerciales équivalentes}}{61}{table.caption.41}%
+\contentsline {table}{\numberline {5.1}{\ignorespaces Résultats des tests de précision et répétabilité selon ISO 230-1 sur les 5 axes}}{59}{table.caption.36}%
+\contentsline {table}{\numberline {5.2}{\ignorespaces AMDEC de la CNC 5 axes (Criticité $C = P \times G \times D$, seuil d'alerte: $C > 15$)}}{62}{table.caption.38}%
+\contentsline {table}{\numberline {5.3}{\ignorespaces BOM (Bill of Materials) complet de la CNC 5 axes Trunnion}}{62}{table.caption.39}%
+\contentsline {table}{\numberline {5.4}{\ignorespaces Analyse de valeur : Notre prototype vs solutions commerciales équivalentes}}{63}{table.caption.40}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {A.1}{\ignorespaces Caractéristiques techniques clés de l'ESP32-WROOM-32U (Source : Espressif DS ESP32 Rev 3.3)}}{72}{table.caption.45}%
-\contentsline {table}{\numberline {A.2}{\ignorespaces Caractéristiques techniques clés du Driver DM556 (Source : Leadshine DS 2018)}}{73}{table.caption.46}%
-\contentsline {table}{\numberline {A.3}{\ignorespaces Caractéristiques techniques du moteur pas-à-pas NEMA 17HS4401}}{73}{table.caption.47}%
-\contentsline {table}{\numberline {A.4}{\ignorespaces Données brutes des 20 mesures métrologie de l'axe Y (déplacement consigne = 50 mm)}}{74}{table.caption.48}%
-\contentsline {table}{\numberline {A.5}{\ignorespaces Planning de maintenance préventive de la CNC 5 axes}}{75}{table.caption.49}%
+\contentsline {table}{\numberline {A.1}{\ignorespaces Caractéristiques techniques clés de l'ESP32-WROOM-32U (Source : Espressif DS ESP32 Rev 3.3)}}{74}{table.caption.44}%
+\contentsline {table}{\numberline {A.2}{\ignorespaces Caractéristiques techniques clés du Driver DM556 (Source : Leadshine DS 2018)}}{75}{table.caption.45}%
+\contentsline {table}{\numberline {A.3}{\ignorespaces Caractéristiques techniques du moteur pas-à-pas NEMA 17HS4401}}{75}{table.caption.46}%
+\contentsline {table}{\numberline {A.4}{\ignorespaces Données brutes des 20 mesures métrologie de l'axe Y (déplacement consigne = 50 mm)}}{76}{table.caption.47}%
+\contentsline {table}{\numberline {A.5}{\ignorespaces Planning de maintenance préventive de la CNC 5 axes}}{77}{table.caption.48}%
