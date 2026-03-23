@@ -17,7 +17,11 @@
 \contentsline {figure}{\numberline {4.3}{\ignorespaces Diagramme de Classes simplifié du firmware ESP32 (4 classes principales)}}{48}{figure.caption.29}%
 \contentsline {figure}{\numberline {4.4}{\ignorespaces Architecture en 3 couches de l'IHM Flutter avec Riverpod}}{51}{figure.caption.32}%
 \contentsline {figure}{\numberline {4.5}{\ignorespaces Flux de données pour une commande Jog depuis l'IHM Flutter jusqu'aux moteurs}}{52}{figure.caption.33}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Interface de l'Application : Tableau de Bord (Dashboard Principal)}}{53}{figure.caption.34}%
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Interface de l'Application : Écran de Contrôle Manuel (Jog Panel)}}{53}{figure.caption.35}%
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Interface : Éditeur de G-Code}}{54}{figure.caption.36}%
+\contentsline {figure}{\numberline {4.9}{\ignorespaces Interface : Écran des Paramètres}}{54}{figure.caption.36}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Histogramme des résultats de métrologie par axe — tous les axes passent le critère de conformité}}{55}{figure.caption.35}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Histogramme des résultats de métrologie par axe — tous les axes passent le critère de conformité}}{57}{figure.caption.38}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }

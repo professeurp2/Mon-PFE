@@ -44,7 +44,8 @@
 \usepackage{pgf-umlsd}          % Diagrammes de séquence UML
 \usepackage{siunitx}            % Unités SI normalisées
 \usepackage{fancyhdr}           % En-têtes et pieds de page personnalisés
-\setlength{\headheight}{15pt}   % Évite le warning fancyhdr
+\setlength{\headheight}{40pt}   % Fixe le warning fancyhdr (titres longs sur 2 lignes)
+\addtolength{\topmargin}{-25pt} % Compense l'augmentation de headheight
 \sisetup{locale=FR, output-decimal-marker={,}}
 \usepackage{listings}           % Affichage du code source (C++, Dart)
 \lstset{
@@ -86,8 +87,8 @@
 % Configuration des en-têtes et pieds de page pro (Fancyhdr)
 \pagestyle{fancy}
 \fancyhf{} % Nettoie les en-têtes et pieds de page
-\fancyhead[L]{\bfseries\color{macouleur}\nouppercase{\leftmark}} % Chapitre à gauche
-\fancyhead[R]{\bfseries\color{macouleur}\nouppercase{\rightmark}} % Section à droite
+\fancyhead[L]{\parbox[b]{0.45\textwidth}{\small\bfseries\color{macouleur}\nouppercase{\leftmark}}} % Chapitre à gauche, largeur limitée
+\fancyhead[R]{\parbox[b]{0.45\textwidth}{\raggedleft\small\bfseries\color{macouleur}\nouppercase{\rightmark}}} % Section à droite, largeur limitée
 \fancyfoot[C]{\textbf{\thepage}} % Numéro de page centré
 \fancyfoot[R]{\footnotesize\color{gray}ENI-ABT -- PFE CNC 5-Axes} % Texte en pied de page
 \renewcommand{\headrulewidth}{0.8pt} % Épaisseur de la ligne d'en-tête

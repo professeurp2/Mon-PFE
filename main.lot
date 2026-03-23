@@ -16,14 +16,14 @@
 \contentsline {table}{\numberline {4.1}{\ignorespaces Paramètres de Denavit-Hartenberg de la configuration Trunnion (Axes A et B)}}{49}{table.caption.30}%
 \contentsline {table}{\numberline {4.2}{\ignorespaces Les 7 phases cinématiques du profil de déplacement en S-Curve}}{50}{table.caption.31}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {5.1}{\ignorespaces Résultats des tests de précision et répétabilité selon ISO 230-1 sur les 5 axes}}{55}{table.caption.34}%
-\contentsline {table}{\numberline {5.2}{\ignorespaces AMDEC de la CNC 5 axes (Criticité $C = P \times G \times D$, seuil d'alerte: $C > 15$)}}{58}{table.caption.36}%
-\contentsline {table}{\numberline {5.3}{\ignorespaces BOM (Bill of Materials) complet de la CNC 5 axes Trunnion}}{58}{table.caption.37}%
-\contentsline {table}{\numberline {5.4}{\ignorespaces Analyse de valeur : Notre prototype vs solutions commerciales équivalentes}}{59}{table.caption.38}%
+\contentsline {table}{\numberline {5.1}{\ignorespaces Résultats des tests de précision et répétabilité selon ISO 230-1 sur les 5 axes}}{57}{table.caption.37}%
+\contentsline {table}{\numberline {5.2}{\ignorespaces AMDEC de la CNC 5 axes (Criticité $C = P \times G \times D$, seuil d'alerte: $C > 15$)}}{60}{table.caption.39}%
+\contentsline {table}{\numberline {5.3}{\ignorespaces BOM (Bill of Materials) complet de la CNC 5 axes Trunnion}}{60}{table.caption.40}%
+\contentsline {table}{\numberline {5.4}{\ignorespaces Analyse de valeur : Notre prototype vs solutions commerciales équivalentes}}{61}{table.caption.41}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {A.1}{\ignorespaces Caractéristiques techniques clés de l'ESP32-WROOM-32U (Source : Espressif DS ESP32 Rev 3.3)}}{70}{table.caption.42}%
-\contentsline {table}{\numberline {A.2}{\ignorespaces Caractéristiques techniques clés du Driver DM556 (Source : Leadshine DS 2018)}}{71}{table.caption.43}%
-\contentsline {table}{\numberline {A.3}{\ignorespaces Caractéristiques techniques du moteur pas-à-pas NEMA 17HS4401}}{71}{table.caption.44}%
-\contentsline {table}{\numberline {A.4}{\ignorespaces Données brutes des 20 mesures métrologie de l'axe Y (déplacement consigne = 50 mm)}}{72}{table.caption.45}%
-\contentsline {table}{\numberline {A.5}{\ignorespaces Planning de maintenance préventive de la CNC 5 axes}}{73}{table.caption.46}%
+\contentsline {table}{\numberline {A.1}{\ignorespaces Caractéristiques techniques clés de l'ESP32-WROOM-32U (Source : Espressif DS ESP32 Rev 3.3)}}{72}{table.caption.45}%
+\contentsline {table}{\numberline {A.2}{\ignorespaces Caractéristiques techniques clés du Driver DM556 (Source : Leadshine DS 2018)}}{73}{table.caption.46}%
+\contentsline {table}{\numberline {A.3}{\ignorespaces Caractéristiques techniques du moteur pas-à-pas NEMA 17HS4401}}{73}{table.caption.47}%
+\contentsline {table}{\numberline {A.4}{\ignorespaces Données brutes des 20 mesures métrologie de l'axe Y (déplacement consigne = 50 mm)}}{74}{table.caption.48}%
+\contentsline {table}{\numberline {A.5}{\ignorespaces Planning de maintenance préventive de la CNC 5 axes}}{75}{table.caption.49}%

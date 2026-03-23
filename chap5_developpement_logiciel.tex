@@ -292,6 +292,52 @@ Ce diagramme illustre le flux d'exécution d'une commande de déplacement manuel
 \end{figure}
 
 % =====================================================
+\section{Interfaces Utilisateurs (Générées via Google Stitch)}
+
+La conception de l'Interface Homme-Machine (IHM) a été réalisée en s'appuyant sur des mockups modernes générés depuis la plateforme Google Stitch. L'objectif est de fournir une ergonomie de niveau industriel (utilisation du glassmorphism, mode sombre, navigation persistante sur le côté). Les différents écrans ont été standardisés pour garantir une expérience utilisateur fluide et cohérente sur l'ensemble de la supervision de la CNC.
+
+\subsection{Écran Principal (Dashboard)}
+Le tableau de bord centralise toutes les informations vitales de la machine : l'état de la connexion réseau, la position en temps réel des 5 axes (X, Y, Z, A, B), la température de la broche et l'aperçu du chargement du fichier G-Code en cours.
+
+\begin{figure}[htbp]
+    \centering
+    % REMPLACER par votre propre capture téléchargée depuis Stitch
+    \includegraphics[width=0.9\textwidth]{images/stitch_dashboard.png}
+    \caption{Interface de l'Application : Tableau de Bord (Dashboard Principal)}
+    \label{fig:stitch_dashboard}
+\end{figure}
+
+\subsection{Écran de Contrôle Manuel (Jog)}
+Cet écran permet à l'opérateur de déplacer chaque axe individuellement de manière tactile ou au clavier. Il intègre le réglage du pas de déplacement (\textit{Step size}) et l'ajustement de la vitesse d'avance (\textit{Feedrate overide}).
+
+\begin{figure}[htbp]
+    \centering
+    % REMPLACER par votre propre capture téléchargée depuis Stitch
+    \includegraphics[width=0.9\textwidth]{images/stitch_jog.png}
+    \caption{Interface de l'Application : Écran de Contrôle Manuel (Jog Panel)}
+    \label{fig:stitch_jog}
+\end{figure}
+
+\subsection{Éditeur G-Code et Paramètres Machine}
+L'éditeur textuel permet de vérifier et modifier les programmes d'usinage ligne par ligne avant leur exécution. L'écran des paramètres offre, quant à lui, un accès sécurisé aux configurations internes de la machine (limites physiques, résolution steps/mm, limites d'accélération).
+
+\begin{figure}[htbp]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/stitch_gcode.png}
+        \caption{Interface : Éditeur de G-Code}
+        \label{fig:stitch_gcode}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/stitch_settings.png}
+        \caption{Interface : Écran des Paramètres}
+        \label{fig:stitch_settings}
+    \end{minipage}
+\end{figure}
+
+% =====================================================
 \section{Sécurité du Code Embarqué}
 
 \subsection{Validation des Entrées (Input Sanitization)}
