@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.3.6)  23 MAR 2026 17:01
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.3.6)  24 MAR 2026 16:17
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1375,11 +1375,11 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `cmtt' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
-)
+ [15])
 \tf@toc=\write5
 \openout5 = `main.toc'.
 
- [15] [16] (main.lof)
+ [16] (main.lof)
 \tf@lof=\write6
 \openout6 = `main.lof'.
 
@@ -1557,25 +1557,30 @@ Overfull \hbox (7.58511pt too wide) in paragraph at lines 280--280
 |[]\T1/phv/b/n/17.28 (-20) Dimensionnement des Trans-mis-sions Ro-ta-tives (Axes
  []
 
+
+Overfull \hbox (1.26802pt too wide) in paragraph at lines 304--304
+|[]\T1/phv/b/n/14.4 (-20) Calibration et Mé-tro-lo-gie de la Lon-gueur de Pi-vot (Pi-vot Length)| 
+ []
+
 [38]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 325.
+(hyperref)                removing `math shift' on input line 337.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `subscript' on input line 325.
+(hyperref)                removing `subscript' on input line 337.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 325.
+(hyperref)                removing `math shift' on input line 337.
 
-[39]
-Overfull \hbox (3.12634pt too wide) in paragraph at lines 359--360
+[39] [40]
+Overfull \hbox (3.12634pt too wide) in paragraph at lines 371--372
 []\T1/phv/b/n/12 (-20) Déflexion maxi-male (n÷ud cri-tique) : $\OML/cmm/m/it/12 ^^N[] \OT1/cmr/m/n/12 (-20) = 0[]038[]$ \T1/phv/m/n/12 (-20) (vs $\OML/cmm/m/it/12 ^^N[] \OT1/cmr/m/n/12 (-20) = 0[]041[]$
  []
 
-[40]) [41]
+) [41] [42]
 \openout2 = `chap4_realisation_mecatro.aux'.
 
  (chap4_realisation_mecatro.tex
@@ -1610,12 +1615,12 @@ Underfull \hbox (badness 3769) in paragraph at lines 60--60
 \T1/phv/m/n/12 (+20) Buf-fer, pla-ni-fi-ca-teur Look-
  []
 
-[42
+[43
 
 
 
 
-] [43]
+] [44]
 LaTeX Info: Symbol \textrightarrow not provided by
             font family phv in TS1 encoding.
             Default family used instead on input line 126.
@@ -1690,37 +1695,37 @@ LaTeX Info: Symbol \textrightarrow not provided by
 LaTeX Info: Symbol \textrightarrow not provided by
             font family phv in TS1 encoding.
             Default family used instead on input line 126.
- [44]
-Overfull \hbox (5.88333pt too wide) in paragraph at lines 185--185
+ [45] [46]
+Overfull \hbox (5.88333pt too wide) in paragraph at lines 190--190
 |[]\T1/phv/b/n/14.4 (-20) Dimensionnement du Conden-sa-teur de Dé-cou-plage Anti-Brown-
  []
 
-[45]
-Overfull \hbox (0.24162pt too wide) in paragraph at lines 195--195
+
+Overfull \hbox (0.24162pt too wide) in paragraph at lines 200--200
 |[]\T1/phv/b/n/14.4 (-20) Câblage en ^^SCa-té-go-rie d'Ar-rêt 0^^T (Cou-pure non-conditionnelle)| 
  []
 
 
-Overfull \hbox (25.19731pt too wide) in paragraph at lines 218--219
+Overfull \hbox (25.19731pt too wide) in paragraph at lines 223--224
  [][] 
  []
 
-[46]
+[47] [48]
 
-LaTeX Warning: Command \textdegree invalid in math mode on input line 245.
+LaTeX Warning: Command \textdegree invalid in math mode on input line 255.
 
 
-LaTeX Warning: Command \textdegree invalid in math mode on input line 245.
+LaTeX Warning: Command \textdegree invalid in math mode on input line 255.
 
 Missing character: There is no ° in font cmr12!
-) [47]
+) [49] [50]
 \openout2 = `chap5_developpement_logiciel.aux'.
 
  (chap5_developpement_logiciel.tex
 Chapitre 4.
 LaTeX Font Info:    Font shape `TS1/phv/m/n' will be
 (Font)              scaled to size 5.69998pt on input line 45.
-[48
+[51
 
 
 
@@ -1728,53 +1733,53 @@ LaTeX Font Info:    Font shape `TS1/phv/m/n' will be
 ]
 LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <10.95> not available
 (Font)              Font shape `T1/cmtt/m/n' tried instead on input line 134.
- [49]
+ [52]
 Overfull \hbox (1.83694pt too wide) in paragraph at lines 142--142
 |[]\T1/phv/b/n/14.4 (-20) Système de Co-or-don-nées et Pa-ra-mètres de Denavit-Hartenberg| 
  []
 
-[50] [51] [52] [53]
-<images/stitch_dashboard.png, id=1119, 1606.0pt x 1284.8pt>
+[53] [54] [55] [56] [57]
+<images/stitch_dashboard.png, id=1170, 1606.0pt x 1284.8pt>
 File: images/stitch_dashboard.png Graphic file (type png)
 <use images/stitch_dashboard.png>
-Package pdftex.def Info: images/stitch_dashboard.png  used on input line 305.
+Package pdftex.def Info: images/stitch_dashboard.png  used on input line 348.
 (pdftex.def)             Requested size: 396.91327pt x 317.53317pt.
-<images/stitch_jog.png, id=1120, 1606.0pt x 1284.8pt>
+<images/stitch_jog.png, id=1171, 1606.0pt x 1284.8pt>
 File: images/stitch_jog.png Graphic file (type png)
 <use images/stitch_jog.png>
-Package pdftex.def Info: images/stitch_jog.png  used on input line 316.
+Package pdftex.def Info: images/stitch_jog.png  used on input line 359.
 (pdftex.def)             Requested size: 396.91327pt x 317.53317pt.
-<images/stitch_gcode.png, id=1121, 1606.0pt x 1284.8pt>
+<images/stitch_gcode.png, id=1172, 1606.0pt x 1284.8pt>
 File: images/stitch_gcode.png Graphic file (type png)
 <use images/stitch_gcode.png>
-Package pdftex.def Info: images/stitch_gcode.png  used on input line 328.
+Package pdftex.def Info: images/stitch_gcode.png  used on input line 371.
 (pdftex.def)             Requested size: 211.68663pt x 169.34319pt.
-<images/stitch_settings.png, id=1122, 1606.0pt x 1449.415pt>
+<images/stitch_settings.png, id=1173, 1606.0pt x 1449.415pt>
 File: images/stitch_settings.png Graphic file (type png)
 <use images/stitch_settings.png>
-Package pdftex.def Info: images/stitch_settings.png  used on input line 334.
+Package pdftex.def Info: images/stitch_settings.png  used on input line 377.
 (pdftex.def)             Requested size: 211.68663pt x 191.04028pt.
- [54] [55 <./images/stitch_dashboard.png (PNG copy)> <./images/stitch_jog.png (PNG copy)>]
+ [58] [59 <./images/stitch_dashboard.png (PNG copy)> <./images/stitch_jog.png (PNG copy)>]
 
-LaTeX Warning: Command \textdegree invalid in math mode on input line 348.
-
-
-LaTeX Warning: Command \textdegree invalid in math mode on input line 348.
-
-Missing character: There is no ° in font cmr12!
-
-LaTeX Warning: Command \textdegree invalid in math mode on input line 348.
+LaTeX Warning: Command \textdegree invalid in math mode on input line 391.
 
 
-LaTeX Warning: Command \textdegree invalid in math mode on input line 348.
+LaTeX Warning: Command \textdegree invalid in math mode on input line 391.
 
 Missing character: There is no ° in font cmr12!
-) [56 <./images/stitch_gcode.png (PNG copy)> <./images/stitch_settings.png (PNG copy)>] [57]
+
+LaTeX Warning: Command \textdegree invalid in math mode on input line 391.
+
+
+LaTeX Warning: Command \textdegree invalid in math mode on input line 391.
+
+Missing character: There is no ° in font cmr12!
+[60 <./images/stitch_gcode.png (PNG copy)> <./images/stitch_settings.png (PNG copy)>]) [61]
 \openout2 = `chap6_tests_conclusion.aux'.
 
  (chap6_tests_conclusion.tex
 Chapitre 5.
-[58
+[62
 
 
 
@@ -1874,7 +1879,7 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `math shift' on input line 87.
 
-[59]
+[63]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `math shift' on input line 102.
@@ -1899,7 +1904,7 @@ LaTeX Warning: Command \textdegree invalid in math mode on input line 127.
 LaTeX Warning: Command \textdegree invalid in math mode on input line 127.
 
 Missing character: There is no ° in font cmr12!
-[60]
+[64]
 
 LaTeX Warning: Command \textdegree invalid in math mode on input line 131.
 
@@ -2023,10 +2028,10 @@ Underfull \hbox (badness 10000) in paragraph at lines 260--260
 []|$\OMS/cmsy/m/n/12 ^^Y
  []
 
-[61] [62] [63]) [64]
+[65] [66] [67]) [68]
 \openout2 = `99_backmatter.aux'.
 
- (99_backmatter.tex [65
+ (99_backmatter.tex [69
 
 
 
@@ -2063,9 +2068,9 @@ Overfull \hbox (40.94514pt too wide) in paragraph at lines 73--73
 []                                   \T1/cmtt/m/n/12 sqrt(JUNCTION_DEVIATION * acceleration[] 
  []
 
-) [66
+) [70
 
-] [67]
+] [71]
 \openout2 = `99_annexe_documentation.aux'.
 
  (99_annexe_documentation.tex
@@ -2113,7 +2118,7 @@ Overfull \hbox (71.8126pt too wide) in paragraph at lines 107--107
 []    \T1/cmtt/m/n/12 xTaskCreatePinnedToCore(taskRealTime, "RTTask",   4096, NULL, 5, NULL, 1);[] 
  []
 
-[68
+[72
 
 
 
@@ -2121,7 +2126,7 @@ Overfull \hbox (71.8126pt too wide) in paragraph at lines 107--107
 ]
 Overfull \vbox (1194.82149pt too high) has occurred while \output is active []
 
- [69]
+ [73]
 Overfull \hbox (12.86368pt too wide) in paragraph at lines 116--116
 |[]\T1/phv/b/n/14.4 (-20) A.1.2 ^^V Al-go-rithme de Ci-né-ma-tique In-verse : \T1/cmtt/m/n/14.4 InvKinematics.cpp| 
  []
@@ -2140,13 +2145,13 @@ Overfull \hbox (10.07768pt too wide) in paragraph at lines 136--136
 []\T1/cmtt/m/n/12 MotorPositions InvKinematics::solve(float x_w, float y_w, float z_w,[] 
  []
 
-[70]
+[74]
 Overfull \vbox (113.48756pt too high) has occurred while \output is active []
 
- [71] [72]
+ [75] [76]
 Overfull \vbox (619.6124pt too high) has occurred while \output is active []
 
- [73]
+ [77]
 
 LaTeX Warning: Command \textdegree invalid in math mode on input line 281.
 
@@ -2175,7 +2180,7 @@ LaTeX Warning: Command \textdegree invalid in math mode on input line 341.
 LaTeX Warning: Command \textdegree invalid in math mode on input line 341.
 
 Missing character: There is no ° in font cmr12!
-[74] [75] [76]
+[78] [79] [80]
 Underfull \hbox (badness 10000) in paragraph at lines 434--434
 []|\T1/phv/m/n/12 (+20) Avant
  []
@@ -2240,26 +2245,26 @@ Underfull \hbox (badness 10000) in paragraph at lines 452--452
 []|\T1/phv/m/n/12 (+20) Remplacement joints
  []
 
-) [77] (main.aux (00_resume_abstract.aux) (00_dedicaces_remerciements.aux) (00_frontmatter.aux) (chap1_introduction.aux) (chap2_revue_litterature.aux) (chap3_conception_mec.aux) (chap4_realisation_mecatro.aux) (chap5_developpement_logiciel.aux) (chap6_tests_conclusion.aux) (99_backmatter.aux) (99_annexe_documentation.aux))
+) [81] (main.aux (00_resume_abstract.aux) (00_dedicaces_remerciements.aux) (00_frontmatter.aux) (chap1_introduction.aux) (chap2_revue_litterature.aux) (chap3_conception_mec.aux) (chap4_realisation_mecatro.aux) (chap5_developpement_logiciel.aux) (chap6_tests_conclusion.aux) (99_backmatter.aux) (99_annexe_documentation.aux))
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: E41DF8B98381F7A68B6F673A63B739E3;40195.
+(rerunfilecheck)             Checksum: ABADA8F4FBE3126D595F309426108837;42293.
  ) 
 Here is how much of TeX's memory you used:
- 76180 strings out of 467871
- 1920600 string characters out of 5415957
- 2787554 words of memory out of 5000000
- 103128 multiletter control sequences out of 15000+600000
- 718544 words of font info for 505 fonts, out of 8000000 for 9000
+ 76274 strings out of 467871
+ 1921870 string characters out of 5415957
+ 2789987 words of memory out of 5000000
+ 103180 multiletter control sequences out of 15000+600000
+ 720461 words of font info for 524 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  84i,19n,104p,1245b,2455s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\PROFESSEUR\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tctt1200.pk> <C:\Users\PROFESSEUR\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ectt1440.pk> <C:\Users\PROFESSEUR\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ectt1000.pk> <C:\Users\PROFESSEUR\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ectt1095.pk> <C:\Users\PROFESSEUR\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcss1200.pk> <C:\Users\PROFESSEUR\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ectt1200.pk><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/fontawesome5/FontAwesome5Free-Solid.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbsy10.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx8.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmib10.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msam10.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvb8a.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvr8a.pfb><C:/Users/PROFESSEUR/AppData/Local/Programs/MiKTeX/fonts/type1/urw/helvetic/uhvro8a.pfb>
-Output written on main.pdf (77 pages, 2535758 bytes).
+Output written on main.pdf (81 pages, 2556784 bytes).
 PDF statistics:
- 1658 PDF objects out of 1728 (max. 8388607)
- 345 named destinations out of 1000 (max. 500000)
- 115453 words of extra memory for PDF output out of 128383 (max. 10000000)
+ 1711 PDF objects out of 1728 (max. 8388607)
+ 359 named destinations out of 1000 (max. 500000)
+ 115493 words of extra memory for PDF output out of 128383 (max. 10000000)
 

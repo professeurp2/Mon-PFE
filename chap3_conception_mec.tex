@@ -301,6 +301,18 @@ L'erreur linéaire correspondante en bout du plateau est alors :
 \end{equation}
 Cette résolution de 4 microns entre parfaitement dans les tolérances exigées de $\pm 0{,}05$ mm.
 
+\subsection{Calibration et Métrologie de la Longueur de Pivot (Pivot Length)}
+La précision de l'algorithme RTCP dépend de la connaissance exacte de la distance $L_{pivot}$ entre le nez de la broche et l'axe de basculement A.
+Une erreur de seulement $0{,}5 \text{ mm}$ sur ce paramètre génère une erreur géométrique cumulée de plusieurs millimètres lors d'une inclinaison à $90^\circ$.
+
+La procédure de calibration retenue pour ce PFE utilise la méthode de la «Master Ball» :
+\begin{enumerate}
+    \item Fixation d'une sphère de référence au centre du plateau B.
+    \item Palpage du centre de la sphère à $A = 0^\circ$ et $A = 90^\circ$.
+    \item Calcul de l'offset résiduel par la formule : $L_{pivot} = \sqrt{(Z_{90} - Z_0)^2 + (Y_{90} - Y_0)^2}$.
+\end{enumerate}
+Cette valeur est ensuite injectée dans les constantes du firmware ESP32 et de l'IHM Forgeron pour assurer une précision sub-millimétrique.
+
 \subsection{Dimensionnement Dynamique du Couple Moteur (Axes A et B)}
 Le moment de renversement de la table, calculé précédemment à $M_{renversement} = 20\text{ Nm}$, dicte le choix du moteur de l'axe A.
 Ce couple extrinsèque s'applique directement sur l'axe de basculement. Grâce au réducteur à courroie crantée fermée (ratio $i = 50$) et en considérant un rendement de transmission $\eta_{trans} = 0{,}9$, le couple de résistance que doit fournir le moteur pour s'opposer au basculement est :

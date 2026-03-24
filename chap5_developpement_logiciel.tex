@@ -193,6 +193,128 @@ En 3D, la rotation d'angle $\theta_B$ autour de l'axe Z transforme le vecteur d'
     Z_{machine} &= Z_{piece} - \Delta Z_{machine}
 \end{align}
 
+\subsection{Fonction RTCP (Rotation Tool Center Point) pour Table-Table}
+Le mode RTCP (identifié par la commande G43.4 dans le standard industriel) est l'intelligence suprême du contrôleur 5 axes. Sur une machine de type \textit{Table-Table}, où la pièce tourne et bascule, tout mouvement angulaire de l'axe A ou B déplace géométriquement la pièce par rapport à l'outil.
+Sans RTCP, l'opérateur devrait recalculer son G-code à chaque changement de position pièce. Avec RTCP, l'ESP32 maintient la pointe de l'outil fixe dans le repère de la pièce en compensant instantanément les axes linéaires :
+
+\begin{equation}
+    \vec{P}_{machine} = \mathbf{R}_A \cdot \mathbf{R}_B \cdot (\vec{P}_{piece} + \vec{L}_{tool}) + \vec{O}_{pivot}
+\end{equation}
+Où $\mathbf{R}_A$ et $\mathbf{R}_B$ sont les matrices de rotation des axes de la table, $\vec{L}_{tool}$ est la longueur compensée de l'outil et $\vec{O}_{pivot}$ est le vecteur d'offset du centre de rotation du berceau. Cette transformation matricielle garantit que le point de contact outil-pièce reste invariant lors des inclinaisons.
+
+\subsection{Gestion des Singularités et Filtrage de Trajectoire}
+Un problème critique survient lorsque l'angle de basculement de l'axe A approche $0^\circ$ (outil aligné avec l'axe de rotation B). Dans cet état de singularité, une infime variation de la position outil peut exiger une rotation infiniment rapide de l'axe B pour maintenir l'orientation. 
+Notre algorithme implémente une zone de garde autour de la singularité :
+\begin{itemize}
+    \item \textbf{Détection :} Si $|\sin(\theta_A)| < \epsilon$ (avec $\epsilon = 0{,}001$), le système entre en mode «Singularity Freeze».
+    \item \textbf{Action :} L'angle $\theta_B$ est maintenu constant et l'erreur d'orientation est absorbée temporairement par les axes linéaires (X, Y) pour éviter tout saut brusque de vitesse du moteur.
+\end{itemize}
+
+\subsection{Diagramme de Flux Fonctionnel de la Transformation 5 Axes}
+Inspiré des architectures industrielles de pointe, le diagramme suivant illustre le cheminement d'un bloc G-Code depuis sa réception jusqu'à la génération des impulsions moteurs.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        node distance=1.5cm,
+        block/.style={rectangle, draw, fill=blue!5, text width=4cm, align=center, minimum height=1cm, rounded corners, font=\small\bfseries},
+        arrow/.style={-Stealth, thick}
+    ]
+        \node [block, fill=orange!10] (input) {Réception G-Code \\ (X, Y, Z, A, B)};
+        \node [block, below of=input] (wcs) {Vérification WCS / Offsets \\ (G54 - G59)};
+        \node [block, right=5cm of wcs, fill=green!10] (rtcp) {Calcul RTCP / IK \\ (Matrice de rotation Table-Table)};
+        \node [block, below of=rtcp] (sing) {Gestion des Singularités \\ (Zone de garde $\epsilon$)};
+        \node [block, below of=sing, fill=red!10] (step) {Step Generator \\ (Firmware Interrupts)};
+
+        \draw [arrow] (input) -- (wcs);
+        \draw [arrow] (wcs) -- (rtcp) node[midway, above, font=\scriptsize] {Toolpath Vector};
+        \draw [arrow] (rtcp) -- (sing);
+        \draw [arrow] (sing) -- (step) node[midway, right, font=\scriptsize] {Mouvements Pulsés};
+        \draw [arrow, dashed] (rtcp.west) .. controls (1, -1) .. (wcs.east) node[near start, below, font=\scriptsize] {Feedback Coord.};
+    \end{tikzpicture}
+    \subsection{Diagramme de Flux Fonctionnel de la Transformation 5 Axes}
+Inspiré des architectures industrielles de pointe (Fig. 8 et 10 du document de référence), le diagramme suivant illustre le cheminement d'un bloc G-Code depuis sa réception jusqu'à la génération des impulsions moteurs à travers la bibliothèque cinématique.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        node distance=1.8cm,
+        block/.style={rectangle, draw, fill=blue!5, text width=4.5cm, align=center, minimum height=1cm, rounded corners, font=\small\bfseries},
+        arrow/.style={-Stealth, thick}
+    ]
+        \node [block, fill=orange!10] (input) {Réception G-Code \\ (Lecture NC Code)};
+        \node [block, below of=input] (rtcp_check) {Test Condition G43.4 \\ (Activation RTCP)};
+        \node [block, right=6cm of rtcp_check, fill=green!10] (cl_data) {Calcul des positions pivots \\ (Interpolation CL Data)};
+        \node [block, below of=cl_data] (ik) {Cinématique Inverse (IK) \\ (Transformation Analytique)};
+        \node [block, below of=ik] (queue) {Motion Queue \\ (Buffer Bloc)};
+        \node [block, below of=queue, fill=red!10] (step) {Step Generator / Servo \\ (Hardware Timer)};
+
+        \draw [arrow] (input) -- (rtcp_check);
+        \draw [arrow] (rtcp_check) -- (cl_data) node[midway, above, font=\scriptsize] {RTCP On};
+        \draw [arrow] (cl_data) -- (ik);
+        \draw [arrow] (ik) -- (queue);
+        \draw [arrow] (queue) -- (step);
+        \draw [arrow] (rtcp_check.west) -- ++(-1,0) |- (input.west) node[near start, left, font=\scriptsize] {Next Block};
+    \end{tikzpicture}
+    \caption{Algorithme d'exécution du RTCP et flux de transformation (Inspiré Fig. 8 et 10)}
+    \label{fig:rtcp_flow}
+\end{figure}
+
+\subsection{Compensation de Rayon d'Outil en 3D (3D Tool Radius Compensation)}
+Dans l'usinage 5 axes de surfaces gauches, le point piloté par le G-code est souvent le point de contact th\'eorique (Cutter Contact - CC) et non le centre de l'outil (Cutter Location - CL). La compensation de rayon 3D (G41.2) permet de d\'ecaler l'outil dynamiquement en fonction de la normale à la surface.
+
+Comme illustré par le diagramme de structure (Fig. 23 du document), le processus se décompose en trois étapes :
+\begin{enumerate}
+    \item \textbf{Interpolation vectorielle :} Calcul du vecteur normal $\vec{n}$ à la surface au point cible.
+    \item \textbf{Calcul de compensation :} Détermination du point CL par rapport au point CC :
+    \begin{equation}
+        \vec{P}_{CL} = \vec{P}_{CC} + R_{outil} \cdot \vec{n} + (\vec{L}_{outil} - R_{outil}) \cdot \vec{u}
+    \end{equation}
+    Où $\vec{u}$ est le vecteur d'orientation de l'outil.
+    \item \textbf{Transformation finale :} Injection du point $P_{CL}$ dans la bibliothèque cinématique inverse (\textit{Kinematic Lib}) pour obtenir les coordonnées (X, Y, Z, A, B) de la machine Table-Table.
+\end{enumerate}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        node distance=2cm,
+        block/.style={rectangle, draw, fill=gray!5, text width=3.5cm, align=center, minimum height=1.2cm, rounded corners, font=\scriptsize\bfseries},
+        subblock/.style={rectangle, draw, dashed, fill=white, text width=2.8cm, align=center, minimum height=0.8cm, font=\tiny},
+        arrow/.style={-Stealth, thick}
+    ]
+        % Task Level
+        \draw[fill=blue!5, rounded corners] (-4.5, 2.5) rectangle (4.5, 4.5);
+        \node at (4, 4.2) {Task Level};
+        \node [block] (interpreter) at (-2, 3.5) {Interpreter};
+        \node [block] (manager) at (2, 3.5) {Cutter Manager \\ (Shape/Radius)};
+
+        % Motion Level
+        \draw[fill=green!5, rounded corners] (-4.5, -3.5) rectangle (4.5, 2);
+        \node at (3.8, 1.7) {Motion Level};
+        
+        \node [block] (interpolator) at (-2, 0) {Rough Interpolator};
+        \node [subblock] (linear) at (-2, 0.4) {Linear Interpolator};
+        \node [subblock] (vector) at (-2, -0.4) {Vector Interpolator};
+        
+        \node [block] (comp) at (2, 0) {Compensation Calculator};
+        \node [block] (kin) at (2, -2.5) {Kinematic Lib (IK)};
+        \node [block] (mqueue) at (-2, -2.5) {Motion Queue};
+
+        % Arrows
+        \draw [arrow] (interpreter) -- (interpolator);
+        \draw [arrow] (manager) -- (comp);
+        \draw [arrow] (interpolator) -- (comp) node[midway, above, font=\tiny] {CC coord.};
+        \draw [arrow] (comp) -- (kin) node[midway, right, font=\tiny] {CL coord.};
+        \draw [arrow] (kin) -- (mqueue);
+        
+        \node [draw, fill=orange!10, below of=mqueue, node distance=1.5cm] (servo) {Motors / Servo};
+        \draw [arrow] (mqueue) -- (servo);
+
+    \end{tikzpicture}
+    \caption{Structure logicielle de l'unité de calcul pour la compensation 3D (Type Trunnion)}
+    \label{fig:3d_comp_structure}
+\end{figure}
+
 % =====================================================
 \section{L'Algorithme «Look-Ahead» et le Profil d'Accélération S-Curve}
 

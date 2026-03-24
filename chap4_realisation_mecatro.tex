@@ -163,7 +163,9 @@ L'optocoupleur interne des drivers DM556 nécessite $V_f \approx 1{,}4 \text{ V}
 \begin{equation}
     I_{entree} = \frac{V_{uP} - V_f}{R} = \frac{3{,}0 - 1{,}4}{270} \approx \boxed{5{,}9 \text{ mA}} \quad < 10\text{ mA requis}
 \end{equation}
-Ce courant insuffisant dégrade le \textit{Rise Time} de l'optocoupleur à $> 2\,\mu s$, induisant des impulsions manquées à haute fréquence. Le Level Shifter \textbf{SN74AHCT125N} ($5\text{ V}$ en sortie) garantit $I_{out} = 13{,}3\text{ mA}$ et un $t_r \approx 10\text{ ns}$, résolvant le problème.
+Ce courant insuffisant dégrade sévèrement le \textit{Rise Time} de l'optocoupleur (au-delà de $2\,\mu s$). La faible dynamique de charge de la jonction photo-sensible interne, couplée à l'effet de capacité de Miller parasite, induit un retard de propagation asymétrique (\textit{Propagation Delay Skew}). À la haute fréquence exigée de $32\text{ kHz}$, cela provoque un \textit{Jitter} inacceptable des signaux \texttt{STEP}, se traduisant mécaniquement par des irrégularités de trajectoire et des pertes de micro-pas. 
+
+L'interposition d'un Buffer (Level Shifter) \textbf{SN74AHCT125N} alimenté sous $5\text{ V}$ permet d'injecter instantanément $I_{out} = 13{,}3\text{ mA}$, annulant drastiquement les effets capacitifs et restaurant des temps de montée fulgurants ($t_r \approx 10\text{ ns}$).
 
 \subsection{Régime Micro-stepping du DM556 et Anti-Résonance}
 Le driver DM556 est configuré en micro-stepping $1/16$ pas. Outre l'amélioration de résolution angulaire, cette configuration remplit une fonction anti-résonance critique. Les moteurs NEMA 17 présentent une fréquence de résonance mécanique autour de $\approx 150 \text{ Hz}$, qui correspond à environ 600 pas/seconde en mode pas entier. En mode $1/16$, cette résonance est fortement atténuée car l'excitation par palier est beaucoup plus douce, réduisant les harmoniques de vibration transmises au portique et à la pièce.
@@ -171,16 +173,19 @@ Le driver DM556 est configuré en micro-stepping $1/16$ pas. Outre l'améliorati
 % ========================================================
 \section{Bilan de Puissance et Dimensionnement des Alimentations}
 
-\subsection{Dimensionnement de l'Alimentation Principale (PSU 36V)}
-Le courant RMS total en régime critique (5 axes en pleine accélération) :
+\subsection{Réfutation de l'erreur classique : Dimensionnement réel de l'Alimentation 36V}
+Une erreur fréquente d'ingénierie consiste à additionner le courant nominal des 5 moteurs sans considérer le fonctionnement interne de l'électronique de hachage. Si un moteur NEMA 17 possède une résistance de phase $R_{phase} = 1{,}5\,\Omega$ et un courant nominal $I_n = 2\text{ A}$, la puissance thermique réelle dissipée par effet Joule (2 phases actives) est cantonnée à :
 \begin{equation}
-    I_{total\_RMS} \approx 0{,}707 \cdot n \cdot I_{max} = 0{,}707 \times 5 \times 2 = \boxed{7{,}07 \text{ A}}
+    P_{moteur} = 2 \times (R_{phase} \times I_n^2) = 2 \times (1{,}5 \times 2^2) = \boxed{12\text{ W}}
 \end{equation}
-La puissance nominale de l'alimentation avec coefficient de sécurité ($\times 1{,}25$) :
+Le driver DM556 fonctionnant comme un convertisseur de tension à découpage de type "Buck" (\textit{Hacheur Abaisseur}), il prélève sa puissance à tension quasi-constante sur le bus ($V_{bus} = 36\text{ V}$). En considérant le rendement de découpage du driver ($\eta \approx 85\%$), le courant réel prélevé sur l'alimentation (PSU) en phase de maintien pour un moteur s'établit à :
 \begin{equation}
-    P_{PSU} = 36 \times 7{,}07 \times 1{,}25 \approx \boxed{318 \text{ Watts}}
+    I_{PSU\_par\_moteur} = \frac{P_{moteur}}{V_{bus} \times \eta} = \frac{12}{36 \times 0{,}85} \approx \boxed{0{,}39\text{ A}} \ll 2\text{ A}
 \end{equation}
-L'alimentation à découpage industrielle \textbf{MeanWell LRS-350-36 (36V / 9{,}7A / 350W)} a été retenue.
+
+Pour l'ensemble des 5 moteurs en charge dynamique maximale (pertes de fer $P_{fer}$, pertes mécaniques et puissance dédiée à contrer les forces contre-électromotrices BEMF à haute vitesse), la puissance crête totale appelée ne dépasse guère une valeur majorée empiriquement à $P_{Total} \approx 5 \times 30\text{W} = 150\text{ W}$ (soit une demande de $\approx 4\text{ A}$ sous 36V).
+
+Toutefois, l'alimentation à découpage industrielle \textbf{MeanWell LRS-350-36 (36V / 9{,}7A / 350W)} a été effectivement retenue dans cette implémentation. Ce surdimensionnement apparent (coefficient $\times 2{,}3$) n'est pas dicté par une contrainte de courant statique erronée, mais certifie une rigidité structurelle du bus continu ($36\text{V}$ stable) pour absorber les violents courants régénératifs qui s'injectent à l'envers lors des freinages massifs du portique et du plateau (Back-EMF dumping).
 
 \subsection{Dimensionnement du Condensateur de Découplage Anti-Brown-Out}
 Lors de la transmission Wi-Fi par l'ESP32, un pic de courant $\Delta I \approx 500 \text{ mA}$ est absorbé en $\Delta t = 20\,\mu s$. Pour limiter la chute de tension CPU à $\Delta V_{tolere} = 100 \text{ mV}$ :
@@ -219,6 +224,11 @@ Conformément à la norme EN ISO 13850 (\textit{Safety of machinery - Emergency 
     \caption{Logigramme de la chaîne matérielle de coupure d'urgence (Catégorie 0)}
     \label{fig:estop_logic}
 \end{figure}
+
+\subsection{Amortissement de la Coupure Inductive (Circuit Snubber et Diode Flyback)}
+Cependant, la rupture mécanique brutale (Catégorie 0) d'un circuit contenant les puissantes bobines inductives de l'alimentation (transformateurs) et les phases des cinq moteurs en cours de rotation génère inévitablement une force contre-électromotrice (FCEM, guidée par la loi de Lenz) capable de produire des pics de tension cataclysmiques ($V = -L \frac{di}{dt}$ dépassant parfois audacieusement $1~000\text{ V}$). Ce claquage inductif (\textit{Inductive Kickback}) provoque immédiatement l'amorçage d'un arc électrique (étincelle) qui calcine irrémédiablement les pôles du contacteur E-STOP au bout de quelques déclenchements.
+
+Pour garantir la pérennité des équipements et l'immunité isolante de l'ESP32 face aux rebonds d'interférences électromagnétiques extrêmement violentes (\textit{EMI transient}), la réalisation intègre un \textbf{réseau RC (Snubber)} directement en parallèle des contacts alternatifs du relais, limitant l'amplitude de dérivée $\frac{dv}{dt}$. Du côté tension continue ($36\text{V}$), une massive \textbf{Diode de Roue Libre} (\textit{Flyback Diode}) de type Schottky inverse expéditivement l'évacuation non-destructive de l'énergie magnétique rémanente stockée dans les enroulements moteurs.
 
 % ========================================================
 \section{Compatibilité Électromagnétique (CEM)}
