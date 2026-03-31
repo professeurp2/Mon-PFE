@@ -1,0 +1,116 @@
+\relax 
+\providecommand\zref@newlabel[2]{}
+\providecommand\hyper@newdestlabel[2]{}
+\@writefile{toc}{\contentsline {chapter}{\numberline {4}Développement Logiciel, Modélisation UML et Cinématique}{51}{chapter.4}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\newlabel{chap:logiciel}{{4}{51}{Développement Logiciel, Modélisation UML et Cinématique}{chapter.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.1}Architecture Générale du Logiciel}{51}{section.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1.1}Diagramme de Composants UML}{51}{subsection.4.1.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.1}{\ignorespaces Diagramme de Composants UML -- Architecture générale du logiciel CNC 5 axes}}{52}{figure.caption.26}\protected@file@percent }
+\newlabel{fig:uml_components}{{4.1}{52}{Diagramme de Composants UML -- Architecture générale du logiciel CNC 5 axes}{figure.caption.26}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.2}Modélisation du Firmware ESP32 (UML)}{52}{section.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2.1}Diagramme de Machine à États (FSM) -- Machine à États Finis}{52}{subsection.4.2.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.2}{\ignorespaces Diagramme de Machine à États Finis (FSM) du firmware ESP32 avec ses 5 états nominaux}}{52}{figure.caption.27}\protected@file@percent }
+\newlabel{fig:fsm_firmware}{{4.2}{52}{Diagramme de Machine à États Finis (FSM) du firmware ESP32 avec ses 5 états nominaux}{figure.caption.27}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2.2}Diagramme de Classes UML -- Firmware}{53}{subsection.4.2.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.3}{\ignorespaces Diagramme de Classes simplifié du firmware ESP32 (4 classes principales)}}{53}{figure.caption.28}\protected@file@percent }
+\newlabel{fig:uml_classes_fw}{{4.3}{53}{Diagramme de Classes simplifié du firmware ESP32 (4 classes principales)}{figure.caption.28}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.3}Cinématique Inverse de la Configuration Trunnion}{53}{section.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3.1}Système de Coordonnées et Paramètres de Denavit-Hartenberg}{53}{subsection.4.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3.2}Algorithme de Résolution (Cinématique Inverse Analytique)}{53}{subsection.4.3.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4.1}{\ignorespaces Paramètres de Denavit-Hartenberg de la configuration Trunnion (Axes A et B)}}{54}{table.caption.29}\protected@file@percent }
+\newlabel{tab:dh_params}{{4.1}{54}{Paramètres de Denavit-Hartenberg de la configuration Trunnion (Axes A et B)}{table.caption.29}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3.3}Fonction RTCP (Rotation Tool Center Point) pour Table-Table}{54}{subsection.4.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3.4}Gestion des Singularités et Filtrage de Trajectoire}{55}{subsection.4.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3.5}Diagramme de Flux Fonctionnel de la Transformation 5 Axes}{55}{subsection.4.3.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3.6}Compensation de Rayon d'Outil en 3D (3D Tool Radius Compensation)}{55}{subsection.4.3.6}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.4}{\ignorespaces Algorithme d'exécution du RTCP et flux de transformation (Inspiré Fig. 8 et 10)}}{56}{figure.caption.30}\protected@file@percent }
+\newlabel{fig:rtcp_flow}{{4.4}{56}{Algorithme d'exécution du RTCP et flux de transformation (Inspiré Fig. 8 et 10)}{figure.caption.30}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.4}L'Algorithme «Look-Ahead» et le Profil d'Accélération S-Curve}{56}{section.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4.1}Limitations du Profil Trapézoïdal}{56}{subsection.4.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4.2}Le Profil S-Curve (Jerk Limité)}{56}{subsection.4.4.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.5}{\ignorespaces Structure logicielle de l'unité de calcul pour la compensation 3D (Type Trunnion)}}{57}{figure.caption.31}\protected@file@percent }
+\newlabel{fig:3d_comp_structure}{{4.5}{57}{Structure logicielle de l'unité de calcul pour la compensation 3D (Type Trunnion)}{figure.caption.31}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4.2}{\ignorespaces Les 7 phases cinématiques du profil de déplacement en S-Curve}}{57}{table.caption.32}\protected@file@percent }
+\newlabel{tab:s_curve_phases}{{4.2}{57}{Les 7 phases cinématiques du profil de déplacement en S-Curve}{table.caption.32}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4.3}La Fenêtre «Look-Ahead» (Planification Anticipative)}{57}{subsection.4.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.5}Modélisation UML de l'Application Flutter (IHM)}{58}{section.4.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5.1}Architecture Provider / Notifier (Riverpod)}{58}{subsection.4.5.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.6}{\ignorespaces Architecture en 3 couches de l'IHM Flutter avec Riverpod}}{58}{figure.caption.33}\protected@file@percent }
+\newlabel{fig:flutter_archi}{{4.6}{58}{Architecture en 3 couches de l'IHM Flutter avec Riverpod}{figure.caption.33}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5.2}Diagramme de Séquence UML : Envoi d'une commande Jog}{58}{subsection.4.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.6}Interfaces Utilisateurs (Générées via Google Stitch)}{58}{section.4.6}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.7}{\ignorespaces Flux de données pour une commande Jog depuis l'IHM Flutter jusqu'aux moteurs}}{59}{figure.caption.34}\protected@file@percent }
+\newlabel{fig:seq_jog}{{4.7}{59}{Flux de données pour une commande Jog depuis l'IHM Flutter jusqu'aux moteurs}{figure.caption.34}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.6.1}Écran Principal (Dashboard)}{59}{subsection.4.6.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.6.2}Écran de Contrôle Manuel (Jog)}{59}{subsection.4.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.6.3}Éditeur G-Code et Paramètres Machine}{59}{subsection.4.6.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.8}{\ignorespaces Interface de l'Application : Tableau de Bord (Dashboard Principal)}}{60}{figure.caption.35}\protected@file@percent }
+\newlabel{fig:stitch_dashboard}{{4.8}{60}{Interface de l'Application : Tableau de Bord (Dashboard Principal)}{figure.caption.35}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.9}{\ignorespaces Interface de l'Application : Écran de Contrôle Manuel (Jog Panel)}}{60}{figure.caption.36}\protected@file@percent }
+\newlabel{fig:stitch_jog}{{4.9}{60}{Interface de l'Application : Écran de Contrôle Manuel (Jog Panel)}{figure.caption.36}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.10}{\ignorespaces Interface : Éditeur de G-Code}}{61}{figure.caption.37}\protected@file@percent }
+\newlabel{fig:stitch_gcode}{{4.10}{61}{Interface : Éditeur de G-Code}{figure.caption.37}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.11}{\ignorespaces Interface : Écran des Paramètres}}{61}{figure.caption.37}\protected@file@percent }
+\newlabel{fig:stitch_settings}{{4.11}{61}{Interface : Écran des Paramètres}{figure.caption.37}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.7}Sécurité du Code Embarqué}{61}{section.4.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.7.1}Validation des Entrées (Input Sanitization)}{61}{subsection.4.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.7.2}Protection contre les Débordements (MISRA-C Guidelines)}{61}{subsection.4.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.7.3}Intégrité des Communications (Checksum)}{61}{subsection.4.7.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.8}Conclusion du Chapitre Logiciel}{62}{section.4.8}\protected@file@percent }
+\@setckpt{chap5_developpement_logiciel}{
+\setcounter{page}{63}
+\setcounter{equation}{10}
+\setcounter{enumi}{9}
+\setcounter{enumii}{0}
+\setcounter{enumiii}{0}
+\setcounter{enumiv}{0}
+\setcounter{footnote}{0}
+\setcounter{mpfootnote}{0}
+\setcounter{part}{0}
+\setcounter{chapter}{4}
+\setcounter{section}{8}
+\setcounter{subsection}{0}
+\setcounter{subsubsection}{0}
+\setcounter{paragraph}{0}
+\setcounter{subparagraph}{0}
+\setcounter{figure}{11}
+\setcounter{table}{2}
+\setcounter{parentequation}{0}
+\setcounter{LT@tables}{1}
+\setcounter{LT@chunks}{4}
+\setcounter{tcbbreakpart}{1}
+\setcounter{tcblayer}{0}
+\setcounter{tcolorbox@number}{5}
+\setcounter{tcbrastercolumn}{1}
+\setcounter{tcbrasterrow}{1}
+\setcounter{tcbrasternum}{1}
+\setcounter{tcbraster}{0}
+\setcounter{lstnumber}{1}
+\setcounter{tcblisting}{0}
+\setcounter{lofdepth}{1}
+\setcounter{lotdepth}{1}
+\setcounter{section@level}{0}
+\setcounter{Item}{30}
+\setcounter{Hfootnote}{0}
+\setcounter{bookmark@seq@number}{108}
+\setcounter{preinst}{0}
+\setcounter{instnum}{0}
+\setcounter{threadnum}{0}
+\setcounter{seqlevel}{0}
+\setcounter{callevel}{0}
+\setcounter{callselflevel}{0}
+\setcounter{blocklevel}{0}
+\setcounter{caption@flags}{2}
+\setcounter{continuedfloat}{0}
+\setcounter{subfigure}{0}
+\setcounter{subtable}{0}
+\setcounter{float@type}{16}
+\setcounter{mdf@globalstyle@cnt}{0}
+\setcounter{mdfcountframes}{0}
+\setcounter{mdf@env@i}{0}
+\setcounter{mdf@env@ii}{0}
+\setcounter{mdf@zref@counter}{0}
+\setcounter{lstlisting}{0}
+}
