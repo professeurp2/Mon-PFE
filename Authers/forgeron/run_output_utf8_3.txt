@@ -1,0 +1,252 @@
+﻿Launching lib\main.dart on Chrome in debug mode...
+Waiting for connection from debug service on Chrome...          
+flutter : 
+lib/presentation/screens/jog_screen.dart:233:131: 
+Error: Too many positional arguments: 0 allowed, 
+but 1 found.
+Au caractère Ligne:1 : 1
++ flutter run -d chrome --web-port 8085 
+--web-hostname localhost > run_ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (lib/pr 
+   esentatio...d, but 1 found.:String) [], RemoteE  
+  xception
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Try removing the extra positional arguments.
+        if (horizontal && label.startsWith('X-')) 
+const Icon(Icons.chevron_left, color: 
+AppColors.textPrimary) else const SizedBox(0),
+                                                    
+                                      ^
+/C:/src/flutter/packages/flutter/lib/src/widgets/bas
+ic.dart:2679:9: Context: Found this candidate, but 
+the arguments don't match.
+  const SizedBox({super.key, this.width, 
+this.height, super.child});
+        ^^^^^^^^
+lib/presentation/screens/jog_screen.dart:234:95: 
+Error: Too many positional arguments: 0 allowed, 
+but 1 found.
+Try removing the extra positional arguments.
+        if (horizontal && label.startsWith('X-')) 
+const SizedBox(width: 8) else const SizedBox(0),
+                                                    
+                                      ^
+/C:/src/flutter/packages/flutter/lib/src/widgets/bas
+ic.dart:2679:9: Context: Found this candidate, but 
+the arguments don't match.
+  const SizedBox({super.key, this.width, 
+this.height, super.child});
+        ^^^^^^^^
+lib/presentation/screens/jog_screen.dart:239:165: 
+Error: Too many positional arguments: 0 allowed, 
+but 1 found.
+Try removing the extra positional arguments.
+            if (!horizontal && 
+label.startsWith('Y+')) const Text('Y+', style: 
+TextStyle(color: AppColors.primary, fontWeight: 
+FontWeight.bold)) else const SizedBox(0),
+                                                    
+                                      ^
+/C:/src/flutter/packages/flutter/lib/src/widgets/bas
+ic.dart:2679:9: Context: Found this candidate, but 
+the arguments don't match.
+  const SizedBox({super.key, this.width, 
+this.height, super.child});
+        ^^^^^^^^
+lib/presentation/screens/jog_screen.dart:240:101: 
+Error: Too many positional arguments: 0 allowed, 
+but 1 found.
+Try removing the extra positional arguments.
+            if (!horizontal && 
+label.startsWith('Y+')) const SizedBox(height: 4) 
+else const SizedBox(0),
+                                                    
+                                      ^
+/C:/src/flutter/packages/flutter/lib/src/widgets/bas
+ic.dart:2679:9: Context: Found this candidate, but 
+the arguments don't match.
+  const SizedBox({super.key, this.width, 
+this.height, super.child});
+        ^^^^^^^^
+lib/presentation/screens/jog_screen.dart:241:90: 
+Error: Too many positional arguments: 0 allowed, 
+but 1 found.
+Try removing the extra positional arguments.
+            if (!horizontal) Icon(icon, color: 
+AppColors.textPrimary) else const SizedBox(0),
+                                                    
+                                     ^
+/C:/src/flutter/packages/flutter/lib/src/widgets/bas
+ic.dart:2679:9: Context: Found this candidate, but 
+the arguments don't match.
+  const SizedBox({super.key, this.width, 
+this.height, super.child});
+        ^^^^^^^^
+lib/presentation/screens/jog_screen.dart:243:164: 
+Error: Too many positional arguments: 0 allowed, 
+but 1 found.
+Try removing the extra positional arguments.
+            if (horizontal && 
+label.startsWith('X-')) const Text('X-', style: 
+TextStyle(color: AppColors.primary, fontWeight: 
+FontWeight.bold)) else const SizedBox(0),
+                                                    
+                                      ^
+/C:/src/flutter/packages/flutter/lib/src/widgets/bas
+ic.dart:2679:9: Context: Found this candidate, but 
+the arguments don't match.
+  const SizedBox({super.key, this.width, 
+this.height, super.child});
+        ^^^^^^^^
+lib/presentation/screens/jog_screen.dart:244:164: 
+Error: Too many positional arguments: 0 allowed, 
+but 1 found.
+Try removing the extra positional arguments.
+            if (horizontal && 
+label.startsWith('X+')) const Text('X+', style: 
+TextStyle(color: AppColors.primary, fontWeight: 
+FontWeight.bold)) else const SizedBox(0),
+                                                    
+                                      ^
+/C:/src/flutter/packages/flutter/lib/src/widgets/bas
+ic.dart:2679:9: Context: Found this candidate, but 
+the arguments don't match.
+  const SizedBox({super.key, this.width, 
+this.height, super.child});
+        ^^^^^^^^
+lib/presentation/screens/jog_screen.dart:246:101: 
+Error: Too many positional arguments: 0 allowed, 
+but 1 found.
+Try removing the extra positional arguments.
+            if (!horizontal && 
+label.startsWith('Y-')) const SizedBox(height: 4) 
+else const SizedBox(0),
+                                                    
+                                      ^
+/C:/src/flutter/packages/flutter/lib/src/widgets/bas
+ic.dart:2679:9: Context: Found this candidate, but 
+the arguments don't match.
+  const SizedBox({super.key, this.width, 
+this.height, super.child});
+        ^^^^^^^^
+lib/presentation/screens/jog_screen.dart:247:165: 
+Error: Too many positional arguments: 0 allowed, 
+but 1 found.
+Try removing the extra positional arguments.
+            if (!horizontal && 
+label.startsWith('Y-')) const Text('Y-', style: 
+TextStyle(color: AppColors.primary, fontWeight: 
+FontWeight.bold)) else const SizedBox(0),
+                                                    
+                                      ^
+/C:/src/flutter/packages/flutter/lib/src/widgets/bas
+ic.dart:2679:9: Context: Found this candidate, but 
+the arguments don't match.
+  const SizedBox({super.key, this.width, 
+this.height, super.child});
+        ^^^^^^^^
+lib/presentation/screens/jog_screen.dart:251:95: 
+Error: Too many positional arguments: 0 allowed, 
+but 1 found.
+Try removing the extra positional arguments.
+        if (horizontal && label.startsWith('X+')) 
+const SizedBox(width: 8) else const SizedBox(0),
+                                                    
+                                      ^
+/C:/src/flutter/packages/flutter/lib/src/widgets/bas
+ic.dart:2679:9: Context: Found this candidate, but 
+the arguments don't match.
+  const SizedBox({super.key, this.width, 
+this.height, super.child});
+        ^^^^^^^^
+lib/presentation/screens/jog_screen.dart:252:132: 
+Error: Too many positional arguments: 0 allowed, 
+but 1 found.
+Try removing the extra positional arguments.
+        if (horizontal && label.startsWith('X+')) 
+const Icon(Icons.chevron_right, color: 
+AppColors.textPrimary) else const SizedBox(0),
+                                                    
+                                      ^
+/C:/src/flutter/packages/flutter/lib/src/widgets/bas
+ic.dart:2679:9: Context: Found this candidate, but 
+the arguments don't match.
+  const SizedBox({super.key, this.width, 
+this.height, super.child});
+        ^^^^^^^^
+lib/presentation/screens/gcode_screen.dart:104:359: 
+Error: Method invocation is not a constant 
+expression.
+                    const Row(children: 
+[Icon(Icons.circle, color: AppColors.success, size: 
+8), SizedBox(width: 8), Text('VALIDATION', style: 
+TextStyle(color: AppColors.textPrimary, fontWeight: 
+FontWeight.bold, letterSpacing: 1.5)), Spacer(), 
+Container(padding: EdgeInsets.symmetric(horizontal: 
+6, vertical: 2), decoration: BoxDecoration(color: 
+Colors.green.withOpacity(0.2), borderRadius: 
+BorderRadius.circular(2)), child: Row(children: 
+[Icon(Icons.check, color: AppColors.success, size: 
+10), SizedBox(width: 4), Text('SUCC├êS', style: 
+TextStyle(color: AppColors.success, fontSize: 10, 
+fontWeight: FontWeight.bold))]))]),
+                                                    
+                                      ^^^^^^^^^^^
+lib/presentation/screens/gcode_screen.dart:104:404: 
+Error: Cannot invoke a non-'const' constructor 
+where a const expression is expected.
+Try using a constructor or factory that is 'const'.
+                    const Row(children: 
+[Icon(Icons.circle, color: AppColors.success, size: 
+8), SizedBox(width: 8), Text('VALIDATION', style: 
+TextStyle(color: AppColors.textPrimary, fontWeight: 
+FontWeight.bold, letterSpacing: 1.5)), Spacer(), 
+Container(padding: EdgeInsets.symmetric(horizontal: 
+6, vertical: 2), decoration: BoxDecoration(color: 
+Colors.green.withOpacity(0.2), borderRadius: 
+BorderRadius.circular(2)), child: Row(children: 
+[Icon(Icons.check, color: AppColors.success, size: 
+10), SizedBox(width: 4), Text('SUCC├êS', style: 
+TextStyle(color: AppColors.success, fontSize: 10, 
+fontWeight: FontWeight.bold))]))]),
+                                                    
+                                      ^^^^^^^^
+lib/presentation/screens/gcode_screen.dart:104:244: 
+Error: Cannot invoke a non-'const' constructor 
+where a const expression is expected.
+Try using a constructor or factory that is 'const'.
+                    const Row(children: 
+[Icon(Icons.circle, color: AppColors.success, size: 
+8), SizedBox(width: 8), Text('VALIDATION', style: 
+TextStyle(color: AppColors.textPrimary, fontWeight: 
+FontWeight.bold, letterSpacing: 1.5)), Spacer(), 
+Container(padding: EdgeInsets.symmetric(horizontal: 
+6, vertical: 2), decoration: BoxDecoration(color: 
+Colors.green.withOpacity(0.2), borderRadius: 
+BorderRadius.circular(2)), child: Row(children: 
+[Icon(Icons.check, color: AppColors.success, size: 
+10), SizedBox(width: 4), Text('SUCC├êS', style: 
+TextStyle(color: AppColors.success, fontSize: 10, 
+fontWeight: FontWeight.bold))]))]),
+                                                    
+                                      ^^^^^^^^^
+lib/presentation/screens/gcode_screen.dart:141:57: 
+Error: Cannot invoke a non-'const' constructor 
+where a const expression is expected.
+Try using a constructor or factory that is 'const'.
+                   Positioned(top: 16, left: 16, 
+child: Container(padding: EdgeInsets.all(8), color: 
+AppColors.sidebar, child: 
+Column(crossAxisAlignment: 
+CrossAxisAlignment.start, children: [Text('VIEW: 
+ORTHOGRAPHIC', style: TextStyle(color: 
+AppColors.primary, fontSize: 8)), Text('ZOOM: 
+1.4X', style: TextStyle(color: 
+AppColors.textSecondary, fontSize: 8))]))),
+                                                    
+    ^^^^^^^^^
+Waiting for connection from debug service on Chrome...             30,5s
+Failed to compile application.

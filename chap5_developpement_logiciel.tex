@@ -210,28 +210,7 @@ Notre algorithme implémente une zone de garde autour de la singularité :
     \item \textbf{Action :} L'angle $\theta_B$ est maintenu constant et l'erreur d'orientation est absorbée temporairement par les axes linéaires (X, Y) pour éviter tout saut brusque de vitesse du moteur.
 \end{itemize}
 
-\subsection{Diagramme de Flux Fonctionnel de la Transformation 5 Axes}
-Inspiré des architectures industrielles de pointe, le diagramme suivant illustre le cheminement d'un bloc G-Code depuis sa réception jusqu'à la génération des impulsions moteurs.
 
-\begin{figure}[htbp]
-    \centering
-    \begin{tikzpicture}[
-        node distance=1.5cm,
-        block/.style={rectangle, draw, fill=blue!5, text width=4cm, align=center, minimum height=1cm, rounded corners, font=\small\bfseries},
-        arrow/.style={-Stealth, thick}
-    ]
-        \node [block, fill=orange!10] (input) {Réception G-Code \\ (X, Y, Z, A, B)};
-        \node [block, below of=input] (wcs) {Vérification WCS / Offsets \\ (G54 - G59)};
-        \node [block, right=5cm of wcs, fill=green!10] (rtcp) {Calcul RTCP / IK \\ (Matrice de rotation Table-Table)};
-        \node [block, below of=rtcp] (sing) {Gestion des Singularités \\ (Zone de garde $\epsilon$)};
-        \node [block, below of=sing, fill=red!10] (step) {Step Generator \\ (Firmware Interrupts)};
-
-        \draw [arrow] (input) -- (wcs);
-        \draw [arrow] (wcs) -- (rtcp) node[midway, above, font=\scriptsize] {Toolpath Vector};
-        \draw [arrow] (rtcp) -- (sing);
-        \draw [arrow] (sing) -- (step) node[midway, right, font=\scriptsize] {Mouvements Pulsés};
-        \draw [arrow, dashed] (rtcp.west) .. controls (1, -1) .. (wcs.east) node[near start, below, font=\scriptsize] {Feedback Coord.};
-    \end{tikzpicture}
     \subsection{Diagramme de Flux Fonctionnel de la Transformation 5 Axes}
 Inspiré des architectures industrielles de pointe (Fig. 8 et 10 du document de référence), le diagramme suivant illustre le cheminement d'un bloc G-Code depuis sa réception jusqu'à la génération des impulsions moteurs à travers la bibliothèque cinématique.
 

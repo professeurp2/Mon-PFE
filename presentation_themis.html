@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Soutenance PFE - CNC 5 Axes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reset.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@600;700&display=swap');
+
+        /* Theme CNC THEMIS */
+        body {
+            background-color: #090e1c;
+        }
+        .reveal .slide-background {
+            background-color: #090e1c; 
+            background-image: radial-gradient(circle at center, #111a33 0%, #090e1c 100%);
+        }
+        .reveal {
+            font-family: 'Inter', sans-serif;
+            color: #ffffff;
+        }
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+            color: #6dddff;
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(109, 221, 255, 0.3);
+        }
+        .reveal section img {
+            border: 1px solid rgba(109, 221, 255, 0.2);
+            box-shadow: 0 0 20px rgba(109, 221, 255, 0.1);
+            border-radius: 8px;
+            background: rgba(0,0,0,0.5);
+            margin: 15px 0;
+            max-height: 400px;
+        }
+        .highlight { color: #6dddff; font-weight: bold; }
+        .accent { color: #ff4d4d; }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .glass-panel ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .glass-panel li {
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        
+        .flex-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            margin-top: 30px;
+        }
+        .col-50 {
+            width: 50%;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- Slide 1 : Titre -->
+            <section data-transition="zoom">
+                <img src="images/eni_abt_view.png" alt="ENI-ABT Logo" style="height: 100px; border:none; box-shadow:none; background:transparent;">
+                <h2 style="font-size: 1.6em; margin-top:20px;">Contrôleur CNC 5 Axes Open-Source</h2>
+                <h4 style="font-size: 1em; color:white; letter-spacing: 0px;">Projet de Fin d'Études (PFE) -- ENI-ABT</h4>
+                
+                <div style="margin-top: 50px; display: flex; justify-content: space-around; font-size: 0.6em; color: #aaa;">
+                    <div><strong>Auteur :</strong><br>Votre Nom</div>
+                    <div><strong>Encadrants :</strong><br>Pr. Nom 1<br>Pr. Nom 2</div>
+                </div>
+            </section>
+
+            <!-- Slide 2 : Contexte -->
+            <section data-transition="slide">
+                <h3><span class="highlight">Contexte</span> & Enjeux</h3>
+                <div class="glass-panel" style="font-size: 0.8em; text-align: left;">
+                    <ul>
+                        <li class="fragment fade-right"><strong>Usinage de Surfaces Gauches :</strong> Indispensable pour l'Aéronautique et le Médical (Prothèses).</li>
+                        <li class="fragment fade-right"><strong>Défi Technologique :</strong> Complexité de la cinématique inverse 5 axes (RTCP).</li>
+                        <li class="fragment fade-right"><strong>Enjeu National :</strong> Souveraineté industrielle et réduction des coûts (Alternative Open-Source).</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 3 : Mécanique -->
+            <section data-transition="convex">
+                <section>
+                    <h3>Architecture <span class="highlight">Trunnion</span></h3>
+                    <p style="font-size: 0.7em; color: #ccc;">Configuration à berceau basculant pour rigidité optimale</p>
+                    
+                    <div class="flex-container">
+                        <div class="col-50" style="font-size: 0.6em;">
+                            <div class="fragment fade-up glass-panel" style="padding:15px; margin-bottom:15px;">
+                                <strong class="highlight">Axes Linéaires (X, Y, Z)</strong><br>
+                                Rails HGR15 & Vis à billes SFU1605 (Zéro backlash)
+                            </div>
+                            <div class="fragment fade-up glass-panel" style="padding:15px;">
+                                <strong class="highlight">Axes Rotatifs (A, B)</strong><br>
+                                Basculement (A: ±90°) et Rotation continue (B: 360°)
+                            </div>
+                        </div>
+                        <div class="col-50">
+                            <img class="fragment zoom-in" src="images/img_tech_trunnion.jpg" alt="Trunnion" style="width: 100%;">
+                        </div>
+                    </div>
+                    <p class="fragment fade-up" style="font-size: 0.4em; color: #666; margin-top: 20px;">(Appuyez sur la touche BAs ⬇️ pour voir l'analyse RDM)</p>
+                </section>
+
+                <section>
+                    <h3>Dimensionnement <span class="highlight">RDM</span></h3>
+                    <p style="font-size: 0.7em;">Validation de la structure sous la charge de coupe (300W)</p>
+                    <img src="images/cnc_rigidite_a_1774347645560.png" alt="Simulation Rigidité" style="max-height: 450px;">
+                </section>
+            </section>
+
+            <!-- Slide 4 : Électronique -->
+            <section data-transition="slide">
+                <h3>Cœur de Contrôle : <span class="highlight">ESP32</span></h3>
+                
+                <div class="flex-container">
+                    <div class="col-50 glass-panel" style="font-size: 0.6em;">
+                        <ul>
+                            <li class="fragment fade-in"><strong>Microcontrôleur :</strong> ESP32 Dual-Core 240MHz.</li>
+                            <li class="fragment fade-in"><strong>Puissance :</strong> Drivers DM556 ultra-stables.</li>
+                            <li class="fragment fade-in"><strong>Sécurité :</strong> Isolation par SN74AHCT125N (Level Shifter 3.3V $\rightarrow$ 5V).</li>
+                        </ul>
+                    </div>
+                    <div class="col-50">
+                        <img class="fragment fade-left" src="images/img_tech_courroie.jpg" alt="Composants">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 5 : Logiciel / Algorithmes -->
+            <section data-transition="zoom">
+                <h3>Intelligence <span class="highlight">Algorithmique</span></h3>
+                
+                <div class="glass-panel fragment fade-up" style="font-size: 0.7em; margin-bottom: 20px; text-align:center;">
+                    <strong class="highlight">RTCP (Rotation Tool Center Point - G43.4)</strong><br>
+                    <span style="font-size: 0.8em; color: #ccc;">Maintient le contact outil-pièce invariant pendant la rotation du berceau.</span>
+                </div>
+                
+                <div class="glass-panel fragment fade-up" style="font-size: 0.7em; text-align:center;">
+                    <strong class="highlight">Profil S-Curve & Look-Ahead</strong><br>
+                    <span style="font-size: 0.8em; color: #ccc;">Anticipation de 24 blocs pour éliminer le Jerk (vibrations) et générer des surfaces lisses.</span>
+                </div>
+            </section>
+
+            <!-- Slide 6 : Interface Homme Machine (IHM) -->
+            <section data-transition="convex">
+                <section>
+                    <h3>Dashboard <span class="highlight">Flutter</span></h3>
+                    <p style="font-size: 0.7em;">Architecture logicielle réactive avec Riverpod et UDP</p>
+                    <img class="fragment zoom-in" src="images/stitch_dashboard.png" alt="Dashboard Themis">
+                </section>
+
+                <section>
+                    <h3>Contrôle & <span class="highlight">G-Code</span></h3>
+                    <div class="flex-container">
+                        <div class="col-50">
+                            <p style="font-size: 0.6em;">Panneau Jog Haute Précision</p>
+                            <img src="images/stitch_jog.png" alt="Jog Screen">
+                        </div>
+                        <div class="col-50">
+                            <p style="font-size: 0.6em;">Éditeur G-Code Analytique</p>
+                            <img src="images/stitch_gcode.png" alt="G-Code Screen">
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Slide 7 : Conclusion -->
+            <section data-transition="slide" data-background-color="#050812">
+                <h2>Résultats & <span class="highlight">Perspectives</span></h2>
+                
+                <div class="flex-container" style="align-items: flex-start;">
+                    <div class="col-50 glass-panel" style="font-size: 0.6em;">
+                        <span style="color: #4ade80; font-size: 1.5em;">✓</span> <strong>Réalisé :</strong>
+                        <ul style="margin-top: 10px; color: #ccc;">
+                            <li>Prototype fonctionnel 5 axes.</li>
+                            <li>Firmware C++ RTCP temps-réel.</li>
+                            <li>IHM Flutter industrielle.</li>
+                        </ul>
+                    </div>
+                    <div class="col-50 glass-panel" style="font-size: 0.6em;">
+                        <span style="color: #6dddff; font-size: 1.5em;">🚀</span> <strong>Avenir :</strong>
+                        <ul style="margin-top: 10px; color: #ccc;">
+                            <li>Intégration Visualiseur 3D.</li>
+                            <li>Boucle fermée (Codeurs optiques).</li>
+                            <li>Tests d'usinage sur métaux durs.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section data-transition="zoom" data-background-image="images/img_tech_broche.jpg" data-background-opacity="0.3">
+                <h1 style="font-size: 3em; text-shadow: 0 0 20px #000;">Merci</h1>
+                <h3 style="color: white; text-transform:none;">Avez-vous des questions ?</h3>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.js"></script>
+    <script>
+        Reveal.initialize({
+            controls: true,
+            progress: true,
+            center: true,
+            hash: true,
+            transition: 'slide',
+            backgroundTransition: 'fade'
+        });
+    </script>
+</body>
+</html>
