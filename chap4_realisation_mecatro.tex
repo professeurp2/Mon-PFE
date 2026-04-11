@@ -44,6 +44,13 @@ Raspberry Pi 4 + FPGA & 1,8 GHz & 4 & Linux RT & 40 & Trop complexe, OS non-dét
 
 \textbf{La solution 32 bits, Modèle ESP32 :} L'Espressif ESP32-WROOM-32U a été sélectionné pour sa structure Xtensa Dual-Core à 240 MHz (cycle machine $\approx 4 \text{ ns}$). Sa capacité à exécuter nativement FreeRTOS et à intégrer le Wi-Fi sur puce en fait la solution idéale.
 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/esp32_devboard.jpg}
+    \caption{Carte de développement ESP32-WROOM-32U (Dual-Core 240 MHz, Wi-Fi intégré) utilisée comme contrôleur principal}
+    \label{fig:esp32_board}
+\end{figure}
+
 \subsection{Allocation Mémoire et Tâches (FreeRTOS)}
 Grâce à l'API système d'Espressif (\texttt{xTaskCreatePinnedToCore}), l'architecture a été scindée physiquement entre les deux cœurs :
 
@@ -168,6 +175,26 @@ Ce courant insuffisant dégrade sévèrement le \textit{Rise Time} de l'optocoup
 L'interposition d'un Buffer (Level Shifter) \textbf{SN74AHCT125N} alimenté sous $5\text{ V}$ permet d'injecter instantanément $I_{out} = 13{,}3\text{ mA}$, annulant drastiquement les effets capacitifs et restaurant des temps de montée fulgurants ($t_r \approx 10\text{ ns}$).
 
 \subsection{Régime Micro-stepping du DM556 et Anti-Résonance}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.45\textwidth]{images/nema17_motor.jpg}
+    \hfill
+    \includegraphics[width=0.45\textwidth]{images/dm556_driver.jpg}
+    \\
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \small (a) Moteur pas-à-pas NEMA 17 (2A, 1.8°/pas)
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \small (b) Driver DM556 (micro-stepping 1/16, 36V max)
+    \end{minipage}
+    \caption{Actionneurs et drivers de puissance pour les 5 axes}
+    \label{fig:moteurs_drivers}
+\end{figure}
+
 Le driver DM556 est configuré en micro-stepping $1/16$ pas. Outre l'amélioration de résolution angulaire, cette configuration remplit une fonction anti-résonance critique. Les moteurs NEMA 17 présentent une fréquence de résonance mécanique autour de $\approx 150 \text{ Hz}$, qui correspond à environ 600 pas/seconde en mode pas entier. En mode $1/16$, cette résonance est fortement atténuée car l'excitation par palier est beaucoup plus douce, réduisant les harmoniques de vibration transmises au portique et à la pièce.
 
 % ========================================================
