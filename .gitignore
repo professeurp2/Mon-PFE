@@ -1,0 +1,29 @@
+# LaTeX and TeX build artifacts
+*.aux
+*.log
+*.toc
+*.lof
+*.lot
+*.out
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.pdf
+*.dvi
+*.ps
+
+# Dependencies
+*.sty
+*.cls
+*.bib.backup
+
+# Temporary files
+*.tmp
+*.backup
+*~
+
+# System files
+.DS_Store
+Thumbs.db
